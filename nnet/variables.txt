@@ -1,0 +1,7 @@
+OUT category 0
+TEMP float +1
+PCR_1 float +1 
+DIARR category 0
+AST_1 float +1
+AlkPhos_1 float +1
+TCo2_1 float -1

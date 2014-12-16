@@ -1,0 +1,25 @@
+Outcome	category	1:Died;0:Discharged
+Temperature	float	32.2,39.9
+Diarrhea	category	1:Yes;0:No
+Viral load day 1	float	0.16,18.26
+Total Protein [g/L] day 1	float	39,132
+Vomit	category	1:Yes;0:No
+Aspartate Aminotransferase [U/L] day 1	float	22,2,000.01
+Alkaline Phosphatase [U/L] day 1	float	0.49,1,545
+Edema	category	1:Yes;0:No
+Weakness	category	1:Yes;0:No
+Confusion	category	1:Yes;0:No
+Total Carbon Dioxide [mmol/L] day 1	float	4.99,34
+Hearth rate	float	60,160
+Chloride [mmol/L] day 1	float	79.99,128
+Alanine Aminotransferase [U/L] day 1	float	11,2,000.01
+Creatinine [umol/L] day 1	float	17.99,1,589
+Respiratory rate	float	20,76
+Dizziness	category	1:Yes;0:No
+Potassium [mmol/L] day 1	float	2.4,8.51
+Albumin [g/L] day 1	float	13,65.01
+Calcium [mmol/L] day 1	float	0.99,3.37
+Blood Urea Nitrogen [mmol urea/L] day 1	float	1.5,64.81
+Hearing	category	1:Yes;0:No
+Rash	category	1:Yes;0:No
+Sodium [mmol/L] day 1	float	114,181
