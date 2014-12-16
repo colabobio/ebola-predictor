@@ -40,7 +40,7 @@ python test.py
 
 7) To generate a graphical representation of the neural network where use
 
-pyton nnet.py
+python nnet.py
 
 The grey nodes represent the bias terms, red edges correspond to negative weights, and
 blue edges to positive edges. The width of the edges is proportional to the weight, 
