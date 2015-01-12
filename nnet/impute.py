@@ -9,6 +9,7 @@ import rpy2.robjects as robjects
 var_file = "variables.txt"
 training_file = "training-data.csv"
 aggregated_file = "training-data-imputed.csv"
+amcheck_opt = "FALSE"
 
 model_variables = []
 var_types = {}
@@ -62,17 +63,17 @@ for i in range(0, len(model_variables)):
         min_str = min_str + str(bounds[i][0])
         max_str = max_str + str(bounds[i][1])
 bds_str = idx_str + ", " + min_str + ", " + max_str
-robjects.r('num_bounds <- matrix(c(' + bds_str + '), nrow = ' + str(num_vars) +', ncol = 3)')
+robjects.r('num_bounds <- matrix(c(' + bds_str + '), nrow=' + str(num_vars) +', ncol=3)')
         
 num_imputed = 10
 if 1 < len(sys.argv):
     num_imputed = int(sys.argv[1])
 
 robjects.r('library(Amelia)')
-robjects.r('trdat <- read.table("' + training_file + '", sep = ",", header=TRUE, na.strings="?")')
+robjects.r('trdat <- read.table("' + training_file + '", sep=",", header=TRUE, na.strings="?")')
 robjects.r('nom_vars = c(' + nom_rstr + ')')
-robjects.r('imdat <- amelia(trdat, m = ' + str(num_imputed) + ', noms = nom_vars, bounds = num_bounds, max.resample = 10000)')
-robjects.r('write.amelia(obj=imdat, file.stem="training-data-", format="csv", row.names = FALSE)')
+robjects.r('imdat <- amelia(trdat, m=' + str(num_imputed) + ', noms=nom_vars, bounds=num_bounds, max.resample = 10000, amcheck=' + amcheck_opt + ')')
+robjects.r('write.amelia(obj=imdat, file.stem="training-data-", format="csv", row.names=FALSE)')
 
 print "Aggregating imputed datasets..."
 aggregated_data = []
