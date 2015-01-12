@@ -9,7 +9,7 @@ import rpy2.robjects as robjects
 var_file = "variables.txt"
 training_file = "training-data.csv"
 aggregated_file = "training-data-imputed.csv"
-amcheck_opt = "FALSE"
+incheck_opt = "FALSE"
 
 model_variables = []
 var_types = {}
@@ -72,7 +72,7 @@ if 1 < len(sys.argv):
 robjects.r('library(Amelia)')
 robjects.r('trdat <- read.table("' + training_file + '", sep=",", header=TRUE, na.strings="?")')
 robjects.r('nom_vars = c(' + nom_rstr + ')')
-robjects.r('imdat <- amelia(trdat, m=' + str(num_imputed) + ', noms=nom_vars, bounds=num_bounds, max.resample = 10000, amcheck=' + amcheck_opt + ')')
+robjects.r('imdat <- amelia(trdat, m=' + str(num_imputed) + ', noms=nom_vars, bounds=num_bounds, max.resample = 10000, incheck=' + incheck_opt + ')')
 robjects.r('write.amelia(obj=imdat, file.stem="training-data-", format="csv", row.names=FALSE)')
 
 print "Aggregating imputed datasets..."
