@@ -52,7 +52,7 @@ for r in range(0, len(all_data)):
     else:
         training_data.append(row)    
 
-print "Writing training set..."
+print "Writing train set..."
 with open(training_file, "wb") as trfile:
     writer = csv.writer(trfile, delimiter=",", quotechar='"', quoting=csv.QUOTE_MINIMAL)
     writer.writerow(model_variables)
@@ -60,7 +60,7 @@ with open(training_file, "wb") as trfile:
         writer.writerow(row)
 print "Done, wrote",len(training_data),"rows."
 
-print "Writing training set..."
+print "Writing test set..."
 with open(testing_file, "wb") as tefile:
     writer = csv.writer(tefile, delimiter=",", quotechar='"', quoting=csv.QUOTE_MINIMAL)
     writer.writerow(model_variables)
