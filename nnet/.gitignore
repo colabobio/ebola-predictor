@@ -1,3 +1,4 @@
 predictor.txt
 training-data*.csv
 testing-data.csv
+makepredictions.pyc
