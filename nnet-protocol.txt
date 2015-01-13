@@ -46,17 +46,17 @@ normalized by the maximum weight within that layer.
 
 8) Calculates and prints calibration and discrimination of predictive model.
 
-python nnet/eval.py 1
+python nnet/nnet-eval.py 1
 
 9) Creates calibration plot and Hosmer-Lemeshow statistics.
 
-python nnet/eval.py 2
+python nnet/nnet-eval.py 2
 
 10) Prints out a basic  classification report to evaluate predictive model. Includes
 precision, recall, F1 score.
 
-python nnet/eval.py 3
+python nnet/nnet-eval.py 3
 
 11) Computes and plots the ROC Curve from the predictive model.
 
-python nnet/eval.py 4
+python nnet/nnet-eval.py 4
