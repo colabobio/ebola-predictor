@@ -6,7 +6,7 @@ import sys
 import pandas as pd
 import numpy as np
 
-testing_filename = "testing-data.csv"
+testing_filename = "./data/testing-data.csv"
 
 def linear_index(mat_idx, N, L, S, K):
     l = mat_idx[0] # layer
@@ -124,7 +124,7 @@ df = pd.read_csv(testing_filename, delimiter=",", na_values="?")
 M = df.shape[0]
 N = df.shape[1]
 
-with open("predictor.txt", "rb") as pfile:
+with open("./data/predictor.txt", "rb") as pfile:
     i = 0
     for line in pfile.readlines():
         [name, value] = line.strip().split(":")

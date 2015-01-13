@@ -9,7 +9,7 @@ import numpy as np
 from scipy.optimize import fmin_bfgs
 import matplotlib.pyplot as plt
 
-training_filename = "training-data-imputed.csv"
+training_filename = "./data/training-data-imputed.csv"
 
 iter      = 1     # Number of training runs 
 trainf    = 1     # Fraction of rows from training data to use in each training iteration.
@@ -333,4 +333,4 @@ print ""
 print "***************************************"
 print "Best predictor:"
 print_theta(best_theta, N, L, S, K)
-save_theta("predictor.txt", best_theta, N, L, S, K)
+save_theta("./data/predictor.txt", best_theta, N, L, S, K)

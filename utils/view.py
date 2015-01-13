@@ -10,11 +10,11 @@ from pandas.tools.plotting import scatter_matrix
 import numpy as np
 import matplotlib.pyplot as plt
 
-var_file = "variables.txt"
-training_filename = "training-data-imputed.csv"
-# training_filename = "training-data.csv"
-# training_filename = "training-data-1.csv"
-# training_filename = "testing-data.csv"
+var_file = "./data/variables.txt"
+training_filename = "./data/training-data-imputed.csv"
+# training_filename = "./data/training-data.csv"
+# training_filename = "./data/training-data-1.csv"
+# training_filename = "./data/testing-data.csv"
 
 var_types = {}
 with open(var_file, "rb") as vfile:

@@ -4,10 +4,10 @@ This script creates the training and testing sets.
 
 import sys, csv, random
 
-var_file = "variables.txt"
-input_file = "profile-data.tsv"
-training_file = "training-data.csv"
-testing_file = "testing-data.csv"
+var_file = "./data/variables.txt"
+input_file = "./data/profile-data.tsv"
+training_file = "./data/training-data.csv"
+testing_file = "./data/testing-data.csv"
 
 model_variables = []
 with open(var_file, "rb") as vfile:

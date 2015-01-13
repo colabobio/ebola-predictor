@@ -47,7 +47,7 @@ def predict(x, theta, N, L, S, K):
     h = a[L]
     return h
 
-def nnet_pred(testing_filename = "./data/testing-data.csv", predict_filename = "./data/predictor.txt"):
+def nnet_pred(testing_filename = "testing-data.csv", predict_filename = "predictor.txt"):
 	# Return probabilities, test binary values
 	
 	df = pd.read_csv(testing_filename, delimiter=",", na_values="?")

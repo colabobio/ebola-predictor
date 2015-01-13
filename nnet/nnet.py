@@ -10,8 +10,8 @@
 import numpy as np
 from matplotlib import pyplot as plt
 
-pred_file = "predictor.txt"
-var_file = "variables.txt"
+pred_file = "./data/predictor.txt"
+var_file = "./data/variables.txt"
 
 def linear_index(mat_idx, N, L, S, K):
     l = mat_idx[0] # layer

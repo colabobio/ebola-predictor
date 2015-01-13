@@ -6,9 +6,9 @@ training dataset using all the imputed datasets from Amelia.
 import sys, csv
 import rpy2.robjects as robjects
 
-var_file = "variables.txt"
-training_file = "training-data.csv"
-aggregated_file = "training-data-imputed.csv"
+var_file = "./data/variables.txt"
+training_file = "./data/training-data.csv"
+aggregated_file = "./data/training-data-imputed.csv"
 incheck_opt = "FALSE"
 
 model_variables = []
@@ -73,12 +73,12 @@ robjects.r('library(Amelia)')
 robjects.r('trdat <- read.table("' + training_file + '", sep=",", header=TRUE, na.strings="?")')
 robjects.r('nom_vars = c(' + nom_rstr + ')')
 robjects.r('imdat <- amelia(trdat, m=' + str(num_imputed) + ', noms=nom_vars, bounds=num_bounds, max.resample = 10000, incheck=' + incheck_opt + ')')
-robjects.r('write.amelia(obj=imdat, file.stem="training-data-", format="csv", row.names=FALSE)')
+robjects.r('write.amelia(obj=imdat, file.stem="./data/training-data-", format="csv", row.names=FALSE)')
 
 print "Aggregating imputed datasets..."
 aggregated_data = []
 for i in range(1, num_imputed + 1):
-    filename = "training-data-" + str(i) + ".csv"
+    filename = "./data/training-data-" + str(i) + ".csv"
     print "  Reading " + filename
     with open(filename, "rb") as ifile:
         reader = csv.reader(ifile, delimiter=",")

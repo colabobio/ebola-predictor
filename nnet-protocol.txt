@@ -1,64 +1,62 @@
 NEURAL NETWORK PREDICTOR V0
 
-0) Create variables.txt file with list of variables to use in the model. Each line in this
-file should contain the name of a variable (the short name, not the alias), followed by 
-its Mirador type (separated by a space), which should be int, float, category, etc.
+0) Create variables.txt file in data dir with list of variables to use in the model. Each line in this file should contain the name of a variable (the short name, not the alias), followed by its Mirador type (separated by a space), which should be int, float, category, etc.
 
 1) See to see summary of missingness with the currently selected variables:
 
-python missing.py
+python utils/missing.py
 
 2) Create initial training and testing sets. The testing set is formed by a percentage of 
 the complete rows, i.e.: those rows that don't have missing values for any of the selected
 variables. The percentage is set to 75% by default, and it can be specified as an argument
 for the script:
 
-python makesets.py 70
+python utils/makesets.py 70
 
 3) Create imputed datasets using Amelia and combine them into aggregated training dataset.
 By default the number of imputed datasets is 10, but it can be specified as an argument
 for the script:
 
-python impute.py 5
+python utils/impute.py 5
 
 4) Generates a scatterplot matrix between all the independent variables in the model, 
 labelled by the value of the dependent variable:
 
-python view.py
+python utils/view.py
 
 5) Train the neural network , and save optimal parameters to predictor.txt using the 
 default parameters:
 
-python train.py
+python nnet/train.py
 
 The training algorithm has several parameters that can be edited inside the code.
 
 6) Run predictor on test set, and calculate confusion matrix, accuracy, sensitivity and 
 precision. Also prints the cases the predictor failed on:
 
-python test.py
+python nnet/test.py
 
 7) To generate a graphical representation of the neural network where use
 
-python nnet.py
+python nnet/nnet.py
 
 The grey nodes represent the bias terms, red edges correspond to negative weights, and
 blue edges to positive edges. The width of the edges is proportional to the weight, 
 normalized by the maximum weight within that layer.
 
-8) Prints out a basic  classification report to evaluate predictive model. Includes
+8) Calculates and prints calibration and discrimination of predictive model.
+
+python nnet/eval.py 1
+
+9) Creates calibration plot and Hosmer-Lemeshow statistics.
+
+python nnet/eval.py 2
+
+10) Prints out a basic  classification report to evaluate predictive model. Includes
 precision, recall, F1 score.
 
-python classificationreport.py
+python nnet/eval.py 3
 
-9) Computes and plots the ROC Curve from the predictive model.
+11) Computes and plots the ROC Curve from the predictive model.
 
-python roc.py
-
-10) Calculates and prints calibration and discrimination of predictive model.
-
-python calibrationdiscrimination.py
-
-11) Creates calibration plot and Hosmer-Lemeshow statistics.
-
-python calplot.py
+python nnet/eval.py 4

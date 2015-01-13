@@ -1,7 +1,6 @@
 # Taken from https://github.com/EricChiang/churn/blob/master/churn_measurements.py
 
 from __future__ import division
-from makepredictions import nnet_pred
 
 import numpy as np
 
@@ -78,8 +77,7 @@ def discrimination(prob,outcome,n_bins=10):
         # Squared distance between true and base times num of obs
         d += np.sum(in_bin) * ((true_bin_prob - base_prob) ** 2)
     return d / len(prob)
-
-probs, y_test = nnet_pred()
     
-print "Calibration: ", calibration(probs,y_test)
-print "Discrimination: ", discrimination(probs,y_test)
+def caldis(probs, y_test):
+	print "Calibration: ", calibration(probs,y_test)
+	print "Discrimination: ", discrimination(probs,y_test)

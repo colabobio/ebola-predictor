@@ -4,8 +4,8 @@ This script simply gives information on the missingness in the input file.
 
 import csv
 
-var_file = "variables.txt"
-input_file = "profile-data.tsv"
+var_file = "./data/variables.txt"
+input_file = "./data/profile-data.tsv"
 
 model_variables = []
 with open(var_file, "rb") as vfile:
