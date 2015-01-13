@@ -45,3 +45,20 @@ python nnet.py
 The grey nodes represent the bias terms, red edges correspond to negative weights, and
 blue edges to positive edges. The width of the edges is proportional to the weight, 
 normalized by the maximum weight within that layer.
+
+8) Prints out a basic  classification report to evaluate predictive model. Includes
+precision, recall, F1 score.
+
+python classificationreport.py
+
+9) Computes and plots the ROC Curve from the predictive model.
+
+python roc.py
+
+10) Calculates and prints calibration and discrimination of predictive model.
+
+python calibrationdiscrimination.py
+
+11) Creates calibration plot and Hosmer-Lemeshow statistics.
+
+python calplot.py
