@@ -1,0 +1,59 @@
+DECISION TREE PREDICTOR V0
+
+0) Create variables.txt file in data dir with list of variables to use in the model. Each line in this file should contain the name of a variable (the short name, not the alias), followed by its Mirador type (separated by a space), which should be int, float, category, etc.
+
+1) See to see summary of missingness with the currently selected variables:
+
+python utils/missing.py
+
+2) Create initial training and testing sets. The testing set is formed by a percentage of 
+the complete rows, i.e.: those rows that don't have missing values for any of the selected
+variables. The percentage is set to 75% by default, and it can be specified as an argument
+for the script:
+
+python utils/makesets.py 70
+
+3) Create imputed datasets using Amelia and combine them into aggregated training dataset.
+By default the number of imputed datasets is 10, but it can be specified as an argument
+for the script:
+
+python utils/impute.py 5
+
+4) Generates a scatterplot matrix between all the independent variables in the model, 
+labelled by the value of the dependent variable:
+
+python utils/view.py
+
+5) Train the decision tree , and save pickled model to data/dt-model.p:
+
+python dt/dt_train.py
+
+6) Run predictor on test set, and calculate confusion matrix, accuracy, sensitivity and 
+precision. Also prints the cases the predictor failed on:
+
+python dt/dt_test.py
+
+7) To generate a graphical representation of the decision tree use
+
+python dt/dt_draw.py
+
+The grey nodes represent the bias terms, red edges correspond to negative weights, and
+blue edges to positive edges. The width of the edges is proportional to the weight, 
+normalized by the maximum weight within that layer.
+
+8) Calculates and prints calibration and discrimination of predictive model.
+
+python dt/dt_eval.py 1
+
+9) Creates calibration plot and Hosmer-Lemeshow statistics.
+
+python dt/dt_eval.py 2
+
+10) Prints out a basic  classification report to evaluate predictive model. Includes
+precision, recall, F1 score.
+
+python dt/dt_eval.py 3
+
+11) Computes and plots the ROC Curve from the predictive model.
+
+python dt/dt_eval.py 4
