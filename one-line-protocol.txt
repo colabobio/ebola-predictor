@@ -1,0 +1,7 @@
+MIXED PREDICTOR ONE LINE PROTOCOL V0
+
+python main.py -n [number of neural nets] -d [number of decision trees] -s [outfile for model] -e [evaluation method numbers ...]
+
+You will need to pip install cloud.
+
+All arguments are optional.

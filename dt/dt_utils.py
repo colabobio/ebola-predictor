@@ -39,3 +39,15 @@ def dt_pred(testing_filename = "./data/testing-data.csv", model_filename = "./da
 	probs = [x[1] for x in scores]
 	
 	return probs, y
+	
+def dt_pred_model(model_filename = "./data/dt-model.p"):
+
+	# Load the decision tree
+	clf = pickle.load(open( model_filename, "rb" ) )
+
+	def pred_model(X):
+		scores = clf.predict_proba(X)
+		probs = [x[1] for x in scores]
+		return probs
+
+	return pred_model

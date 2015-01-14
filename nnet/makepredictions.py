@@ -93,3 +93,35 @@ def nnet_pred(testing_filename = "./data/testing-data.csv", predict_filename = "
 	
 	return scores, y
 	
+def nnet_pred_model(predict_filename = "./data/predictor.txt"):
+	# Return a function that gives a prediction from a design matrix row
+	with open(predict_filename, "rb") as pfile:
+		i = 0
+		for line in pfile.readlines():
+			[name, value] = line.strip().split(":")
+			if i == 0:
+				N = int(value.strip()) + 1
+			elif i == 1:
+				L = int(value.strip()) + 1
+			elif i == 2:
+				S = int(value.strip()) + 1
+			elif i == 3:
+				K = int(value.strip())
+				R = (S - 1) * N + (L - 2) * (S - 1) * S + K * S
+				theta = np.ones(R)
+			else:
+				idx = [int(s.strip().split(" ")[1]) for s in name.split(",")]
+				n = linear_index(idx, N, L, S, K)
+				theta[n] = float(value.strip())
+			i = i + 1
+	
+	def pred_model(X):
+		scores = []
+
+		for i in range(0, len(X)):
+			scores.extend(predict(X[i,:], theta, N, L, S, K))
+	
+		return scores
+			
+	return pred_model
+	
