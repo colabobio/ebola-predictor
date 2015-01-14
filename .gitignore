@@ -1,0 +1,10 @@
+data/dt-model.p
+data/dt.pdf
+data/training-data-*.csv
+data/predictor.txt
+data/testing-data.csv
+data/training-data.csv
+nn-vs-dt.out
+dt/*.pyc
+nnet/*.pyc
+utils/*.pyc
