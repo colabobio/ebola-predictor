@@ -2,6 +2,7 @@
 Builds a text report showing precision, recall, F1 score.
 '''
 from sklearn.metrics import classification_report
+from sklearn.metrics import precision_recall_fscore_support
 
 def report(probs, y_test):
 
@@ -11,3 +12,5 @@ def report(probs, y_test):
 	report = classification_report(y_test, preds, target_names=target_names)
 
 	print report
+	
+	return precision_recall_fscore_support(y_test, preds)

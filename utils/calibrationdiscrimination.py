@@ -79,5 +79,10 @@ def discrimination(prob,outcome,n_bins=10):
     return d / len(prob)
     
 def caldis(probs, y_test):
-	print "Calibration: ", calibration(probs,y_test)
-	print "Discrimination: ", discrimination(probs,y_test)
+	c = calibration(probs,y_test)
+	d = discrimination(probs,y_test)
+
+	print "Calibration: ", c
+	print "Discrimination: ", d
+	
+	return c, d
