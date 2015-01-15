@@ -16,6 +16,7 @@ def roc(probs, y_test):
 	print "Area under the ROC curve : %f" % roc_auc
 
 	# Plot ROC curve
+	plt.clf()
 	plt.plot(fpr, tpr, label='ROC curve (area = %0.2f)' % roc_auc)
 	plt.plot([0, 1], [0, 1], 'k--')
 	plt.xlim([-0.1, 1.1])
