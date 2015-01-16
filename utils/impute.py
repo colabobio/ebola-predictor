@@ -71,7 +71,7 @@ def impute(num_imputed=10):
 	robjects.r('trdat <- read.table("' + training_file + '", sep=",", header=TRUE, na.strings="?")')
 	robjects.r('nom_vars = c(' + nom_rstr + ')')
 	
-    robjects.r('imdat <- amelia(trdat, m=' + str(num_imputed) + ', noms=nom_vars, bounds=num_bounds, max.resample = 10000, incheck=' + incheck_opt + ')')
+	robjects.r('imdat <- amelia(trdat, m=' + str(num_imputed) + ', noms=nom_vars, bounds=num_bounds, max.resample = 10000, incheck=' + incheck_opt + ')')
 	robjects.r('write.amelia(obj=imdat, file.stem="./data/training-data-", format="csv", row.names=FALSE)')        
         
 	print "Aggregating imputed datasets..."
