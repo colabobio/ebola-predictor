@@ -3,10 +3,10 @@ Build a predictive model that combines multiple nnets and DTs.
 '''
 
 import argparse
+import cloud
 import numpy as np
 import pandas as pd
-import cloud
-
+import rpy2.robjects as robjects
 
 from matplotlib import pyplot as plt
 
@@ -16,6 +16,7 @@ from dt.dt_train import train as dttrain
 from nnet.makepredictions import nnet_pred_model
 from nnet.train import train as nnettrain
 
+from utils.calplot import calplot
 from utils.evaluate import eval
 from utils.makesets import makesets
 from utils.impute import impute
@@ -86,7 +87,20 @@ def avg_cal_dis(pred_model_dict, X, y_test):
 	
 def calplots(pred_model_dict, X, y_test):
 	# Method 2
-	raise Exception("Not implemented")
+	colors = {'nnet' : 'red', 'dt' : 'blue'}
+	
+	robjects.r.X11()
+	
+	# Calculate the calibrations
+	for model_type in pred_model_dict:
+		for i, model in enumerate(pred_model_dict[model_type]):
+			probs = model(X)
+			calplot(probs, y_test, "data/calibration-"+model_type+str(i)+".txt", color=colors[model_type])
+			
+	# Plot the calibrations
+	print "Press Ctrl+C to quit"
+	while True:
+		continue
 	
 def avg_reports(pred_model_dict, X, y_test):
 	# Method 3

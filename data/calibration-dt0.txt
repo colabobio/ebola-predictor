@@ -1,0 +1,2 @@
+"total"	"meanpred"	"meanobs"	"predicted"	"observed"
+"[0,Inf]"	14	0,929	0,714	13	10
