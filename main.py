@@ -138,13 +138,13 @@ def avg_reports(pred_model_dict, X, y_test):
 def rocplots(pred_model_dict, X, y_test):
 	# Method 4
 	
-	markers = {'nnet' : 'o', 'dt' : 's'}
+	colors = {'nnet' : 'red', 'dt' : 'blue'}
 	plt.clf()
 	
 	for model_type in pred_model_dict:
 		for model in pred_model_dict[model_type]:
 			probs = model(X)
-			roc(probs, y_test, mark=markers[model_type], label=model_type, pltshow = False)
+			roc(probs, y_test, color=colors[model_type], label=model_type, pltshow = False)
 	
 	plt.show()
 	

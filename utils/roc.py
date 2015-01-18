@@ -8,7 +8,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 from sklearn.metrics import roc_curve, auc
 
-def roc(probs, y_test, mark='o', label='ROC curve', pltshow = True):
+def roc(probs, y_test, color='red', label='ROC curve', pltshow = True):
 
 	# Compute ROC curve and area the curve
 	fpr, tpr, thresholds = roc_curve(y_test, probs)
@@ -16,7 +16,7 @@ def roc(probs, y_test, mark='o', label='ROC curve', pltshow = True):
 	print "Area under the ROC curve : %f" % roc_auc
 
 	# Plot ROC curve
-	plt.plot(fpr, tpr, label=label, marker=mark)
+	plt.plot(fpr, tpr, label=label, marker='o', c=color)
 	plt.plot([0, 1], [0, 1], 'k--')
 	plt.xlim([-0.1, 1.1])
 	plt.ylim([-0.1, 1.1])
