@@ -5,6 +5,7 @@ data/predictor.txt
 data/testing-data.csv
 data/training-data.csv
 nn-vs-dt.out
+model*.p
 dt/*.pyc
 nnet/*.pyc
 utils/*.pyc
