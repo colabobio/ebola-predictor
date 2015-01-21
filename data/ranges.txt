@@ -1,0 +1,2 @@
+DIAG category 1
+AGE int 0,100

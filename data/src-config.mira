@@ -1,0 +1,13 @@
+project.title=EVD dataset
+data.source=data.csv
+data.dictionary=dictionary.csv
+data.groups=groups.xml
+data.binary=data.bin
+missing.string=\N
+missing.threshold=MISS_IGNORE
+dates.parse=yyyy-MM-dd
+dates.print=d MMM yy
+correlation.pvalue=P_IGNORE
+correlation.algorithm=SURROGATE_GAUSS
+correlation.surrogates=100
+correlation.threshold=0.001

@@ -1,11 +1,11 @@
-'''
+"""
 This script simply gives information on the missingness in the input file.
-'''
+"""
 
 import csv
 
 var_file = "./data/variables.txt"
-input_file = "./data/profile-data.tsv"
+input_file = "./data/src-data.csv"
 
 model_variables = []
 with open(var_file, "rb") as vfile:
@@ -18,7 +18,7 @@ complete_count = 0
 missing_count = [0] * len(model_variables)
 
 with open(input_file, "rb") as ifile:
-    reader = csv.reader(ifile, delimiter="\t")
+    reader = csv.reader(ifile)
     titles = reader.next()
     model_idx = [titles.index(var) for var in model_variables]
     r = 0 
