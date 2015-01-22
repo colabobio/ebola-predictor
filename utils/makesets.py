@@ -1,5 +1,7 @@
 """
-This script creates the training and testing sets.
+This script creates the training and test sets.
+
+@copyright: The Broad Institute of MIT and Harvard 2015
 """
 
 import sys, csv, random
@@ -10,7 +12,7 @@ range_file = "./data/ranges.txt"
 training_file = "./data/training-data.csv"
 testing_file = "./data/testing-data.csv"
    
-def makesets(test_percentage = 75):
+def makesets(test_percentage):
     input_file = ""
     with open(src_file, "rb") as sfile:
         for line in sfile.readlines():
@@ -93,7 +95,7 @@ def makesets(test_percentage = 75):
     print "Done, wrote",len(testing_data),"rows."
 
 if __name__ == "__main__":
-    test_percentage = 75
+    test_percentage = 50
     if 1 < len(sys.argv):
         test_percentage = float(sys.argv[1])
     makesets(test_percentage)

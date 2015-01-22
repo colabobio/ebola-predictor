@@ -1,12 +1,13 @@
 """
-This script simply gives information on the missingness in the input file.
+This script gives information on the missingness in the input file.
+
+@copyright: The Broad Institute of MIT and Harvard 2015
 """
 
 import csv
 
 src_file = "./data/sources.txt"
 var_file = "./data/variables.txt"
-input_file = "./data/src-data.csv"
 
 input_file = ""
 with open(src_file, "rb") as sfile:
