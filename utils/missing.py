@@ -4,8 +4,15 @@ This script simply gives information on the missingness in the input file.
 
 import csv
 
+src_file = "./data/sources.txt"
 var_file = "./data/variables.txt"
 input_file = "./data/src-data.csv"
+
+input_file = ""
+with open(src_file, "rb") as sfile:
+    for line in sfile.readlines():
+        [key, val] = line.split("=")
+        if key == "data": input_file = val.strip()
 
 model_variables = []
 with open(var_file, "rb") as vfile:

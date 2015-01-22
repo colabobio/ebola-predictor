@@ -1,16 +1,22 @@
-'''
+"""
 This script creates the training and testing sets.
-'''
+"""
 
 import sys, csv, random
 
+src_file = "./data/sources.txt"
 var_file = "./data/variables.txt"
 range_file = "./data/ranges.txt"
-input_file = "./data/src-data.csv"
 training_file = "./data/training-data.csv"
 testing_file = "./data/testing-data.csv"
    
 def makesets(test_percentage = 75):
+    input_file = ""
+    with open(src_file, "rb") as sfile:
+        for line in sfile.readlines():
+            [key, val] = line.split("=")
+            if key == "data": input_file = val.strip()
+
     model_variables = []
     with open(var_file, "rb") as vfile:
         for line in vfile.readlines():
@@ -70,7 +76,7 @@ def makesets(test_percentage = 75):
         else:
             training_data.append(row)    
 
-    print "Writing train set..."
+    print "Writing training set..."
     with open(training_file, "wb") as trfile:
         writer = csv.writer(trfile, delimiter=",", quotechar='"', quoting=csv.QUOTE_MINIMAL)
         writer.writerow(model_variables)
