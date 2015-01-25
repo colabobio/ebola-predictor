@@ -1,11 +1,12 @@
 data/dt-model.p
+data/eps-model.p
 data/dt.pdf
 data/training-data-*.csv
 data/predictor.txt
 data/testing-data.csv
 data/training-data.csv
-nn-vs-dt.out
 model*.p
 dt/*.pyc
 nnet/*.pyc
 utils/*.pyc
+eps/*.pyc
