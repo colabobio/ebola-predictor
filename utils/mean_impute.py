@@ -1,7 +1,9 @@
-'''
+"""
 This script imputes the missing values using means.
 It should not be used in practice! Just for dev purposes.
-'''
+
+@copyright: The Broad Institute of MIT and Harvard 2015
+"""
 
 import numpy as np
 import pandas as pd

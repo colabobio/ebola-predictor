@@ -1,0 +1,10 @@
+AGE float 45
+PCR_MAX float 5
+TEMP float 38
+DIARR category 1
+WEAK category 1
+DIZZI category 1
+PABD category 1
+BUN_1 float 10.8
+Cr_1 float 264.9
+AST_1 float 500

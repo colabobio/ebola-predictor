@@ -6,19 +6,11 @@ import sys
 import pandas as pd
 import numpy as np
 
-testing_filename = "testing-data.csv"
+from eps_utils import design_matrix, eps_dataframe, eps_pred
 
-def sigmoid(v):
-    return 1 / (1 + np.exp(-v))
+testing_filename = "./data/testing-data.csv"
 
-def print_theta(theta, names):
-    print "---------------------------------------"
-    print "Predictor parameters:"
-    print "{:10s} {:2.4f}".format("Intercept", theta[0])
-    for i in range(1, N):
-        print "{:10s} {:3.5f}".format(names[i-1], theta[i])
-
-def evaluate(X, y, theta):
+def evaluate(probs, y):
     n_total = 0
     
     n_out1 = 0
@@ -31,9 +23,7 @@ def evaluate(X, y, theta):
     
     failed_preds = []
     
-    for i in range(0, M):
-        n_total = n_total + 1
-        p = sigmoid(np.dot(X[i,:], theta))
+    for i, p in enumerate(probs):
         pred = 0.5 < p
         
         if pred == 1:
@@ -53,6 +43,8 @@ def evaluate(X, y, theta):
             n_out1 = n_out1 + 1
         else:    
             n_out0 = n_out0 + 1
+        
+        n_total = n_total + 1
     
     hit_rate = float(n_hit) / n_out1
     correct_rej_rate = float(n_correct_rej) / n_out0    
@@ -79,46 +71,28 @@ def evaluate(X, y, theta):
     print "Null sensitivity     : 100%"
     print "Null precision       :", round(100 * float(n_out1) / n_total, 2), "%"
         
-    return failed_preds
-    
+    return failed_preds  
+
 ##########################################################################################
 
-# Main 
-    
-df = pd.read_csv(testing_filename, delimiter=",", na_values="?")
-M = df.shape[0]
-N = df.shape[1]
-vars = df.columns.values[1: N] 
+# Main
 
-theta = np.ones(N)
-with open("predictor.txt", "rb") as pfile:
-    i = 0
-    for line in pfile.readlines():
-        theta[i] = float(line.strip().split(' ')[1])
-        i = i + 1
+probs, y_test = eps_pred()
 
-y = df.values[:,0]
-# Building the (normalized) design matrix
-X = np.ones((M, N))
-for j in range(1, N):
-    # Computing i-th column. The pandas dataframe
-    # contains all the values as numpy arrays that
-    # can be handled individually:
-    values = df.values[:, j]
-    minv = values.min()
-    maxv = values.max()
-    X[:, j] = (values - minv) / (maxv - minv)
+print probs
 
-print_theta(theta, vars)
-fails = evaluate(X, y, theta)
+fails = evaluate(probs, y_test)
 
 print ""
 print "---------------------------------------"
 print "Failed predictions:"
 
 if fails:
-    for i in fails:
-        print "****** Patient", i, "******"
-        print df.ix[i]
+# 	df = pd.read_csv(testing_filename, delimiter=",", na_values="?")
+	df = eps_dataframe(testing_filename)
+	for i in fails:
+		print "****** Patient", i, "******"
+		print df.ix[i]
 else:
-    print "None!"
+    print "None!"    
+    

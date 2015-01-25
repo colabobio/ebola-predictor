@@ -1,7 +1,9 @@
-'''
+"""
 This script imputes the missing values using Amelia in R, and creates and aggregated 
 training dataset using all the imputed datasets from Amelia.
-'''
+
+@copyright: The Broad Institute of MIT and Harvard 2015
+"""
 
 import sys, csv
 import rpy2.robjects as robjects
@@ -11,7 +13,7 @@ training_file = "./data/training-data.csv"
 aggregated_file = "./data/training-data-imputed.csv"
 incheck_opt = "FALSE"
 
-def impute(num_imputed=10):
+def impute(num_imputed):
 	
 	model_variables = []
 	var_types = {}

@@ -11,21 +11,21 @@ training_filename = "./data/training-data-imputed.csv"
 model_file = "./data/dt-model.p"
 
 def train():
-	# Loading data frame
-	df = pd.read_csv(training_filename, delimiter=',', na_values="?")
+    # Loading data frame
+    df = pd.read_csv(training_filename, delimiter=',', na_values="?")
 
-	# Separating target from inputs
-	X, y = design_matrix(df)
+    # Separating target from inputs
+    X, y = design_matrix(df)
 
-	# Initializing DT classifier
-	clf = tree.DecisionTreeClassifier()
+    # Initializing DT classifier
+    clf = tree.DecisionTreeClassifier()
 
-	# Fitting DT classifier
-	clf.fit(X,y)
+    # Fitting DT classifier
+    clf.fit(X,y)
 
-	# Pickle and save
-	f = open(model_file, 'wb')
-	pickle.dump(clf, f)
+    # Pickle and save
+    f = open(model_file, 'wb')
+    pickle.dump(clf, f)
 	
 if __name__ == "__main__":
-	train()
+    train()
