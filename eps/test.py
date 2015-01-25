@@ -5,7 +5,6 @@ Evaluates the predictor on the test set.
 import sys
 import pandas as pd
 import numpy as np
-
 from eps_utils import design_matrix, eps_dataframe, eps_pred
 
 testing_filename = "./data/testing-data.csv"
