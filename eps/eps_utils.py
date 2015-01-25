@@ -25,7 +25,7 @@ def design_matrix(df):
 		
 	return X, y
 	
-def eps_dataframe(data_filename, threshold_filename="./eps7/thresholds.txt"):
+def eps_dataframe(data_filename, threshold_filename="./eps/thresholds.txt"):
     thresh_variables = []
     model_variables = []
     with open(threshold_filename, "rb") as tfile:

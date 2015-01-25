@@ -248,96 +248,96 @@ def save_theta(filename, theta, N, L, S, K):
 # Main
 
 def train():
-	global L
-	global params
-	global values
-	K = 1
+    global L
+    global params
+    global values
+    K = 1
 
-	if L < 1:
-		print "Need to have at least one hidden layer"
-		sys.exit(1)
+    if L < 1:
+        print "Need to have at least one hidden layer"
+        sys.exit(1)
 
-	L = L + 1
+    L = L + 1
 
-	# Loading data frame and initalizing dimensions
-	df = pd.read_csv(training_filename, delimiter=',', na_values="?")
-	M = df.shape[0]
-	N = df.shape[1]
-	S = int((N - 1) * hf) # includes the bias unit on each layer, so the number of units is S-1
-	print "Number of data samples          :", M
-	print "Number of independent variables :", N-1 
-	print "Number of hidden layers         :", L-1
-	print "Number of units per hidden layer:", S-1
-	print "Number of output classes        :", K
+    # Loading data frame and initalizing dimensions
+    df = pd.read_csv(training_filename, delimiter=',', na_values="?")
+    M = df.shape[0]
+    N = df.shape[1]
+    S = int((N - 1) * hf) # includes the bias unit on each layer, so the number of units is S-1
+    print "Number of data samples          :", M
+    print "Number of independent variables :", N-1 
+    print "Number of hidden layers         :", L-1
+    print "Number of units per hidden layer:", S-1
+    print "Number of output classes        :", K
 
-	# Number of parameters:
-	# * (S - 1) x N for the first weight natrix (N input nodes counting the bias term), into S-1 nodes in
-	#   the first hidden layer
-	# * (S - 1) x S for all the weight matrices in the hidden layers, which go from S (counting bias term)
-	#   into S-1 nodes in the next layer. Since L counts the number of hidden layers plus the output layer,
-	#   and the first transition was accounted by the first term, then we only need L-2
-	# * K x S, for the last transition into the output layer with K nodes
-	R = (S - 1) * N + (L - 2) * (S - 1) * S + K * S
+    # Number of parameters:
+    # * (S - 1) x N for the first weight natrix (N input nodes counting the bias term), into S-1 nodes in
+    #   the first hidden layer
+    # * (S - 1) x S for all the weight matrices in the hidden layers, which go from S (counting bias term)
+    #   into S-1 nodes in the next layer. Since L counts the number of hidden layers plus the output layer,
+    #   and the first transition was accounted by the first term, then we only need L-2
+    # * K x S, for the last transition into the output layer with K nodes
+    R = (S - 1) * N + (L - 2) * (S - 1) * S + K * S
 
-	best_theta = np.ones(R)
-	best_rate = 0
+    best_theta = np.ones(R)
+    best_rate = 0
 
-	y = df.values[:,0]
-	# Building the (normalized) design matrix
-	X = np.ones((M, N))
-	for j in range(1, N):
-		# Computing i-th column. The pandas dataframe
-		# contains all the values as numpy arrays that
-		# can be handled individually:
-		values = df.values[:, j]
-		minv = values.min()
-		maxv = values.max()
-		X[:, j] = (values - minv) / (maxv - minv)
+    y = df.values[:,0]
+    # Building the (normalized) design matrix
+    X = np.ones((M, N))
+    for j in range(1, N):
+        # Computing i-th column. The pandas dataframe
+        # contains all the values as numpy arrays that
+        # can be handled individually:
+        values = df.values[:, j]
+        minv = values.min()
+        maxv = values.max()
+        X[:, j] = (values - minv) / (maxv - minv)
 
-	for n in range(0, iter):
-		print "-------> Training iteration",n
+    for n in range(0, iter):
+        print "-------> Training iteration",n
 
-		# Create training set by randomly choosing 70% of rows from each output
-		# category
-		i0 = np.where(y == 0)
-		i1 = np.where(y == 1)
-		ri0 = np.random.choice(i0[0], size=0.7*i0[0].shape[0], replace=False)
-		ri1 = np.random.choice(i1[0], size=0.7*i1[0].shape[0], replace=False)
-		itrain = np.concatenate((ri1, ri0))
-		itrain.sort()
+        # Create training set by randomly choosing 70% of rows from each output
+        # category
+        i0 = np.where(y == 0)
+        i1 = np.where(y == 1)
+        ri0 = np.random.choice(i0[0], size=0.7*i0[0].shape[0], replace=False)
+        ri1 = np.random.choice(i1[0], size=0.7*i1[0].shape[0], replace=False)
+        itrain = np.concatenate((ri1, ri0))
+        itrain.sort()
 
-		Xtrain = X[itrain,:]
-		ytrain = y[itrain]
+        Xtrain = X[itrain,:]
+        ytrain = y[itrain]
 
-		theta0 = np.random.rand(R)
-		params = (Xtrain, ytrain, N, L, S, K, gamma)
+        theta0 = np.random.rand(R)
+        params = (Xtrain, ytrain, N, L, S, K, gamma)
 
-		# http://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.fmin_bfgs.html
-		print "Training Neural Network..."
-		values = np.array([])
-		theta = fmin_bfgs(cost, theta0, fprime=gradient, args=params, gtol=threshold, callback=debug)
-		print "Done!"
+        # http://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.fmin_bfgs.html
+        print "Training Neural Network..."
+        values = np.array([])
+        theta = fmin_bfgs(cost, theta0, fprime=gradient, args=params, gtol=threshold, callback=debug)
+        print "Done!"
 
-		if trainf < 1: 
-			[rate, rrate] = evaluate(X, y, itrain, theta)    
-			if best_rate < rate:
-				best_rate = rate
-				best_theta = theta
-		else:
-			best_theta = theta    
-	
-		plt.plot(np.arange(values.shape[0]), values)
-		plt.xlabel("Step number")
-		plt.ylabel("Cost function")    
+        if trainf < 1:
+            [rate, rrate] = evaluate(X, y, itrain, theta)
+            if best_rate < rate:
+                best_rate = rate
+                best_theta = theta
+        else:
+            best_theta = theta
 
-	if showp:    
-		plt.show()    
+        plt.plot(np.arange(values.shape[0]), values)
+        plt.xlabel("Step number")
+        plt.ylabel("Cost function")
 
-	print ""
-	print "***************************************"
-	print "Best predictor:"
-	print_theta(best_theta, N, L, S, K)
-	save_theta("./data/predictor.txt", best_theta, N, L, S, K)
-	
+    if showp:
+        plt.show()
+
+    print ""
+    print "***************************************"
+    print "Best predictor:"
+    print_theta(best_theta, N, L, S, K)
+    save_theta("./data/predictor.txt", best_theta, N, L, S, K)
+
 if __name__ == "__main__":
-	train()
+    train()

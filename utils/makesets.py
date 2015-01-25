@@ -5,6 +5,7 @@ This script creates the training and test sets.
 """
 
 import sys, csv, random
+import numpy as np
 
 src_file = "./data/sources.txt"
 var_file = "./data/variables.txt"
@@ -12,6 +13,26 @@ range_file = "./data/ranges.txt"
 training_file = "./data/training-data.csv"
 testing_file = "./data/testing-data.csv"
    
+# Returns a set of indices for the test set, making sure that both training and test 
+# set will have same fraction of outcomes
+def test_set(all_data, complete_rows, test_percentage):
+    outlist = []
+    for i in complete_rows:
+        row = all_data[i]
+        outlist.append(int(row[0]))
+    out = np.array(outlist)
+    i0 = np.where(out == 0)
+    i1 = np.where(out == 1)
+    f = test_percentage / 100.0
+    ri0 = np.random.choice(i0[0], size=f*i0[0].shape[0], replace=False)
+    ri1 = np.random.choice(i1[0], size=f*i1[0].shape[0], replace=False)
+    itest = np.concatenate((ri1, ri0))
+    itest.sort() 
+        
+    # itest contains the indices for the complete_rows list, which in turn is the list of
+    # indices in the original data, so we:
+    return np.array(complete_rows)[itest]
+    
 def makesets(test_percentage):
     input_file = ""
     with open(src_file, "rb") as sfile:
@@ -67,16 +88,16 @@ def makesets(test_percentage):
                 if not some_missing: complete_rows.append(r)
                 r = r + 1 
 
-    n = int(len(complete_rows) * (test_percentage / 100.0))
-    test_idx = random.sample(complete_rows, n)
+    test_idx = test_set(all_data, complete_rows, test_percentage)    
     training_data = []
     testing_data = []
     for r in range(0, len(all_data)):
         row = all_data[r]
         if r in test_idx:
             testing_data.append(row)
+            print row
         else:
-            training_data.append(row)    
+            training_data.append(row)
 
     print "Writing training set..."
     with open(training_file, "wb") as trfile:
