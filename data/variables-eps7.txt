@@ -1,0 +1,8 @@
+OUT category
+AGE float
+PCR float
+TEMP float
+DIARR category
+WEAK category
+DIZZI category
+PABD category
