@@ -49,8 +49,7 @@ def eps_dataframe(data_filename, threshold_filename="./eps/thresholds.txt"):
                 if var["type"] == "category": 
                     score = score + (1 if row[i] == var["threshold"] else 0) 
                 else:
-                    score = score + (1 if float(row[i]) > float(var["threshold"]) else 0)
-#             print out, score
+                    score = score + (1 if float(row[i]) >= float(var["threshold"]) else 0)
             index.append(count)
             data.append([float(out), float(score)])
             count = count + 1

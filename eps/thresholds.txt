@@ -1,5 +1,5 @@
 AGE float 45
-PCR_MAX float 5
+PCR float 5
 TEMP float 38
 DIARR category 1
 WEAK category 1

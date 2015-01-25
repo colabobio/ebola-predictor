@@ -51,6 +51,7 @@ def makesets(test_percentage):
             parts = line.strip().split()        
             range_variables.append({"name":parts[0], "type":parts[1], "range":parts[2].split(",")})
 
+    ids = []
     all_data = []
     complete_rows = []
     with open(input_file, "rb") as ifile:
@@ -84,6 +85,7 @@ def makesets(test_percentage):
                 inside_range = inside_range and test
                    
             if not all_missing and not missing_dvar and inside_range:
+                ids.append(row[0])
                 all_data.append([row[idx].replace("\\N", "?") for idx in model_idx])
                 if not some_missing: complete_rows.append(r)
                 r = r + 1 
@@ -95,7 +97,6 @@ def makesets(test_percentage):
         row = all_data[r]
         if r in test_idx:
             testing_data.append(row)
-            print row
         else:
             training_data.append(row)
 

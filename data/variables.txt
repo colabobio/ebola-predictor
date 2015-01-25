@@ -1,8 +1,11 @@
 OUT category
 AGE float
-PCR_MAX float
+PCR float
 TEMP float
 DIARR category
 WEAK category
 DIZZI category
 PABD category
+BUN_1 float
+Cr_1 float
+AST_1 float
