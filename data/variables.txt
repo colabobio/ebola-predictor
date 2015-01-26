@@ -1,11 +1,6 @@
 OUT category
-AGE float
-PCR float
 TEMP float
-DIARR category
-WEAK category
+VOMIT category
 DIZZI category
-PABD category
-BUN_1 float
-Cr_1 float
 AST_1 float
+TCo2_1 float

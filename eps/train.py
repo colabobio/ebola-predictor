@@ -11,7 +11,6 @@ import pickle
 from sklearn import linear_model
 from eps_utils import design_matrix, eps_dataframe
 
-
 training_filename = "./data/training-data-imputed.csv"
 model_file = "./data/eps-model.p"
 

@@ -8,3 +8,6 @@ PABD category 1
 BUN_1 float 10.8
 Cr_1 float 264.9
 AST_1 float 500
+TCo2_1 float <14
+VOMIT category 1
+HRATE float 110
