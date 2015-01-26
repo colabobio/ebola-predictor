@@ -37,8 +37,7 @@ def makesets(test_percentage):
     input_file = ""
     with open(src_file, "rb") as sfile:
         for line in sfile.readlines():
-            [key, val] = line.strip().split("=")
-            if key == "data": input_file = val
+            input_file = line.strip()
 
     model_variables = []
     with open(var_file, "rb") as vfile:

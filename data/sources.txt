@@ -1,2 +1,1 @@
-data=/Users/andres/code/research/mirador/ebola/mirador/data.csv
-dict=/Users/andres/code/research/mirador/ebola/mirador/dictionary.csv
+/Users/andres/code/research/mirador/ebola/mirador/data.csv
