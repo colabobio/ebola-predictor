@@ -1,6 +1,6 @@
 OUT category
+PCR float
 TEMP float
-VOMIT category
-DIZZI category
+DIARR category
+WEAK category
 AST_1 float
-TCo2_1 float
