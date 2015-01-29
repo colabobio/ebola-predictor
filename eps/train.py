@@ -7,7 +7,8 @@ Trains the Ebola Prognostic Score (EPS) predictor.
 import csv
 import pandas as pd
 import pickle
-# from sklearn import tree
+from sklearn import tree
+from sklearn import svm
 from sklearn import linear_model
 from eps_utils import design_matrix, eps_dataframe
 
@@ -21,9 +22,9 @@ def train(df):
     # Initializing DT classifier
 #     clf = tree.DecisionTreeClassifier()
     clf = linear_model.LogisticRegression()
+#     clf = svm.SVC(probability=True)
 
     # Fitting DT classifier
-#     clf.fit(X,y)
     clf.fit(X, y)
 
     # Pickle and save
