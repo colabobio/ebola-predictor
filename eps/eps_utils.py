@@ -7,7 +7,7 @@ import numpy as np
 import pandas as pd
 import pickle
 
-use_naive_classifier = True
+use_naive_classifier = False
 
 def design_matrix(df):
 	M = df.shape[0]
@@ -71,16 +71,13 @@ def eps_pred(testing_filename = "./data/testing-data.csv", model_filename = "./d
 	df = eps_dataframe(testing_filename)
 	X, y = design_matrix(df)
 	
-	
-	# Load the decision tree
-	clf = pickle.load(open( model_filename, "rb" ) )
-
-	# Make predictions
-	scores = clf.predict_proba(X)
-	
 	if use_naive_classifier:
 		probs = [0 if s < 2 else 1 for s in df["SCORE"]]
 	else:
+		# Load the classifier
+		clf = pickle.load(open( model_filename, "rb" ) )
+		# Make predictions
+		scores = clf.predict_proba(X)	
 		probs = [x[1] for x in scores]
 	
 	return probs, y
