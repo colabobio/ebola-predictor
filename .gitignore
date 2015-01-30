@@ -2,6 +2,7 @@ data/dt-model.p
 data/eps-model.p
 data/dt.pdf
 data/training-data-*.csv
+data/testing-data-*.csv
 data/predictor.txt
 data/testing-data.csv
 data/training-data.csv
