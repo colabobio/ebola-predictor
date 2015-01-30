@@ -8,7 +8,7 @@ def report(probs, y_test):
 
 	preds = [int(0.5 < p) for p in probs]
 
-	target_names = ['Died', 'Survived']
+	target_names = ['Survived', 'Died']
 	report = classification_report(y_test, preds, target_names=target_names)
 
 	print report
