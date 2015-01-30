@@ -247,7 +247,7 @@ def save_theta(filename, theta, N, L, S, K):
 #
 # Main
 
-def train():
+def train(training_filename=training_filename):
     global L
     global params
     global values

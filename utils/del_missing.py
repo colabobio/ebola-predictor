@@ -8,7 +8,7 @@ import csv
 training_file = "./data/training-data.csv"
 out_file = "./data/training-data-imputed.csv"
 
-def remove():
+def remove(training_file=training_file, out_file=out_file):
     titles = []
     data = []
     with open(training_file, "rb") as ifile:

@@ -20,7 +20,10 @@ def design_matrix(df):
 		values = df.values[:, j]
 		minv = values.min()
 		maxv = values.max()
-		X[:, j] = (values - minv) / (maxv - minv)
+		if maxv>minv:
+			X[:, j] = (values - minv) / (maxv - minv)
+		else:
+			X[:, j] = 1.0/M
 		
 	return X, y
 	

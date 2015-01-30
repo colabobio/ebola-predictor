@@ -1,1 +1,1 @@
-/Users/andres/code/research/mirador/ebola/mirador/data.csv
+/Users/tomsilver/Documents/sabeti/ebola-predictor/data/data.csv

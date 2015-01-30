@@ -6,7 +6,7 @@ import rpy2.robjects as robjects
 
 test_file = "./data/testing-data.csv"
 
-def calplot(probs, y_test, out_file = "./data/calibration.txt", color='red'):
+def calplot(probs, test_file=test_file, out_file = "./data/calibration.txt", color='red'):
 	predrisk = 'c('+ ', '.join([str(p) for p in probs])+')'
 
 	robjects.r('par(new=TRUE)')

@@ -13,7 +13,7 @@ training_file = "./data/training-data.csv"
 aggregated_file = "./data/training-data-imputed.csv"
 incheck_opt = "FALSE"
 
-def impute(num_imputed):
+def impute(num_imputed, training_file=training_file, aggregated_file=aggregated_file):
 	
 	model_variables = []
 	var_types = {}

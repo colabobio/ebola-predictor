@@ -33,7 +33,7 @@ def test_set(all_data, complete_rows, test_percentage):
     # indices in the original data, so we:
     return np.array(complete_rows)[itest]
     
-def makesets(test_percentage):
+def makesets(test_percentage, testing_file=testing_file, training_file=training_file):
     input_file = ""
     with open(src_file, "rb") as sfile:
         for line in sfile.readlines():
