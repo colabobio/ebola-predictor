@@ -175,10 +175,19 @@ def avg_reports(file_ids):
 
 			output += '\n'
 			output += "Summary for "+model_type+'\n'
-			output += "Average precision: "+str(avg_prec)+'\n'
-			output += "Average recall: "+str(avg_rec)+'\n'
-			output += "Average F1: "+str(avg_f1)+'\n'
+			output += "{:10s} {:10s} {:10s} {:10s}".format("", "precision", "recall", "f1-score")+'\n'
+			output += "{:10s}      {:2.2f}    {:2.2f}        {:2.2f}".format("Survived", avg_prec[0], avg_rec[0], avg_f1[0])+'\n'
+			output += "{:10s}      {:2.2f}    {:2.2f}        {:2.2f}".format("Died", avg_prec[1], avg_rec[1], avg_f1[1])+'\n'
+			output += "{:10s}      {:2.2f}    {:2.2f}        {:2.2f}".format("Total", (avg_prec[0] + avg_prec[1])/2, (avg_rec[0]+avg_rec[1])/2, (avg_f1[0]+avg_f1[1])/2)+'\n'
 			output += '\n'
+
+
+# 			output += '\n'
+# 			output += "Summary for "+model_type+'\n'
+# 			output += "Average precision: "+str(avg_prec)+'\n'
+# 			output += "Average recall: "+str(avg_rec)+'\n'
+# 			output += "Average F1: "+str(avg_f1)+'\n'
+# 			output += '\n'
 	
 	print output
 	return output
