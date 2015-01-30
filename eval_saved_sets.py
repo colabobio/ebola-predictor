@@ -89,8 +89,8 @@ def avg_cal_dis(file_ids):
 	if N > 0:
 		for model_type in pred_model_dict:
 		
-			avg_cal = total_cal[model_type]/N
-			avg_dis = total_dis[model_type]/N
+			avg_cal = total_cal[model_type]/(1.0*N)
+			avg_dis = total_dis[model_type]/(1.0*N)
 
 			output += '\n'
 			output += "Summary for "+model_type+'\n'
@@ -169,9 +169,9 @@ def avg_reports(file_ids):
 	if N > 0:
 		for model_type in pred_model_dict:
 	
-			avg_prec = total_prec[model_type]/N
-			avg_rec = total_rec[model_type]/N
-			avg_f1 = total_f1[model_type]/N
+			avg_prec = total_prec[model_type]/(1.0*N)
+			avg_rec = total_rec[model_type]/(1.0*N)
+			avg_f1 = total_f1[model_type]/(1.0*N)
 
 			output += '\n'
 			output += "Summary for "+model_type+'\n'
@@ -220,6 +220,65 @@ def rocplots(file_ids):
 
     plt.show()
 
+def confusion_matrix(file_ids):
+	# Method 5
+	output = ''
+	
+	total_n_hit ={'eps': 0, 'dt': 0, 'nnet': 0}
+	total_n_false_alarm ={'eps': 0, 'dt': 0, 'nnet': 0}
+	total_n_miss ={'eps': 0, 'dt': 0, 'nnet': 0}
+	total_n_correct_rej ={'eps': 0, 'dt': 0, 'nnet': 0}
+
+	for id in file_ids:
+
+		train_file = "data/training-data-imputed-"+str(id)+".csv"
+		test_file = "data/testing-data-"+str(id)+".csv"
+
+		pred_model_dict = {'eps': build_eps(train_file), 'dt': build_dt(train_file), 'nnet': build_nnet(train_file)}
+		
+		df = pd.read_csv(test_file, delimiter=",", na_values="?")
+		X, y_test = design_matrix(df)
+		
+		X_eps = eps_dataframe(test_file)
+
+		for model_type, model in pred_model_dict.items():
+		
+			print "Evaluating "+model_type
+		
+			if model_type == 'eps':
+				probs = model(X_eps)
+			else:
+				probs = model(X)
+			
+			n_hit, n_false_alarm, n_miss, n_correct_rej = eval(probs, y_test, 5)
+			
+			total_n_hit[model_type] += n_hit
+			total_n_false_alarm[model_type] += n_false_alarm
+			total_n_miss[model_type] += n_miss
+			total_n_correct_rej[model_type] += n_correct_rej
+
+	N = len(file_ids)
+	
+	if N > 0:
+		for model_type in pred_model_dict:
+		
+			avg_n_hit = total_n_hit[model_type]/(1.0*N)
+			avg_n_false_alarm = total_n_false_alarm[model_type]/(1.0*N)
+			avg_n_miss = total_n_miss[model_type]/(1.0*N)
+			avg_n_correct_rej = total_n_correct_rej[model_type]/(1.0*N)
+			
+			output += '\n'
+			output += "Summary for "+model_type+'\n'
+			output += "---------------------------------------\n"
+			output += "Confusion matrix\n"
+			output += "{:10s} {:5s} {:5s}".format("", "Out 1", "Out 0")+'\n'
+			output += "{:10s} {:2.2f}    {:2.2f}".format("Pred 1", avg_n_hit, avg_n_false_alarm)+'\n'
+			output += "{:10s} {:2.2f}    {:2.2f}".format("Pred 0", avg_n_miss, avg_n_correct_rej)+'\n'
+			output += '\n'
+		
+	print output
+	return output
+
 def eval_pred(file_ids, methods):
 
 	print "Evaluating file ids: ", file_ids
@@ -240,6 +299,10 @@ def eval_pred(file_ids, methods):
 		# Plot each method on same ROC plot
 		elif method == 4:
 			rocplots(file_ids)
+			
+		# Average confusion matrix
+		elif method == 5:
+			confusion_matrix(file_ids)
 
 		# Method not defined:
 		else:
