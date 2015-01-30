@@ -3,6 +3,8 @@ Prepare training and test sets with optional imputation.
 """
 
 import argparse
+import os
+import glob
 
 from del_missing import remove
 from makesets import makesets
@@ -10,7 +12,7 @@ from impute import impute
 
 def prepare_data_round(test_percentage, num_imputed, id):
 	print "Preparing data..."
-	
+		
 	test_file_name = "./data/testing-data-"+str(id)+".csv"
 	train_file_name = "./data/training-data-"+str(id)+".csv"
 	aggregated_file_name = "./data/training-data-imputed-"+str(id)+".csv"
@@ -28,7 +30,15 @@ def prepare_data_round(test_percentage, num_imputed, id):
 	print "Done."
 
 def prepare_data(iter_count, test_percentage, num_imputed, id_start):
-
+	if id_start == 0:
+		# remove old data
+		test_files = glob.glob('data/testing-data*.csv')
+		train_files = glob.glob('data/training-data*.csv')
+		for file in test_files:
+			os.remove(file)
+		for file in train_files:
+			os.remove(file)
+		
 	for i in range(iter_count):
 		prepare_data_round(test_percentage, num_imputed, i+id_start)
 
