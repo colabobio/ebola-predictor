@@ -8,7 +8,7 @@ import argparse
 import os
 import glob
 
-from del_missing import remove
+from listdel import listdel
 from makesets import makesets
 from impute import impute
 
@@ -27,7 +27,7 @@ def create_sets_round(test_percentage, num_imputed, id):
 		impute(num_imputed, training_file=train_file_name, aggregated_file=aggregated_file_name)
 		
 	else:
-		remove(training_file=train_file_name, out_file=aggregated_file_name)
+		listdel(in_file=train_file_name, out_file=aggregated_file_name)
 	
 	print "Done."
 

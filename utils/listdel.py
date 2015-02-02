@@ -1,12 +1,13 @@
 """
-This script performs list-wise deletion on the input file.
+This script performs list-wise deletion on the input file, so all rows with any missing
+values are removed from the output.
 
 @copyright: The Broad Institute of MIT and Harvard 2015
 """
 
 import csv
 
-def remove(in_file=training_file, out_file=out_file):
+def listdel(in_file, out_file):
     titles = []
     data = []
     with open(in_file, "rb") as ifile:
@@ -25,4 +26,4 @@ def remove(in_file=training_file, out_file=out_file):
 if __name__ == "__main__":
     in_file = "./data/training-data.csv"
     out_file = "./data/training-data-completed.csv"
-    remove()
+    listdel(in_file, out_file)
