@@ -1,5 +1,7 @@
 """
 Create training and test sets with optional imputation.
+
+@copyright: The Broad Institute of MIT and Harvard 2015
 """
 
 import argparse
@@ -10,12 +12,12 @@ from del_missing import remove
 from makesets import makesets
 from impute import impute
 
-def prepare_data_round(test_percentage, num_imputed, id):
+def create_sets_round(test_percentage, num_imputed, id):
 	print "Preparing data..."
 		
 	test_file_name = "./data/testing-data-"+str(id)+".csv"
 	train_file_name = "./data/training-data-"+str(id)+".csv"
-	aggregated_file_name = "./data/training-data-imputed-"+str(id)+".csv"
+	aggregated_file_name = "./data/training-data-completed-"+str(id)+".csv"
 
 	print "Making sets..."
 	makesets(test_percentage, testing_file=test_file_name, training_file=train_file_name)
@@ -29,7 +31,7 @@ def prepare_data_round(test_percentage, num_imputed, id):
 	
 	print "Done."
 
-def prepare_data(iter_count, test_percentage, num_imputed, id_start):
+def create_sets(iter_count, test_percentage, num_imputed, id_start):
 	if id_start == 0:
 		# remove old data
 		test_files = glob.glob('data/testing-data*.csv')
@@ -40,10 +42,9 @@ def prepare_data(iter_count, test_percentage, num_imputed, id_start):
 			os.remove(file)
 		
 	for i in range(iter_count):
-		prepare_data_round(test_percentage, num_imputed, i+id_start)
+		create_sets_round(test_percentage, num_imputed, i+id_start)
 
 if __name__ == "__main__":
-
 	parser = argparse.ArgumentParser()
 
 	# Number of iterations
@@ -65,5 +66,4 @@ if __name__ == "__main__":
 	num_imputed = args.i[0]
 	id_start = args.s[0]
 	
-	prepare_data(iter_count, test_percentage, num_imputed, id_start)
-	
+	create_sets(iter_count, test_percentage, num_imputed, id_start)

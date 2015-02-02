@@ -10,7 +10,7 @@ import rpy2.robjects as robjects
 
 var_file = "./data/variables.txt"
 training_file = "./data/training-data.csv"
-aggregated_file = "./data/training-data-imputed.csv"
+aggregated_file = "./data/training-data-completed.csv"
 incheck_opt = "FALSE"
 
 def impute(num_imputed, training_file=training_file, aggregated_file=aggregated_file):
