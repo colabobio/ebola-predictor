@@ -1,5 +1,5 @@
 """
-Prepare training and test sets with optional imputation.
+Create training and test sets with optional imputation.
 """
 
 import argparse
