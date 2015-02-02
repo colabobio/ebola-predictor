@@ -4,6 +4,7 @@ This script creates the training and test sets.
 @copyright: The Broad Institute of MIT and Harvard 2015
 """
 
+import argparse
 import sys, csv, random
 import numpy as np
 
@@ -11,8 +12,13 @@ src_file = "./data/sources.txt"
 var_file = "./data/variables.txt"
 range_file = "./data/ranges.txt"
 
-# Returns a set of indices for the test set, making sure that both training and test 
-# set will have same fraction of outcomes
+"""Returns a set of indices for the test set, making sure that both training and test 
+set will have same fraction of outcomes
+
+:param all_data: all rows in the dataset
+:param complete_rows: indices of rows w/out missing values in all_data
+:param test_percentage: percentage of complete rows that will be used in the test set
+"""
 def test_set(all_data, complete_rows, test_percentage):
     outlist = []
     for i in complete_rows:
@@ -31,7 +37,15 @@ def test_set(all_data, complete_rows, test_percentage):
     # indices in the original data, so we:
     return np.array(complete_rows)[itest]
 
-def makesets(test_percentage, testing_file, training_file):
+"""Creates a training/test sets and saves them to the specified files. The test set won't
+have any missing values, and will include the given percentage of complete rows from the
+source data
+
+:param test_percentage: percentage of complete rows that will be used in the test set
+:param test_filename: name of file to store test set
+:param train_filename: name of file to store training set
+"""
+def makesets(test_percentage, test_filename, train_filename):
     input_file = ""
     with open(src_file, "rb") as sfile:
         for line in sfile.readlines():
@@ -97,24 +111,24 @@ def makesets(test_percentage, testing_file, training_file):
         else:
             training_data.append(row)
 
-    with open(training_file, "wb") as trfile:
+    with open(train_filename, "wb") as trfile:
         writer = csv.writer(trfile, delimiter=",", quotechar='"', quoting=csv.QUOTE_MINIMAL)
         writer.writerow(model_variables)
         for row in training_data:
             writer.writerow(row)
-    print "Wrote", len(training_data), "rows to training set in", training_file 
+    print "Wrote", len(training_data), "rows to training set in", train_filename
 
-    with open(testing_file, "wb") as tefile:
+    with open(test_filename, "wb") as tefile:
         writer = csv.writer(tefile, delimiter=",", quotechar='"', quoting=csv.QUOTE_MINIMAL)
         writer.writerow(model_variables)
         for row in testing_data:
             writer.writerow(row)
-    print "Wrote", len(testing_data), "rows to training set in", testing_file
+    print "Wrote", len(testing_data), "rows to training set in", test_filename
 
 if __name__ == "__main__":
-    test_percentage = 50
-    if 1 < len(sys.argv):
-        test_percentage = float(sys.argv[1])
-    training_file = "./data/training-data.csv"
-    testing_file = "./data/testing-data.csv"
-    makesets(test_percentage, training_file, testing_file)
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-train', nargs=1, default=["./data/training-data.csv"])
+    parser.add_argument('-test', nargs=1, default=["./data/testing-data.csv"])
+    parser.add_argument('-p', type=int, nargs=1, default=[70])
+    args = parser.parse_args()
+    makesets(args.p[0], args.test[0], args.train[0])

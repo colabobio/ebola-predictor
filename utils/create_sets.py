@@ -12,17 +12,30 @@ from listdel import listdel
 from makesets import makesets
 from impute import impute
 
+"""Creates a round of training/test sets
+
+:param test_percentage: percentage of complete rows to include in the test set
+:param num_imputed: number of intermediate imputed sets if imputation is selected
+:param id: round id
+"""
 def create_sets_round(test_percentage, num_imputed, id):
-    test_file_name = "./data/testing-data-"+str(id)+".csv"
-    train_file_name = "./data/training-data-"+str(id)+".csv"
-    aggregated_file_name = "./data/training-data-completed-"+str(id)+".csv"
-    makesets(test_percentage, testing_file=test_file_name, training_file=train_file_name)
+    test_filename = "./data/testing-data-"+str(id)+".csv"
+    train_filename = "./data/training-data-"+str(id)+".csv"
+    completed_filename = "./data/training-data-completed-"+str(id)+".csv"
+    makesets(test_percentage, test_filename, train_filename)
     if num_imputed > 0:
         print "Imputing..."
-        impute(num_imputed, training_file=train_file_name, aggregated_file=aggregated_file_name)
+        impute(num_imputed, training_file=train_filename, aggregated_file=completed_filename)
     else:
-        listdel(in_file=train_file_name, out_file=aggregated_file_name)
+        listdel(in_file=train_filename, out_file=completed_filename)
 
+"""Creates training/test sets using the provided parameters
+
+:param iter_count: number of training/test sets to create
+:param test_percentage: percentage of complete rows to include in the test set
+:param num_imputed: number of intermediate imputed sets if imputation is selected
+:param id_start: id of first group of sets
+"""
 def create_sets(iter_count, test_percentage, num_imputed, id_start):
     if id_start == 0:
         # remove old data
@@ -52,10 +65,10 @@ if __name__ == "__main__":
     parser.add_argument('-t', type=int, nargs=1, default=[70])
 
     # If flagged, impute the data with number given
-    parser.add_argument('-i', type=int,  nargs=1, default=[0])
+    parser.add_argument('-i', type=int, nargs=1, default=[0])
 
     # If flagged, start the ids at this value
-    parser.add_argument('-s', type=int,  nargs=1, default=[0])
+    parser.add_argument('-s', type=int, nargs=1, default=[0])
 
     args = parser.parse_args()
 
