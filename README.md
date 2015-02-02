@@ -2,6 +2,22 @@
 
 Algorithms to predict outcome of Ebola patients given their clinical and lab symptoms. Based on the metadata available at http://fathom.info/mirador/ebola/datarelease.html
 
+Steps for setting model:
+1) Set data file in data/sources.txt
+2) Set ranges in data/ranges.txt
+3) Set variables in utils/variables.txt
+
+
+
+Batch mode
+1) Create training/test sets
+```bash
+python utils/create_sets.py -n [number of iterations] -t [test percentage] -i [number of imputed files to run MI on*] -s [starting id]
+```
+2) 
+
+
+
 ###Score
 Simple scoring scheme which counts how many variables fall outside the normal range 
 
