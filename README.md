@@ -12,8 +12,17 @@ Steps for setting model:
 Batch mode
 1) Create training/test sets
 ```bash
-python utils/create_sets.py -n [number of iterations] -t [test percentage] -i [number of imputed files to run MI on*] -s [starting id]
+python utils/create_sets.py -n [number of iterations] -t [test percentage] -i [number of imputed files to run MI on] -s [starting id]
 ```
+
+number of iterations = number of sets
+
+test percentage = percentage of complete rows that will be used in the test sets
+
+number of imputed files to run MI on = If you do -i 0 or just don't flag -i, it will delete the missing values.
+
+starting id = will delete currents sets if is 0
+
 2) 
 
 
