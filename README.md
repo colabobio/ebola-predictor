@@ -2,18 +2,41 @@
 
 Algorithms to predict outcome of Ebola patients given their clinical and lab symptoms. Based on the metadata available at http://fathom.info/mirador/ebola/datarelease.html
 
-Steps for setting model:
+##Dependencies
+RPy2
+Pandas
+Numpy
+matplotlib
+R, Amelia II
+
+
+##Steps for setting model:
 1) Set data file in data/sources.txt
 2) Set ranges in data/ranges.txt
 3) Set variables in utils/variables.txt
 
+Inspecting missigness for current model:
+```bash
+python utils/missing.py
+```
+
+View scatterplot matrix for given dataset
+```bash
+python utils/scatterplot.py ./data/training-data-completed-9.csv
+```
 
 
-Batch mode
+##Batch mode
 1) Create training/test sets
 ```bash
-python utils/create_sets.py -n [number of iterations] -t [test percentage] -i [number of imputed files to run MI on] -s [starting id]
+python init.py -n [number of iterations] -t [test percentage] -i [number of imputed files to run MI on] -s [starting id]
 ```
+
+```bash
+python init.py -n 10 -t 70 -i 10 -s 0
+```
+
+
 
 number of iterations = number of sets
 
