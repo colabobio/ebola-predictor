@@ -1,7 +1,9 @@
-'''
+"""
 Display pairwise plots for each combination of predictor variables, labeling the items
 according to the value of the dependent variable in the training set.
-'''
+
+@copyright: The Broad Institute of MIT and Harvard 2015
+"""
 
 import itertools
 import sys
@@ -11,7 +13,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 var_file = "./data/variables.txt"
-training_filename = "./data/training-data-imputed.csv"
+training_filename = "./data/training-data-completed.csv"
 # training_filename = "./data/training-data.csv"
 # training_filename = "./data/training-data-1.csv"
 # training_filename = "./data/testing-data.csv"
@@ -88,14 +90,15 @@ def scatterplot_matrix(data, names=[], types={}, **kwargs):
         axes[-1,-1].set_ylim(ylimits)
 
     return fig
+    
+if __name__ == "__main__":    
+    df = pd.read_csv(training_filename, delimiter=',', na_values="?")
+    M = df.shape[0]
+    N = df.shape[1]
+    names = df.columns.values[1: N].tolist()
+    dvar = df.as_matrix(columns=df.columns.values[0: 1])
+    data = np.transpose(df.as_matrix(columns=names))
 
-df = pd.read_csv(training_filename, delimiter=',', na_values="?")
-M = df.shape[0]
-N = df.shape[1]
-names = df.columns.values[1: N].tolist()
-dvar = df.as_matrix(columns=df.columns.values[0: 1])
-data = np.transpose(df.as_matrix(columns=names))
-
-fig = scatterplot_matrix(data, names, var_types, c=dvar, marker='o', s = 10, edgecolors = 'none', alpha=0.5)
-fig.suptitle('EBOV model variables scatter plot')
-plt.show()
+    fig = scatterplot_matrix(data, names, var_types, c=dvar, marker='o', s = 10, edgecolors = 'none', alpha=0.5)
+    fig.suptitle('Model variables scatter plot')
+    plt.show()

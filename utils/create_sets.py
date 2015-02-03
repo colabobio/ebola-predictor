@@ -24,8 +24,7 @@ def create_sets_round(test_percentage, num_imputed, id):
     completed_filename = "./data/training-data-completed-"+str(id)+".csv"
     makesets(test_percentage, test_filename, train_filename)
     if num_imputed > 0:
-        print "Imputing..."
-        impute(num_imputed, training_file=train_filename, aggregated_file=completed_filename)
+        impute(num_imputed, train_filename, completed_filename)
     else:
         listdel(in_file=train_filename, out_file=completed_filename)
 
