@@ -5,9 +5,8 @@ evaluation.
 @copyright: The Broad Institute of MIT and Harvard 2015
 """
 
-from nnet.train import train as nnet_train
-
 import os, argparse, glob
+from nnet.train import train as nnet_train
 
 if __name__ == "__main__":
     train_files = glob.glob("./data/training-data-completed-*.csv")

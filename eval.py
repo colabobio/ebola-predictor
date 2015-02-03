@@ -1,39 +1,7 @@
 import argparse, glob, os
-import numpy as np
-import pandas as pd
-
-from utils.calplot import calplot
-from utils.evaluate import eval
-from utils.roc import roc
-
-from nnet.utils import gen_predictor as nnet_gen_predictor
+from nnet.eval import eval as nnet_eval
 
 predictors = ["nnet"]
-
-def design_matrix(test_filename, train_filename):
-    df0 = pd.read_csv(train_filename, delimiter=",", na_values="?")
-    df = pd.read_csv(test_filename, delimiter=",", na_values="?")
-    # df and df0 must have the same number of columns (N), but not necessarily the same
-    # number of rows.
-    M = df.shape[0]
-    N = df.shape[1]
-    y = df.values[:,0]
-    X = np.ones((M, N))
-    for j in range(1, N):
-        # Computing i-th column. The pandas dataframe
-        # contains all the values as numpy arrays that
-        # can be handled individually:
-        values = df.values[:, j]
-        # Using the max/min values from the training set because those were used to 
-        # train the predictor
-        values0 = df0.values[:, j]
-        minv0 = values0.min()
-        maxv0 = values0.max()
-        if maxv0 > minv0:
-            X[:, j] = np.clip((values - minv0) / (maxv0 - minv0), 0, 1)
-        else:
-            X[:, j] = 1.0 / M
-    return X, y
 
 def avg_cal_dis():
     print "1"
@@ -55,12 +23,8 @@ def avg_report():
             if os.path.exists(testfile) and os.path.exists(pfile) and os.path.exists(trainfile):
                 count = count + 1
                 print id, testfile, pfile, trainfile
-                X, y = design_matrix(testfile, trainfile)
-                predictor = nnet_gen_predictor(pfile)
-                probs = predictor(X)
-                p, r, f, _ = eval(probs, y, 3)
-#                 print X
-#                 print y
+                p, r, f, _ = nnet_eval(testfile, trainfile, pfile, 3)
+
     print "report"
 
 def roc_plots():

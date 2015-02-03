@@ -316,6 +316,5 @@ if __name__ == "__main__":
 	args = parser.parse_args()
 
 	file_ids = find_saved_sets()
-    print file_ids
  
-	#eval_pred(file_ids, args.e)
+	eval_pred(file_ids, args.e)
