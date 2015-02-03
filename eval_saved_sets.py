@@ -280,7 +280,6 @@ def confusion_matrix(file_ids):
 	return output
 
 def eval_pred(file_ids, methods):
-
 	print "Evaluating file ids: ", file_ids
 
 	for method in methods:
@@ -309,7 +308,6 @@ def eval_pred(file_ids, methods):
 			raise Exception("Invalid method given")
 
 if __name__ == "__main__":
-
 	parser = argparse.ArgumentParser()
 
 	# Evaluate the model with given method(s)
@@ -318,5 +316,6 @@ if __name__ == "__main__":
 	args = parser.parse_args()
 
 	file_ids = find_saved_sets()
-
-	eval_pred(file_ids, args.e)
+    print file_ids
+ 
+	#eval_pred(file_ids, args.e)

@@ -9,7 +9,7 @@ import numpy as np
 from scipy.optimize import fmin_bfgs
 import matplotlib.pyplot as plt
 
-training_filename = "./data/training-data-imputed.csv"
+training_filename = "./data/training-data-completed.csv"
 
 iter      = 1     # Number of training runs 
 trainf    = 1     # Fraction of rows from training data to use in each training iteration.
@@ -17,7 +17,7 @@ trainf    = 1     # Fraction of rows from training data to use in each training 
                   # so that the final parameters are chosen to be those that maximize
                   # the accuracy.
 L = 1
-hf = 1            # Factor to calculate number of hidden units given the number of variables         
+hf = 1            # Factor to calculate number of hidden units given the number of variables
 gamma = 0.002     # Regularization coefficient
 threshold = 1E-5  # Default convergence threshold
 showp = False     # Show minimization plot
