@@ -1,77 +1,20 @@
-'''
-Trains the Neural Network predictor.
-'''
+"""
+Trains a Neural Network predictor with binary output.
 
+@copyright: The Broad Institute of MIT and Harvard 2015
+"""
+
+import argparse
 import sys
 import math
 import pandas as pd
 import numpy as np
 from scipy.optimize import fmin_bfgs
 import matplotlib.pyplot as plt
+from utils import thetaMatrix, gradientArray, sigmoid, forwardProp, backwardProp, predict
 
-training_filename = "./data/training-data-completed.csv"
-
-iter      = 1     # Number of training runs 
-trainf    = 1     # Fraction of rows from training data to use in each training iteration.
-                  # The rest of rows are used to calculate the accuracy of the parameters,
-                  # so that the final parameters are chosen to be those that maximize
-                  # the accuracy.
-L = 1
-hf = 1            # Factor to calculate number of hidden units given the number of variables
-gamma = 0.002     # Regularization coefficient
-threshold = 1E-5  # Default convergence threshold
-showp = False     # Show minimization plot
-gcheck = False    # Gradient check
-
-def thetaMatrix(theta, N, L, S, K):
-    # The cost argument is a 1D-array that needs to be reshaped into the
-    # parameter matrix for each layer:
-    thetam = [None] * L
-    C = (S - 1) * N
-    thetam[0] = theta[0 : C].reshape((S - 1, N))
-    for l in range(1, L - 1):
-        thetam[l] = theta[C : C + (S - 1) * S].reshape((S - 1, S))
-        C = C + (S - 1) * S
-    thetam[L - 1] = theta[C : C + K * S].reshape((K, S))
-    return thetam
-
-def gradientArray(gmatrix, N, L, S, K):
-    garray = np.zeros((S - 1) * N + (L - 2) * (S - 1) * S + K * S)
-    C0 = (S - 1) * N
-    # http://docs.scipy.org/doc/numpy/reference/generated/numpy.copyto.html
-    np.copyto(garray[0 : C0], gmatrix[0].reshape(C0))
-    C = C0
-    for l in range(1, L - 1):
-        Ch = (S - 1) * S
-        np.copyto(garray[C : C + Ch], gmatrix[l].reshape(Ch))
-        C = C + Ch
-    Ck =  K * S
-    np.copyto(garray[C : C + Ck], gmatrix[L - 1].reshape(Ck))
-    
-    return garray
-
-def sigmoid(v):
-    return 1 / (1 + np.exp(-v))
-
-def forwardProp(x, thetam, L):
-    a = [None] * (L + 1)
-    a[0] = x
-    for l in range(0, L):            
-        z = np.dot(thetam[l], a[l])
-        res = sigmoid(z)
-        a[l + 1] = np.insert(res, 0, 1) if l < L - 1 else res
-    return a
-
-def backwardProp(y, a, thetam, L, N):
-    err = [None] * (L + 1)
-    err[L] = a[L] - y
-    for l in range(L - 1, 0, -1):  
-        backp = np.dot(np.transpose(thetam[l]), err[l + 1])
-        deriv = np.multiply(a[l], 1 - a[l])
-        err[l] = np.delete(np.multiply(backp, deriv), 0)
-    err[0] = np.zeros(N);
-    return err
-
+"""Evaluates the cost function
+"""
 def cost(theta, X, y, N, L, S, K, gamma):
     M = X.shape[0]
 
@@ -85,18 +28,20 @@ def cost(theta, X, y, N, L, S, K, gamma):
         a = forwardProp(X[i,:], thetam, L)
         h[i] = a[L]
         t0 = -y[i] * np.log(h[i]) if 0 < y[i] else 0
-        t1 = -(1-y[i]) * np.log(1-h[i]) if y[i] < 1 else 0    
+        t1 = -(1-y[i]) * np.log(1-h[i]) if y[i] < 1 else 0
         if math.isnan(t0) or math.isnan(t1):
             #print "NaN detected when calculating cost contribution of observation",i
             terms[i] = 10
         else:
             terms[i] = t0 + t1 
-    
+
     # Regularization penalty
     penalty = (gamma/2) * np.sum(theta * theta)
 
     return terms.mean() + penalty;
 
+"""Computes the gradient of the cost function
+"""
 def gradient(theta, X, y, N, L, S, K, gamma):
     M = X.shape[0]
 
@@ -115,9 +60,9 @@ def gradient(theta, X, y, N, L, S, K, gamma):
     delta[L - 1] = np.zeros((K, S))
     D[L - 1] = np.zeros((K, S))
 
-    for i in range(0, M):        
+    for i in range(0, M):
         a = forwardProp(X[i,:], thetam, L)
-        err = backwardProp(y[i], a, thetam, L, N)        
+        err = backwardProp(y[i], a, thetam, L, N)
         for l in range(0, L):
             # Notes about multiplying numpy arrays: err[l+1] is a 1-dimensional
             # array so it needs to be made into a 2D array by putting inside [],
@@ -148,7 +93,7 @@ def gradient(theta, X, y, N, L, S, K, gamma):
             c1 = cost(theta1, X, y, N, L, S, K, gamma)
             grad1[i] = (c1 - c0) / (2 * epsilon)
             diff = abs(grad1[i] - grad[i])
-            if maxerr < diff: 
+            if maxerr < diff:
                 print "Numerical and analytical gradients differ by",diff,"at argument",i,"/",size
                 ok = False
         if ok:
@@ -156,22 +101,20 @@ def gradient(theta, X, y, N, L, S, K, gamma):
 
     return grad
 
-def predict(x, theta, N, L, S, K):
-    thetam = thetaMatrix(theta, N, L, S, K)
-    a = forwardProp(x, thetam, L) 
-    h = a[L]
-    return h;
-
-def debug(theta):
-    global params 
+"""Adds the current cost to the vector of values
+"""
+def add_value(theta):
+    global params
     global values
     (X, y, N, L, S, K, gamma) = params
     value = cost(theta, X, y, N, L, S, K, gamma);
     values = np.append(values, [value])
 
+"""
+Calculating the prediction rate by applying the trained model on the remaining fraction 
+of the data (the test set), and comparing with random selection
+"""
 def evaluate(X, y, itrain, theta):
-    # Calculating the prediction rate by applying the trained model on the remaining
-    # fraction of the data (the test set), and comparing with random selection
     ntot = 0
     nhit = 0
     nnul = 0
@@ -193,29 +136,33 @@ def evaluate(X, y, itrain, theta):
     print "Null success rate on test set     :", str(nnul) + "/" + str(ntot), round(100 * rrate, 2), "%"
     
     return [rate, rrate]
-    
+
+"""Prints the neural net parameters
+"""
 def print_theta(theta, N, L, S, K):
     thetam = thetaMatrix(theta, N, L, S, K)
 
     # Coefficients of first layer
     theta0 = thetam[0]
-    for i1 in range(0, S - 1):    
+    for i1 in range(0, S - 1):
         for i0 in range(0, N):
             print "{:5s} {:1.0f}, {:4s} {:1.0f}, {:5s} {:1.0f}: {:3.5f}".format("layer", 0, "node", i1, "input", i0, theta0[i1][i0])
             
     for l in range(1, L - 1):
         thetal = thetam[l]
         # Coefficients of l-th layer 
-        for i1 in range(0, S - 1):        
+        for i1 in range(0, S - 1):
             for i0 in range(0, S):
                 print "{:5s} {:1.0f}, {:4s} {:1.0f}, {:5s} {:1.0f}: {:3.5f}".format("layer", l, "node", i1, "input", i0, thetal[i1][i0])
 
     # Coefficients of output unit
-    thetaf = thetam[L - 1]                
-    for i1 in range(0, K):    
+    thetaf = thetam[L - 1]
+    for i1 in range(0, K):
         for i0 in range(0, S):
             print "{:5s} {:1.0f}, {:4s} {:1.0f}, {:5s} {:1.0f}: {:3.5f}".format("layer", L - 1, "node", i1, "input", i0, thetaf[i1][i0])
 
+"""Saves the neural net parameters to the specified file
+"""
 def save_theta(filename, theta, N, L, S, K):
     with open(filename, "wb") as pfile:
         thetam = thetaMatrix(theta, N, L, S, K)
@@ -226,31 +173,38 @@ def save_theta(filename, theta, N, L, S, K):
 
         # Coefficients of first layer
         theta0 = thetam[0]
-        for i1 in range(0, S - 1):    
+        for i1 in range(0, S - 1):
             for i0 in range(0, N):
                 pfile.write("layer 0, node " + str(i1) + ", input " + str(i0) + ": " + str(theta0[i1][i0]) + "\n")
             
         for l in range(1, L - 1):
             thetal = thetam[l]
             # Coefficients of l-th layer 
-            for i1 in range(0, S - 1):        
+            for i1 in range(0, S - 1):
                 for i0 in range(0, S):
                     pfile.write("layer " + str(l) + ", node " + str(i1) + ", input " + str(i0) + ": " + str(thetal[i1][i0]) + "\n")
 
         # Coefficients of output unit
-        thetaf = thetam[L - 1]                
+        thetaf = thetam[L - 1]
         for i1 in range(0, K):    
             for i0 in range(0, S):
                 pfile.write("layer " + str(L - 1) + ", node " + str(i1) + ", input " + str(i0) + ": " + str(thetaf[i1][i0]) + "\n")
 
-##########################################################################################    
-#
-# Main
+"""
+Trains the neural net given the specified parameters
 
-def train(training_filename=training_filename):
-    global L
+:param L: number of hidden layers
+:param hf: factor to calculate number of hidden units given the number of variables
+:param gamma: regularization coefficient
+:param threshold: default convergence threshold
+:param show: show minimization plot
+:param debug: gradient check
+"""
+def train(train_filename, param_filename, L=1, hf=1, gamma=0.002, threshold=1E-5, show=False, debug=False):
+    global gcheck
     global params
     global values
+    gcheck = debug
     K = 1
 
     if L < 1:
@@ -260,7 +214,7 @@ def train(training_filename=training_filename):
     L = L + 1
 
     # Loading data frame and initalizing dimensions
-    df = pd.read_csv(training_filename, delimiter=',', na_values="?")
+    df = pd.read_csv(train_filename, delimiter=",", na_values="?")
     M = df.shape[0]
     N = df.shape[1]
     S = int((N - 1) * hf) # includes the bias unit on each layer, so the number of units is S-1
@@ -294,6 +248,15 @@ def train(training_filename=training_filename):
         maxv = values.max()
         X[:, j] = (values - minv) / (maxv - minv)
 
+   # Number of training runs
+    iter = 1
+
+    # Fraction of rows from training data to use in each training iteration.
+    # The rest of rows are used to calculate the accuracy of the parameters,
+    # so that the final parameters are chosen to be those that maximize
+    # the accuracy.
+    trainf = 1
+
     for n in range(0, iter):
         print "-------> Training iteration",n
 
@@ -315,7 +278,7 @@ def train(training_filename=training_filename):
         # http://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.fmin_bfgs.html
         print "Training Neural Network..."
         values = np.array([])
-        theta = fmin_bfgs(cost, theta0, fprime=gradient, args=params, gtol=threshold, callback=debug)
+        theta = fmin_bfgs(cost, theta0, fprime=gradient, args=params, gtol=threshold, callback=add_value)
         print "Done!"
 
         if trainf < 1:
@@ -330,14 +293,24 @@ def train(training_filename=training_filename):
         plt.xlabel("Step number")
         plt.ylabel("Cost function")
 
-    if showp:
+    if show:
         plt.show()
 
     print ""
     print "***************************************"
     print "Best predictor:"
     print_theta(best_theta, N, L, S, K)
-    save_theta("./data/predictor.txt", best_theta, N, L, S, K)
+    save_theta(param_filename, best_theta, N, L, S, K)
 
 if __name__ == "__main__":
-    train()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-t", "--train", nargs=1, default=["./data/training-data-completed.csv"], help="File containing training set")
+    parser.add_argument("-p", "--param", nargs=1, default=["./data/nnet-params"], help="Output file to save the parameters of the neural net")
+    parser.add_argument("-l", "--layers", type=int, nargs=1, default=[1], help="Number of hidden layers")
+    parser.add_argument("-f", "--hfactor", type=float, nargs=1, default=[1], help="Hidden units factor")
+    parser.add_argument("-g", "--gamma", type=float, nargs=1, default=[0.002], help="Regularization coefficient")
+    parser.add_argument("-c", "--convergence", type=float, nargs=1, default=[1E-5], help="Convergence threshold for the BFGS minimizer")
+    parser.add_argument("-s", "--show", action="store_true", help="Shows minimization plot")
+    parser.add_argument("-d", "--debug", action="store_true", help="Debugs gradient calculation")
+    args = parser.parse_args()
+    train(args.train[0], args.param[0], args.layers[0], args.hfactor[0], args.gamma[0], args.convergence[0], args.show, args.debug)

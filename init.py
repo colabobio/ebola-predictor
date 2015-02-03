@@ -8,9 +8,9 @@ import argparse
 import os
 import glob
 
-from listdel import listdel
-from makesets import makesets
-from impute import impute
+from utils.listdel import listdel
+from utils.makesets import makesets
+from utils.impute import impute
 
 """Creates a round of training/test sets
 
@@ -38,8 +38,8 @@ def create_sets_round(test_percentage, num_imputed, id):
 def create_sets(iter_count, test_percentage, num_imputed, id_start):
     if id_start == 0:
         # remove old data
-        test_files = glob.glob('data/testing-data*.csv')
-        train_files = glob.glob('data/training-data*.csv')
+        test_files = glob.glob("./data/testing-data*.csv")
+        train_files = glob.glob("./data/training-data*.csv")
         if test_files or train_files:
             print "Removing old sets..."
         for file in test_files:
