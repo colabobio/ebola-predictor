@@ -40,18 +40,17 @@ with open(input_file, "rb") as ifile:
              else:
                  all_missing = False
         if not all_missing and not missing_dvar:
-            total_count = total_count + 1            
+            total_count = total_count + 1
             if not some_missing: complete_count = complete_count + 1
             for i in range(0, len(model_variables)):
                 var_idx = model_idx[i]
                 if row[var_idx] == "\\N":
-                    missing_count[i] = missing_count[i] + 1         
+                    missing_count[i] = missing_count[i] + 1
 
-print "Total number of data rows   :",total_count        
+print "Total number of data rows   :",total_count
 print "Number of complete data rows:",complete_count
 
 print "Missing counts and precentages for each independent variable:"
 for i in range(1, len(model_variables)):
     miss_frac = 100.0 * float(missing_count[i])/ total_count
     print "{:7s} {:2.0f}/{:2.0f} {:2.2f}%".format(model_variables[i], missing_count[i], total_count, miss_frac)
-

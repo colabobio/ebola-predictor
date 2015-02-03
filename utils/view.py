@@ -5,36 +5,26 @@ according to the value of the dependent variable in the training set.
 @copyright: The Broad Institute of MIT and Harvard 2015
 """
 
-import itertools
+import argparse
 import sys
+import itertools
 import pandas as pd
 from pandas.tools.plotting import scatter_matrix
 import numpy as np
 import matplotlib.pyplot as plt
 
 var_file = "./data/variables.txt"
-training_filename = "./data/training-data-completed.csv"
-# training_filename = "./data/training-data.csv"
-# training_filename = "./data/training-data-1.csv"
-# training_filename = "./data/testing-data.csv"
 
-var_types = {}
-with open(var_file, "rb") as vfile:
-    for line in vfile.readlines():
-        [name, type] = line.split()[0:2]
-        var_types[name] = type == "category" 
+"""Plots a scatterplot matrix of subplots. Each row of "data" is plotted against other 
+rows, resulting in a nrows by nrows grid of subplots with the diagonal subplots labeled 
+with "names".  Additional keyword arguments are passed on to matplotlib's "plot" command. 
+Returns the matplotlib figure object containg the subplot grid.
 
-# Adapted from: 
-# http://stackoverflow.com/questions/7941207/is-there-a-function-to-make-scatterplot-matrices-in-matplotlib
-# to add jitter to categorical variables
+Adapted from: 
+http://stackoverflow.com/questions/7941207/is-there-a-function-to-make-scatterplot-matrices-in-matplotlib
+"""
 def scatterplot_matrix(data, names=[], types={}, **kwargs):
-    """
-    Plots a scatterplot matrix of subplots.  Each row of "data" is plotted
-    against other rows, resulting in a nrows by nrows grid of subplots with the
-    diagonal subplots labeled with "names".  Additional keyword arguments are
-    passed on to matplotlib's "plot" command. Returns the matplotlib figure
-    object containg the subplot grid.
-    """
+    print "Generating scatterplot matrix..."
     numvars, numdata = data.shape
     fig, axes = plt.subplots(nrows=numvars, ncols=numvars, figsize=(10, 10))
     fig.subplots_adjust(hspace=0.0, wspace=0.0)
@@ -58,7 +48,7 @@ def scatterplot_matrix(data, names=[], types={}, **kwargs):
         # Jittering categorical values so they are not overdrawn
         for i in range(0, len(names)):
             if types[names[i]]:
-                data[i] = data[i] + np.random.uniform(-0.07, 0.07, numdata)                 
+                data[i] = data[i] + np.random.uniform(-0.07, 0.07, numdata)
 
     # Plot the data.
     for i, j in zip(*np.triu_indices_from(axes, k=1)):
@@ -89,10 +79,21 @@ def scatterplot_matrix(data, names=[], types={}, **kwargs):
         axes[-1,-1].set_xlim(xlimits)
         axes[-1,-1].set_ylim(ylimits)
 
+    print "Done."
     return fig
-    
-if __name__ == "__main__":    
-    df = pd.read_csv(training_filename, delimiter=',', na_values="?")
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("data", nargs=1, default=["./data/training-data-completed.csv"], help="data file to plot")
+    args = parser.parse_args()
+
+    var_types = {}
+    with open(var_file, "rb") as vfile:
+        for line in vfile.readlines():
+            [name, type] = line.split()[0:2]
+            var_types[name] = type == "category"
+
+    df = pd.read_csv(args.data[0], delimiter=',', na_values="?")
     M = df.shape[0]
     N = df.shape[1]
     names = df.columns.values[1: N].tolist()
