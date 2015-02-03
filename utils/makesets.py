@@ -5,7 +5,7 @@ This script creates the training and test sets.
 """
 
 import argparse
-import sys, csv, random
+import sys, csv, os, random
 import numpy as np
 
 src_file = "./data/sources.txt"
@@ -49,7 +49,7 @@ def makesets(test_percentage, test_filename, train_filename):
     input_file = ""
     with open(src_file, "rb") as sfile:
         for line in sfile.readlines():
-            input_file = line.strip()
+            input_file = os.path.abspath(line.strip())
 
     model_variables = []
     with open(var_file, "rb") as vfile:

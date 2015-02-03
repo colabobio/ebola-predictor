@@ -4,7 +4,7 @@ This script gives information on the missingness in the input file.
 @copyright: The Broad Institute of MIT and Harvard 2015
 """
 
-import csv
+import os, csv
 
 src_file = "./data/sources.txt"
 var_file = "./data/variables.txt"
@@ -12,7 +12,7 @@ var_file = "./data/variables.txt"
 input_file = ""
 with open(src_file, "rb") as sfile:
     for line in sfile.readlines():
-        input_file = line.strip()
+        input_file = os.path.abspath(line.strip())
 
 model_variables = []
 with open(var_file, "rb") as vfile:

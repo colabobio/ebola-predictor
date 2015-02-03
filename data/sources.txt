@@ -1,1 +1,1 @@
-/Users/tomsilver/Documents/sabeti/ebola-predictor/data/data.csv
+./data/data.csv
