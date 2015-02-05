@@ -3,3 +3,4 @@ PCR float
 TEMP float
 DIARR category
 AST_1 float
+TCo2_1 float
