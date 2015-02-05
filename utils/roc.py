@@ -5,6 +5,7 @@ ROC code from http://scikit-learn.org/0.11/auto_examples/plot_roc.html.
 @copyright: The Broad Institute of MIT and Harvard 2015
 """
 
+import os
 import numpy as np
 
 from matplotlib import pyplot as plt
@@ -30,6 +31,7 @@ def roc(probs, y_test, **kwparams):
 
     # Plot ROC curve
 #     plt.plot(fpr, tpr, label=label, marker='o', c=color)
+    if pltshow: fig = plt.figure()
     plt.plot(fpr, tpr, c=color)
     plt.plot([0, 1], [0, 1], 'k--')
     plt.xlim([-0.1, 1.1])
@@ -38,8 +40,9 @@ def roc(probs, y_test, **kwparams):
     plt.ylabel('True Positive Rate')
     plt.title('Receiver operating characteristic')
 #     plt.legend(loc="lower right")
-
     if pltshow:
-        plt.show()
+        if not os.path.exists("./out"): os.makedirs("./out")
+        fig.savefig('./out/roc.pdf')
+        print "Saved ROC curve to ./out/roc.pdf"
 
     return roc_auc

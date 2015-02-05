@@ -3,9 +3,13 @@ Creates calibration plot and Hosmer-Lemeshow statistics.
 Main R package from http://www.genabel.org/PredictABEL/plotCalibration.html
 """
 
+import os
 import rpy2.robjects as robjects
 
-test_file = "./data/testing-data.csv"
+def create_path(fn):
+    dir = os.path.abspath(os.path.split(fn)[0])
+    if not os.path.exists(dir):
+        os.makedirs(dir)
 
 def calplot(probs, y_test, **kwparams):
     if "color" in kwparams:
@@ -25,6 +29,9 @@ def calplot(probs, y_test, **kwparams):
 
     test_file = kwparams["test_file"]
 
+    create_path(out_file)
+    create_path(plot_file)
+    
     robjects.r('pdf("'+ plot_file +'", useDingbats=FALSE)') 
     predrisk = 'c('+ ', '.join([str(p) for p in probs])+')'
 

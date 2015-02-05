@@ -82,12 +82,12 @@ def avg_report(module):
     print "{:10s}      {:2.2f}    {:2.2f}        {:2.2f}".format("Total", (avg_prec[0] + avg_prec[1])/2, (avg_rec[0]+avg_rec[1])/2, (avg_f1[0]+avg_f1[1])/2)
 
 def roc_plots(module):
-    plt.clf()
     test_files = glob.glob("./data/testing-data-*.csv")
     print "Calculating ROC curves for " + module.title() + "..."
     count = 0
     total_roc_auc = 0
-    
+    plt.clf()
+    fig = plt.figure()
     for testfile in test_files:
         start_idx = testfile.find("./data/testing-data-") + len("./data/testing-data-")
         stop_idx = testfile.find('.csv')
@@ -101,8 +101,9 @@ def roc_plots(module):
     ave_roc_auc = (total_roc_auc)/(count)
     print "********************************************"
     print "Average area under the ROC curve for " + module.title() + ": " + str(ave_roc_auc)
-    plt.show()
-
+    fig.savefig('./out/roc.pdf')
+    print "Saved ROC curve to ./out/roc.pdf"
+    
 def avg_conf_mat(module):
     test_files = glob.glob("./data/testing-data-*.csv")
     print "Calculating average report for " + module.title() + "..."
@@ -157,6 +158,8 @@ def evaluate(predictor, method):
     module_filename = "eval"
     sys.path.insert(0, module_path)
     module = import_module(module_filename)
+
+    if not os.path.exists("./out"): os.makedirs("./out")
 
     # Average calibrations and discriminations
     if method == "caldis":
