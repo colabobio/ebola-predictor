@@ -15,11 +15,11 @@ def prefix():
 def title():
     return "Neural Network"
 
-def eval(test_filename, train_filename, param_filename, method):
+def eval(test_filename, train_filename, param_filename, method, **kwparams):
     X, y = design_matrix(test_filename, train_filename)
     predictor = gen_predictor(param_filename)
     probs = predictor(X)
-    return run_eval(probs, y, method)
+    return run_eval(probs, y, method, **kwparams)
 
 def miss(test_filename, train_filename, param_filename):
     X, y, df = design_matrix(test_filename, train_filename, get_df=True)
@@ -43,7 +43,7 @@ def evaluate(test_filename, train_filename, param_filename, method):
         eval(test_filename, train_filename, param_filename, 3)
     # Plot each method on same ROC plot
     elif method == "roc":
-        eval(test_filename, train_filename, param_filename, 4)
+        eval(test_filename, train_filename, param_filename, 4, pltshow=True)
     # Average confusion matrix
     elif method == "confusion":
         eval(test_filename, train_filename, param_filename, 5)

@@ -62,7 +62,7 @@ def roc_plots(module):
         if os.path.exists(testfile) and os.path.exists(pfile) and os.path.exists(trainfile):
             print "Report for test set " + id + " ----------------------------------"
             count = count + 1
-            total_roc_auc += module.eval(testfile, trainfile, pfile, 4)
+            total_roc_auc += module.eval(testfile, trainfile, pfile, 4, pltshow=False)
     ave_roc_auc = (total_roc_auc)/(count)
     print "Average area under the ROC curve: " + str(ave_roc_auc)
     plt.show()

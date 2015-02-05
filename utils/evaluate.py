@@ -40,7 +40,7 @@ def design_matrix(test_filename, train_filename, get_df=False):
     else:
         return X, y
 
-def run_eval(probs, y_test, method=1):
+def run_eval(probs, y_test, method=1, **kwparams):
     if method == 1:
         return caldis(probs, y_test)
     elif method == 2:
@@ -48,7 +48,7 @@ def run_eval(probs, y_test, method=1):
     elif method == 3:
         return report(probs, y_test)
     elif method == 4:
-        return roc(probs, y_test)
+        return roc(probs, y_test, **kwparams)
     elif method == 5:
         return confusion(probs, y_test)
     else:
