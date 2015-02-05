@@ -8,6 +8,7 @@ Pandas
 Numpy
 matplotlib
 scikit-learn
+pydot, Graphviz
 R (Amelia II, PredictABEL)
 
 
