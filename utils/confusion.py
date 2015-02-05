@@ -35,6 +35,6 @@ def confusion(probs, y_test):
     print "Confusion matrix"
     print "{:25s} {:20s} {:20s}".format("", "Output " + target_names[1], "Output " + target_names[0])
     print "{:25s}{:2.0f}{:19s}{:2.0f}".format("Predicted " + target_names[1], n_hit,"", n_false_alarm)
-    print "{:25s}{:2.0f}{:19}{:2.0f}".format("Predicted " + target_names[0], n_miss,"", n_correct_rej) 
+    print "{:25s}{:2.0f}{:19s}{:2.0f}".format("Predicted " + target_names[0], n_miss,"", n_correct_rej) 
  
     return (n_hit, n_false_alarm, n_miss, n_correct_rej)

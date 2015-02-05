@@ -68,7 +68,37 @@ def roc_plots(module):
     plt.show()
 
 def avg_conf_mat(module):
-    print "5"
+    test_files = glob.glob("./data/testing-data-*.csv")
+    print "Calculating average report for " + module.title() + "..."
+    count = 0
+    total_n_hit = 0
+    total_n_false_alarm = 0
+    total_n_miss = 0
+    total_n_correct_rej = 0
+    for testfile in test_files:
+        start_idx = testfile.find("./data/testing-data-") + len("./data/testing-data-")
+        stop_idx = testfile.find('.csv')
+        id = testfile[start_idx:stop_idx]
+        pfile = "./data/" + module.prefix() + "-params-" + str(id)
+        trainfile = "./data/training-data-completed-" + str(id) + ".csv"
+        if os.path.exists(testfile) and os.path.exists(pfile) and os.path.exists(trainfile):
+            count = count + 1
+            print "Confusion matrix for test set " + id + " ------------------------------"
+            n_hit, n_false_alarm, n_miss, n_correct_rej = module.eval(testfile, trainfile, pfile, 5)
+            total_n_hit += n_hit
+            total_n_false_alarm += n_false_alarm
+            total_n_miss += n_miss
+            total_n_correct_rej += n_correct_rej
+
+    avg_n_hit = total_n_hit/(1.0*count)
+    avg_n_false_alarm = total_n_false_alarm/(1.0*count)
+    avg_n_miss = total_n_miss/(1.0*count)
+    avg_n_correct_rej = total_n_correct_rej/(1.0*count)
+     
+    print "Average confusion matrix for " + module.title() + " ********************************************"
+    print "{:25s} {:20s} {:20s}".format("", "Output " + target_names[1], "Output " + target_names[0])
+    print "{:25s} {:2.2f}{:17s}{:2.2f}".format("Predicted " + target_names[1], avg_n_hit,"", avg_n_false_alarm)
+    print "{:25s} {:2.2f}{:17s}{:2.2f}".format("Predicted " + target_names[0], avg_n_miss,"", avg_n_correct_rej) 
 
 def list_misses(module):
     test_files = glob.glob("./data/testing-data-*.csv")
