@@ -13,7 +13,6 @@ Equations take from Yaniv, Yates, & Smith (1991):
   "Measures of Descrimination Skill in Probabilistic Judgement"
 """
 
-
 def calibration(prob,outcome,n_bins=10):
     """Calibration measurement for a set of predictions.
     When predicting events at a given probability, how far is frequency
@@ -77,12 +76,12 @@ def discrimination(prob,outcome,n_bins=10):
         # Squared distance between true and base times num of obs
         d += np.sum(in_bin) * ((true_bin_prob - base_prob) ** 2)
     return d / len(prob)
-    
-def caldis(probs, y_test):
-	c = calibration(probs,y_test)
-	d = discrimination(probs,y_test)
 
-	print "Calibration: ", c
-	print "Discrimination: ", d
-	
-	return c, d
+def caldis(probs, y_test):
+    c = calibration(probs,y_test)
+    d = discrimination(probs,y_test)
+
+    print "Calibration   : ", c
+    print "Discrimination: ", d
+
+    return c, d

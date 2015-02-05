@@ -9,9 +9,58 @@ with open(label_file, "rb") as vfile:
         target_names.append(line.split()[1])
 
 def avg_cal_dis(module):
-    print "1"
+    test_files = glob.glob("./data/testing-data-*.csv")
+    print "Calculating Calibration/Discrimination for " + module.title() + "..."
+    count = 0
+    total_cal = 0
+    total_dis = 0
+    for testfile in test_files:
+        start_idx = testfile.find("./data/testing-data-") + len("./data/testing-data-")
+        stop_idx = testfile.find('.csv')
+        id = testfile[start_idx:stop_idx]
+        pfile = "./data/" + module.prefix() + "-params-" + str(id)
+        trainfile = "./data/training-data-completed-" + str(id) + ".csv"
+        if os.path.exists(testfile) and os.path.exists(pfile) and os.path.exists(trainfile):
+            count = count + 1
+            print "Calibration/Discrimination for test set " + id + " ----------------------------------"
+            cal, dis = module.eval(testfile, trainfile, pfile, 1)
+            total_cal += cal
+            total_dis += dis
+    avg_cal = (total_cal)/(count)
+    avg_dis = (total_dis)/(count)
+
+    print "********************************************"
+    print "Average calibration   : " + str(avg_cal)
+    print "Average discrimination: " + str(avg_dis)
 
 def cal_plots(module):
+# 	colors = {'eps' : 'green', 'nnet' : 'red', 'dt' : 'blue'}
+# 
+# 	robjects.r.X11()
+# 
+# 	for id in file_ids:
+# 
+# 		train_file = "data/training-data-imputed-"+str(id)+".csv"
+# 		test_file = "data/testing-data-"+str(id)+".csv"
+# 
+# 		pred_model_dict = {'eps': build_eps(train_file), 'dt': build_dt(train_file), 'nnet': build_nnet(train_file)}
+# 
+# 		df = pd.read_csv(test_file, delimiter=",", na_values="?")
+# 		X, y_test = design_matrix(df)
+# 
+# 		X_eps = eps_dataframe(test_file)
+# 
+# 		for model_type, model in pred_model_dict.items():
+# 			if model_type == 'eps':
+# 				probs = model(X_eps)
+# 			else:
+# 				probs = model(X)
+# 			calplot(probs, test_file, "data/calibration-"+model_type+str(id)+".txt", color=colors[model_type])
+# 
+# 	# Plot the calibrations
+# 	print "Press Ctrl+C to quit"
+# 	while True:
+# 		continue
     print "2"
 
 def avg_report(module):
@@ -64,6 +113,7 @@ def roc_plots(module):
             count = count + 1
             total_roc_auc += module.eval(testfile, trainfile, pfile, 4, pltshow=False)
     ave_roc_auc = (total_roc_auc)/(count)
+    print "********************************************"
     print "Average area under the ROC curve: " + str(ave_roc_auc)
     plt.show()
 
