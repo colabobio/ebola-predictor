@@ -21,6 +21,7 @@ def miss(test_filename, train_filename, param_filename):
     probs = predictor(X)
     indices = get_misses(probs, y)
     for i in indices:
+        print "----------------"
         print df.ix[i]
     return indices
 
