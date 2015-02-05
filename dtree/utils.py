@@ -1,56 +1,21 @@
-'''
+"""
 Utility functions for the decision tree classifier.
-'''
+
+@copyright: The Broad Institute of MIT and Harvard 2015
+"""
 
 import numpy as np
 import pandas as pd
 import pickle
 
-def design_matrix(df):
-	M = df.shape[0]
-	N = df.shape[1]
-	
-	y = df.values[:,0]
-	# Building the (normalized) design matrix
-	X = np.ones((M, N))
-	for j in range(1, N):
-		# Computing i-th column. The pandas dataframe
-		# contains all the values as numpy arrays that
-		# can be handled individually:
-		values = df.values[:, j]
-		minv = values.min()
-		maxv = values.max()
-		if maxv>minv:
-			X[:, j] = (values - minv) / (maxv - minv)
-		else:
-			X[:, j] = 1.0/M
-		
-	return X, y
-	
-def dt_pred(testing_filename = "./data/testing-data.csv", model_filename = "./data/dt-model.p"):
-	# Runs predictors on test sets, returns scores (probabilities).
-	
-	# Load the test data
-	df = pd.read_csv(testing_filename, delimiter=",", na_values="?")
-	X, y = design_matrix(df)
-	
-	# Load the decision tree
-	clf = pickle.load(open( model_filename, "rb" ) )
+"""Return a function that gives a prediction from a design matrix row
+"""
+def gen_predictor(params_filename="./data/dtree-params"):
+    clf = pickle.load(open(params_filename, "rb" ) )
 
-	# Make predictions
-	scores = clf.predict_proba(X)
-	probs = [x[1] for x in scores]
-	
-	return probs, y
-	
-def dt_pred_model(model_filename = "./data/dt-model.p"):
+    def predictor(X):
+        scores = clf.predict_proba(X)
+        probs = [x[1] for x in scores]
+        return probs
 
-	# Load the decision tree
-	clf = pickle.load(open( model_filename, "rb" ) )
-
-	def pred_model(X):
-		scores = clf.predict_proba(X)
-		probs = [x[1] for x in scores]
-		return probs
-
-	return pred_model
+    return predictor

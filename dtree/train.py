@@ -1,31 +1,43 @@
-'''
-Trains the Decision Tree predictor.
-'''
+"""
+Trains the Decision Tree predictor from scikit-learn:
+http://scikit-learn.org/stable/modules/tree.html
+
+@copyright: The Broad Institute of MIT and Harvard 2015
+"""
+
+import sys, os, argparse
 import pandas as pd
 import pickle
-
 from sklearn import tree
-from dt_utils import design_matrix
+sys.path.append(os.path.abspath('./utils'))
+from evaluate import design_matrix
 
-training_filename = "./data/training-data-imputed.csv"
-model_file = "./data/dt-model.p"
+def prefix():
+    return "dtree"
 
-def train(training_filename=training_filename):
+def title():
+    return "Decision Tree"
+
+def train(train_filename, param_filename):
     # Loading data frame
-	df = pd.read_csv(training_filename, delimiter=',', na_values="?")
+#     df = pd.read_csv(train_filename, delimiter=',', na_values="?")
 
-	# Separating target from inputs
-	X, y = design_matrix(df)
-	
-	# Initializing DT classifier
-	clf = tree.DecisionTreeClassifier()
+    # Separating target from inputs
+    X, y = design_matrix(train_filename=train_filename)
 
-	# Fitting DT classifier
-	clf.fit(X,y)
+    # Initializing DT classifier
+    clf = tree.DecisionTreeClassifier()
 
-	# Pickle and save
-	f = open(model_file, 'wb')
-	pickle.dump(clf, f)
-	
+    # Fitting DT classifier
+    clf.fit(X, y)
+
+    # Pickle and save
+    f = open(param_filename, 'wb')
+    pickle.dump(clf, f)
+
 if __name__ == "__main__":
-    train()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-t", "--train", nargs=1, default=["./data/training-data-completed.csv"], help="File containing training set")
+    parser.add_argument("-p", "--param", nargs=1, default=["./data/dtree-params"], help="Output file to save the parameters of the decision tree")
+    args = parser.parse_args() 
+    train(args.train[0], args.param[0])

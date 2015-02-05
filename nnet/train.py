@@ -13,12 +13,6 @@ from scipy.optimize import fmin_bfgs
 import matplotlib.pyplot as plt
 from utils import thetaMatrix, gradientArray, sigmoid, forwardProp, backwardProp, predict
 
-def prefix():
-    return "nnet"
-
-def title():
-    return "Neural Network"
-
 """Evaluates the cost function
 """
 def cost(theta, X, y, N, L, S, K, gamma):
