@@ -1,5 +1,7 @@
 """
 Run variety of evaluation metrics on nnet predictive model.
+
+@copyright: The Broad Institute of MIT and Harvard 2015
 """
 
 import argparse, sys, os
