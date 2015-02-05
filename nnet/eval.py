@@ -7,13 +7,22 @@ Run variety of evaluation metrics on nnet predictive model.
 import argparse, sys, os
 from utils import gen_predictor
 sys.path.append(os.path.abspath('./utils'))
-from evaluate import run_eval, design_matrix
+from evaluate import design_matrix, run_eval, get_misses
 
 def eval(test_filename, train_filename, param_filename, method):
     X, y = design_matrix(test_filename, train_filename)
     predictor = gen_predictor(param_filename)
     probs = predictor(X)
     return run_eval(probs, y, method)
+
+def miss(test_filename, train_filename, param_filename):
+    X, y, df = design_matrix(test_filename, train_filename, get_df=True)
+    predictor = gen_predictor(param_filename)
+    probs = predictor(X)
+    indices = get_misses(probs, y)
+    for i in indices:
+        print df.ix[i]
+    return indices
 
 def evaluate(test_filename, train_filename, param_filename, method):
     # Average calibrations and discriminations
@@ -32,6 +41,8 @@ def evaluate(test_filename, train_filename, param_filename, method):
     elif method == "confusion":
         eval(test_filename, train_filename, param_filename, 5)
     # Method not defined:
+    elif method == "misses":
+        miss(test_filename, train_filename, param_filename)
     else:
         raise Exception("Invalid method given")
 

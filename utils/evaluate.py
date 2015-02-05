@@ -9,7 +9,7 @@ from classificationreport import report
 from confusion import confusion
 from roc import roc
 
-def design_matrix(test_filename, train_filename):
+def design_matrix(test_filename, train_filename, get_df=False):
     df0 = pd.read_csv(train_filename, delimiter=",", na_values="?")
     df = pd.read_csv(test_filename, delimiter=",", na_values="?")
     # df and df0 must have the same number of columns (N), but not necessarily the same
@@ -32,7 +32,10 @@ def design_matrix(test_filename, train_filename):
             X[:, j] = np.clip((values - minv0) / (maxv0 - minv0), 0, 1)
         else:
             X[:, j] = 1.0 / M
-    return X, y
+    if get_df:
+        return X, y, df
+    else:
+        return X, y
 
 def run_eval(probs, y_test, method=1):
     if method == 1:
@@ -47,3 +50,12 @@ def run_eval(probs, y_test, method=1):
         return confusion(probs, y_test)
     else:
         raise Exception("Invalid method argument given")
+
+def get_misses(probs, y_test):
+    miss = []
+    for i in range(len(probs)):
+        p = probs[i]
+        pred = 0.5 < p
+        if pred != y_test[i]:
+            miss.append(i)
+    return miss

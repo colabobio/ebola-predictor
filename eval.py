@@ -1,5 +1,6 @@
 import argparse, glob, os
 from nnet.eval import eval as nnet_eval
+from nnet.eval import miss as nnet_miss
 
 label_file = "./data/labels.txt"
 target_names = []
@@ -50,14 +51,27 @@ def avg_report():
         output += '\n'
         print output
 
-
-    print "report"
-
 def roc_plots():
     print "4"
 
 def avg_conf_mat():
     print "5"
+
+def list_misses():
+    test_files = glob.glob("./data/testing-data-*.csv")
+    for pred in predictors:
+        print "Miss-classifications for predictor " + pred + "..."
+        count = 0
+        for testfile in test_files:
+            start_idx = testfile.find("./data/testing-data-") + len("./data/testing-data-")
+            stop_idx = testfile.find('.csv')
+            id = testfile[start_idx:stop_idx]
+            pfile = "./data/" + pred + "-params-" + str(id)
+            trainfile = "./data/training-data-completed-" + str(id) + ".csv"
+            if os.path.exists(testfile) and os.path.exists(pfile) and os.path.exists(trainfile):
+                count = count + 1
+                nnet_miss(testfile, trainfile, pfile)
+        print "Total miss-classifications:",count
 
 def evaluate(methods):
     for method in methods:
@@ -76,6 +90,8 @@ def evaluate(methods):
         # Average confusion matrix
         elif method == "confusion":
             avg_conf_mat()
+        elif method == "misses":
+            list_misses()
         # Method not defined:
         else:
             raise Exception("Invalid method given")
@@ -83,6 +99,6 @@ def evaluate(methods):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     # Evaluate the model with given method(s)
-    parser.add_argument('-e', nargs='+', default=["confusion"], help="Supported evaluation methods: roc, cd, report, calibration, confusion")
+    parser.add_argument('-e', nargs='+', default=["confusion"], help="Supported evaluation methods: roc, cd, report, calibration, confusion, misses")
     args = parser.parse_args()
     evaluate(args.e)
