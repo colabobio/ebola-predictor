@@ -1,14 +1,21 @@
-# Author: Jake VanderPlas <vanderplas@astro.washington.edu>
-# License: BSD
-#   The figure produced by this code is published in the textbook
-#   "Statistics, Data Mining, and Machine Learning in Astronomy" (2013)
-#   For more information, see http://astroML.github.com
-# http://www.astroml.org/book_figures/appendix/fig_neural_network.html
+"""
+Renders a graphical representation of the neural network stored in a parameters file.
 
-# Only works for 1 hidden layer!
+Based on the code from Jake VanderPlas <vanderplas@astro.washington.edu>
+Released under the BSD License
+
+The figure produced by this code is published in the textbook
+"Statistics, Data Mining, and Machine Learning in Astronomy" (2013)
+For more information, see http://astroML.github.com
+http://www.astroml.org/book_figures/appendix/fig_neural_network.html
+
+Important: Only works for 1 hidden layer!
+"""
 
 import numpy as np
+import argparse
 from matplotlib import pyplot as plt
+from utils import linear_index, thetaMatrix
 
 pred_file = "./data/predictor.txt"
 var_file = "./data/variables.txt"
@@ -16,7 +23,7 @@ var_file = "./data/variables.txt"
 def linear_index(mat_idx, N, L, S, K):
     l = mat_idx[0] # layer
     n = mat_idx[1] # node
-    i = mat_idx[2] # input    
+    i = mat_idx[2] # input
     if l < 1: 
         return n * N + i
     elif l < L - 1:
@@ -36,14 +43,22 @@ def thetaMatrix(theta, N, L, S, K):
     thetam[L - 1] = theta[C : C + K * S].reshape((K, S))
     return thetam
 
+##########################################################################################
+# Main
+##########################################################################################
+
+parser = argparse.ArgumentParser()
+parser.add_argument("param", nargs=1, default=["./data/nnet-params"], help="parameters of neural network")
+args = parser.parse_args()
+
 model_variables = []
 with open(var_file, "rb") as vfile:
     for line in vfile.readlines(): 
-        name = line.split()[0]       
+        name = line.split()[0]
         model_variables.append(name)
 model_variables[0] = "Bias"
 
-with open(pred_file, "rb") as pfile:
+with open(args.param[0], "rb") as pfile:
     i = 0
     for line in pfile.readlines():
         [name, value] = line.strip().split(":")
@@ -64,15 +79,13 @@ with open(pred_file, "rb") as pfile:
         i = i + 1
 
 fig = plt.figure(facecolor='w')
-ax = fig.add_axes([0, 0, 1, 1],
-                  xticks=[], yticks=[])
+ax = fig.add_axes([0, 0, 1, 1], xticks=[], yticks=[])
 plt.box(False)
 circ = plt.Circle((1, 1), 2)
 
 radius = 0.2
 
 arrow_kwargs = dict(head_width=0.05, fc='black')
-
 
 # function to draw arrows
 def draw_connecting_arrow(ax, circ1, rad1, circ2, rad2, coeff):
@@ -86,25 +99,23 @@ def draw_connecting_arrow(ax, circ1, rad1, circ2, rad2, coeff):
               circ2[1] - circ1[1] - (rad1 + 1.4 * rad2) * np.sin(theta))
 
     arrow_kwargs['fc'] = 'black'
-    arrow_kwargs['edgecolor'] = 'black'
+    arrow_kwargs['ec'] = None
     arrow_kwargs['alpha'] = 1
     arrow_kwargs['head_width'] = 0.05
     w = 0.01
     if coeff:
-        arrow_kwargs['edgecolor'] = 'none'
         arrow_kwargs['alpha'] = 0.5
         w = 0.05 * abs(coeff) / max_coeff
         arrow_kwargs['head_width'] = 0.1 * abs(coeff) / max_coeff
         if coeff < 0:
+            arrow_kwargs['ec'] = 'red'
             arrow_kwargs['fc'] = 'red'
         else:
+            arrow_kwargs['ec'] = 'blue'
             arrow_kwargs['fc'] = 'blue'
-            
 
-        
     ax.arrow(starting_point[0], starting_point[1],
              length[0], length[1], width=w, **arrow_kwargs)
-
 
 # function to draw circles
 def draw_circle(ax, center, radius, color='none'):
@@ -149,10 +160,10 @@ i1 = 0
 offset = 4.0 / (S - 1)
 for i2, y2 in enumerate(np.linspace(2, -2, S)):
     y2 = y2 - offset
-    for i1, y1 in enumerate(np.linspace(1.5, -1.5, N)): 
+    for i1, y1 in enumerate(np.linspace(1.5, -1.5, N)):
         if i2 == S - 1: continue
         draw_connecting_arrow(ax, (x1, y1), radius, (x2, y2), radius, theta0[i2][i1])
-        
+
 # IMPORTANT: no more than 1 hidden layers are supported!
 
 thetaf = thetam[1]
