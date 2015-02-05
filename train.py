@@ -2,6 +2,8 @@
 Trains all the predictors and saves the parameters to the data folder for later 
 evaluation.
 
+TODO: add module import to train other predictors
+
 @copyright: The Broad Institute of MIT and Harvard 2015
 """
 

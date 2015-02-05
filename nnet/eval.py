@@ -58,6 +58,6 @@ if __name__ == "__main__":
     parser.add_argument('-train', nargs=1, default=["./data/training-data-completed.csv"])
     parser.add_argument('-test', nargs=1, default=["./data/training-data.csv"])
     parser.add_argument('-param', nargs=1, default=["./data/nnet-params"])
-    parser.add_argument('-method', nargs=1, default=["confusion"])
+    parser.add_argument('-method', nargs=1, default=["report"])
     args = parser.parse_args()
     evaluate(args.test[0], args.train[0], args.param[0], args.method[0])

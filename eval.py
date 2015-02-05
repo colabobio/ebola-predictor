@@ -29,9 +29,9 @@ def avg_cal_dis(module):
     avg_cal = (total_cal)/(count)
     avg_dis = (total_dis)/(count)
 
-    print "********************************************"
-    print "Average calibration   : " + str(avg_cal)
-    print "Average discrimination: " + str(avg_dis)
+    print module.title() + " Average Calibration/Discrimination ********************************************"
+    print "Calibration   : " + str(avg_cal)
+    print "Discrimination: " + str(avg_dis)
 
 def cal_plots(module):
 # 	colors = {'eps' : 'green', 'nnet' : 'red', 'dt' : 'blue'}
@@ -114,7 +114,7 @@ def roc_plots(module):
             total_roc_auc += module.eval(testfile, trainfile, pfile, 4, pltshow=False)
     ave_roc_auc = (total_roc_auc)/(count)
     print "********************************************"
-    print "Average area under the ROC curve: " + str(ave_roc_auc)
+    print "Average area under the ROC curve for " + module.title() + ": " + str(ave_roc_auc)
     plt.show()
 
 def avg_conf_mat(module):
@@ -163,40 +163,40 @@ def list_misses(module):
         if os.path.exists(testfile) and os.path.exists(pfile) and os.path.exists(trainfile):
             count = count + 1
             module.miss(testfile, trainfile, pfile)
-    print "Total miss-classifications:",count
+    print "********************************************"
+    print "Total miss-classifications for " + module.title() + ":",count
 
-def evaluate(predictor, methods):
+def evaluate(predictor, method):
     module_path = os.path.abspath(predictor)
     module_filename = "eval"
     sys.path.insert(0, module_path)
     module = import_module(module_filename)
 
-    for method in methods:
-        # Average calibrations and discriminations
-        if method == "cd":
-            avg_cal_dis(module)
-        # Plot each method on same calibration plot
-        elif method == "calibration":
-            cal_plots(module)
-        # Average precision, recall, and F1 scores
-        elif method == "report":
-            avg_report(module)
-        # Plot each method on same ROC plot
-        elif method == "roc":
-            roc_plots(module)
-        # Average confusion matrix
-        elif method == "confusion":
-            avg_conf_mat(module)
-        elif method == "misses":
-            list_misses(module)
-        # Method not defined:
-        else:
-            raise Exception("Invalid method given")
+    # Average calibrations and discriminations
+    if method == "cd":
+        avg_cal_dis(module)
+    # Plot each method on same calibration plot
+    elif method == "calibration":
+        cal_plots(module)
+    # Average precision, recall, and F1 scores
+    elif method == "report":
+        avg_report(module)
+    # Plot each method on same ROC plot
+    elif method == "roc":
+        roc_plots(module)
+    # Average confusion matrix
+    elif method == "confusion":
+       avg_conf_mat(module)
+    elif method == "misses":
+        list_misses(module)
+    # Method not defined:
+    else:
+        raise Exception("Invalid method given")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     # Evaluate the model with given method(s)
     parser.add_argument('-p', nargs=1, default=["nnet"], help="Folder containing predictor to evaluate")
-    parser.add_argument('-e', nargs='+', default=["confusion"], help="Supported evaluation methods: roc, cd, report, calibration, confusion, misses")
+    parser.add_argument('-m', nargs=1, default=["report"], help="Supported evaluation methods: roc, cd, report, calibration, confusion, misses")
     args = parser.parse_args()
-    evaluate(args.p[0], args.e) 
+    evaluate(args.p[0], args.m[0])
