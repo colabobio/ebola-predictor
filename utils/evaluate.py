@@ -1,4 +1,7 @@
-""" Run variety of evaluation metrics on predictive model.
+"""
+Run variety of evaluation metrics on predictive model.
+
+@copyright: The Broad Institute of MIT and Harvard 2015
 """
 
 import pandas as pd

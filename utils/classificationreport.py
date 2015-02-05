@@ -1,5 +1,7 @@
 """
 Builds a text report showing precision, recall, F1 score.
+
+@copyright: The Broad Institute of MIT and Harvard 2015
 """
 
 from sklearn.metrics import classification_report

@@ -9,6 +9,12 @@ from utils import gen_predictor
 sys.path.append(os.path.abspath('./utils'))
 from evaluate import design_matrix, run_eval, get_misses
 
+def prefix():
+    return "nnet"
+
+def title():
+    return "Neural Network"
+
 def eval(test_filename, train_filename, param_filename, method):
     X, y = design_matrix(test_filename, train_filename)
     predictor = gen_predictor(param_filename)
