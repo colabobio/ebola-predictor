@@ -1,3 +1,5 @@
+.DS_Store
+*/.DS_Store
 data/*-params*
 data/training-data-*.csv
 data/testing-data-*.csv
@@ -6,4 +8,4 @@ data/training-data.csv
 out
 utils/*.pyc
 nnet/*.pyc
-
+dtree/*.pyc
