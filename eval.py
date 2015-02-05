@@ -34,34 +34,21 @@ def avg_cal_dis(module):
     print "Discrimination: " + str(avg_dis)
 
 def cal_plots(module):
-# 	colors = {'eps' : 'green', 'nnet' : 'red', 'dt' : 'blue'}
-# 
-# 	robjects.r.X11()
-# 
-# 	for id in file_ids:
-# 
-# 		train_file = "data/training-data-imputed-"+str(id)+".csv"
-# 		test_file = "data/testing-data-"+str(id)+".csv"
-# 
-# 		pred_model_dict = {'eps': build_eps(train_file), 'dt': build_dt(train_file), 'nnet': build_nnet(train_file)}
-# 
-# 		df = pd.read_csv(test_file, delimiter=",", na_values="?")
-# 		X, y_test = design_matrix(df)
-# 
-# 		X_eps = eps_dataframe(test_file)
-# 
-# 		for model_type, model in pred_model_dict.items():
-# 			if model_type == 'eps':
-# 				probs = model(X_eps)
-# 			else:
-# 				probs = model(X)
-# 			calplot(probs, test_file, "data/calibration-"+model_type+str(id)+".txt", color=colors[model_type])
-# 
-# 	# Plot the calibrations
-# 	print "Press Ctrl+C to quit"
-# 	while True:
-# 		continue
-    print "2"
+    test_files = glob.glob("./data/testing-data-*.csv")
+    print "Calculating calibration plots for " + module.title() + "..."
+    for testfile in test_files:
+        start_idx = testfile.find("./data/testing-data-") + len("./data/testing-data-")
+        stop_idx = testfile.find('.csv')
+        id = testfile[start_idx:stop_idx]
+        pfile = "./data/" + module.prefix() + "-params-" + str(id)
+        trainfile = "./data/training-data-completed-" + str(id) + ".csv"
+        if os.path.exists(testfile) and os.path.exists(pfile) and os.path.exists(trainfile):
+            print "Calibration for test set " + id + " ----------------------------------"
+            out_file = "./out/calstats-" + id + ".txt"
+            plot_file = "./out/calplot-" + id + ".pdf"
+            module.eval(testfile, trainfile, pfile, 2, test_file=testfile, out_file=out_file, plot_file=plot_file)
+    print "********************************************"
+    print "Saved calibration plot and Hosmer-Lemeshow goodness of fit for " + module.title() + " in out folder."
 
 def avg_report(module):
     test_files = glob.glob("./data/testing-data-*.csv")
@@ -96,7 +83,6 @@ def avg_report(module):
 
 def roc_plots(module):
     plt.clf()
-
     test_files = glob.glob("./data/testing-data-*.csv")
     print "Calculating ROC curves for " + module.title() + "..."
     count = 0
@@ -173,10 +159,10 @@ def evaluate(predictor, method):
     module = import_module(module_filename)
 
     # Average calibrations and discriminations
-    if method == "cd":
+    if method == "caldis":
         avg_cal_dis(module)
     # Plot each method on same calibration plot
-    elif method == "calibration":
+    elif method == "calplot":
         cal_plots(module)
     # Average precision, recall, and F1 scores
     elif method == "report":
@@ -197,6 +183,6 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     # Evaluate the model with given method(s)
     parser.add_argument('-p', nargs=1, default=["nnet"], help="Folder containing predictor to evaluate")
-    parser.add_argument('-m', nargs=1, default=["report"], help="Supported evaluation methods: roc, cd, report, calibration, confusion, misses")
+    parser.add_argument('-m', nargs=1, default=["report"], help="Supported evaluation methods: caldis, calplot, report, roc, confusion, misses")
     args = parser.parse_args()
     evaluate(args.p[0], args.m[0])

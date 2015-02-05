@@ -33,11 +33,11 @@ def miss(test_filename, train_filename, param_filename):
 
 def evaluate(test_filename, train_filename, param_filename, method):
     # Average calibrations and discriminations
-    if method == "cd":
+    if method == "caldis":
         eval(test_filename, train_filename, param_filename, 1)
     # Plot each method on same calibration plot
-    elif method == "calibration":
-        eval(test_filename, train_filename, param_filename, 2)
+    elif method == "calplot":
+        eval(test_filename, train_filename, param_filename, 2, test_file=test_filename)
     # Average precision, recall, and F1 scores
     elif method == "report":
         eval(test_filename, train_filename, param_filename, 3)

@@ -44,7 +44,7 @@ def run_eval(probs, y_test, method=1, **kwparams):
     if method == 1:
         return caldis(probs, y_test)
     elif method == 2:
-        return calplot(probs, y_test)
+        return calplot(probs, y_test, **kwparams)
     elif method == 3:
         return report(probs, y_test)
     elif method == 4:

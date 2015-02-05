@@ -10,13 +10,23 @@ import numpy as np
 from matplotlib import pyplot as plt
 from sklearn.metrics import roc_curve, auc
 
-def roc(probs, y_test, color='red', label='ROC curve', **kwparams):
+def roc(probs, y_test, **kwparams):
     # Compute ROC curve and area the curve
     fpr, tpr, thresholds = roc_curve(y_test, probs)
     roc_auc = auc(fpr, tpr)
     print "Area under the ROC curve : %f" % roc_auc
 
-    pltshow=kwparams["pltshow"]#False
+    if "color" in kwparams:
+        color = kwparams["color"]
+    else:
+        color = "grey"
+        
+    if "label" in kwparams:
+        label = kwparams["label"]
+    else:
+        label="ROC curve"
+
+    pltshow = kwparams["pltshow"]
 
     # Plot ROC curve
 #     plt.plot(fpr, tpr, label=label, marker='o', c=color)
