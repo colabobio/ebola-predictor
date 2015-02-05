@@ -7,7 +7,8 @@ RPy2
 Pandas
 Numpy
 matplotlib
-R, Amelia II
+scikit-learn
+R (Amelia II, PredictABEL)
 
 
 ##Steps for setting model:
