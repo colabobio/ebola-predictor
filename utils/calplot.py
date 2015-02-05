@@ -45,5 +45,5 @@ def calplot(probs, y_test, **kwparams):
     robjects.r('plotCalibration(data=trdat, cOutcome=cOutcome, predRisk=predRisk, filename="' + out_file + '")')
     robjects.r('dev.off()')
 
-    print "Saved calibration plot to:           ",plot_file
+    print "Saved calibration plot to          :",plot_file
     print "Saved Hosmer-Lemeshow statistics to: ",out_file
