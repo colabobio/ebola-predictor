@@ -148,8 +148,8 @@ def list_misses(module):
         pfile = "./data/" + module.prefix() + "-params-" + str(id)
         trainfile = "./data/training-data-completed-" + str(id) + ".csv"
         if os.path.exists(testfile) and os.path.exists(pfile) and os.path.exists(trainfile):
-            count = count + 1
-            module.miss(testfile, trainfile, pfile)
+            idx = module.miss(testfile, trainfile, pfile)
+            count += len(idx)
     print "********************************************"
     print "Total miss-classifications for " + module.title() + ":",count
 
