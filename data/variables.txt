@@ -1,4 +1,5 @@
 OUT category
+AGE float
 PCR float
 TEMP float
 DIARR category
