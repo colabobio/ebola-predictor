@@ -8,6 +8,7 @@ import argparse, sys, os
 from utils import load_dataframe, design_matrix ,gen_predictor
 sys.path.append(os.path.abspath('./utils'))
 from evaluate import run_eval, get_misses
+from evaluate import design_matrix as design_matrix_full
 
 def prefix():
     return "eps"
@@ -22,6 +23,7 @@ def eval(test_filename, train_filename, param_filename, method, cutoff=0, **kwpa
     return run_eval(probs, y, method, **kwparams)
 
 def miss(test_filename, train_filename, param_filename, cutoff=0):
+    _, _, df0 = design_matrix_full(test_filename=test_filename, train_filename="", get_df=True)
     df = load_dataframe(test_filename)
     X, y = design_matrix(df)
     predictor = gen_predictor(cutoff)
@@ -29,7 +31,8 @@ def miss(test_filename, train_filename, param_filename, cutoff=0):
     indices = get_misses(probs, y)
     for i in indices:
         print "----------------"
-        print df.ix[i]
+        print "SCORE:", df.ix[i][1]
+        print df0.ix[i]
     return indices
 
 def evaluate(test_filename, train_filename, param_filename, method, cutoff=0):

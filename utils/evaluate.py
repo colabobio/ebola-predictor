@@ -13,7 +13,7 @@ from confusion import confusion
 from roc import roc
 
 def design_matrix(test_filename="", train_filename="", get_df=False):
-    if test_filename:
+    if test_filename and train_filename:
         # Will build a design matrix from the test data, using the training data for 
         # normalization
         df0 = pd.read_csv(train_filename, delimiter=",", na_values="?")
@@ -39,8 +39,10 @@ def design_matrix(test_filename="", train_filename="", get_df=False):
             else:
                 X[:, j] = 1.0 / M
     else:
-        # Will build the design matrix for the training set
-        df = pd.read_csv(train_filename, delimiter=",", na_values="?")
+        # Will build the design matrix from either the training of testing set
+        if train_filename: filename = train_filename
+        else: filename = test_filename
+        df = pd.read_csv(filename, delimiter=",", na_values="?")
         M = df.shape[0]
         N = df.shape[1]
         y = df.values[:,0]
@@ -56,7 +58,7 @@ def design_matrix(test_filename="", train_filename="", get_df=False):
                 X[:, j] = np.clip((values - minv) / (maxv - minv), 0, 1)
             else:
                 X[:, j] = 1.0 / M
-
+    
     if get_df:
         return X, y, df
     else:
