@@ -27,6 +27,18 @@ View scatterplot matrix for given dataset
 python utils/scatterplot.py ./data/training-data-completed-9.csv
 ```
 
+##Reference prediction: EPS
+
+Use either variables-eps7 or variables-eps10, set ranges to all ages then:
+
+```bash
+python utils/makesets.py -p 100
+```
+
+```bash
+python eps/eval.py -cutoff 0 -method report
+```
+cutoff sets the EPS score above which a patient is predicted to die.
 
 ##Batch mode
 1) Create training/test sets
