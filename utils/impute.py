@@ -104,12 +104,13 @@ def impute(num_imputed, train_filename, aggr_filename, incheck_opt = False, resa
                             break
                 if add: aggregated_data.append(row)
 
-    with open(aggr_filename, "wb") as trfile:
-        writer = csv.writer(trfile, delimiter=",", quotechar='"', quoting=csv.QUOTE_MINIMAL)
-        writer.writerow(model_variables)
-        for row in aggregated_data:
-            writer.writerow(row)
-    print "Saved aggregated imputed datasets to", aggr_filename
+    if aggregated_data:
+        with open(aggr_filename, "wb") as trfile:
+            writer = csv.writer(trfile, delimiter=",", quotechar='"', quoting=csv.QUOTE_MINIMAL)
+            writer.writerow(model_variables)
+            for row in aggregated_data:
+                writer.writerow(row)
+        print "Saved aggregated imputed datasets to", aggr_filename
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
