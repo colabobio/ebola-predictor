@@ -7,12 +7,12 @@ http://gking.harvard.edu/amelia
 @copyright: The Broad Institute of MIT and Harvard 2015
 """
 
-import sys, csv, argparse
+import sys, os, csv, argparse
 import rpy2.robjects as robjects
 
 var_file = "./data/variables.txt"
 
-def impute(num_imputed, train_filename, aggr_filename, incheck_opt = False, resamples_opt = 10000):
+def impute(num_imputed, train_filename, aggr_filename, incheck_opt = False, resamples_opt = 10000, gen_plots = False):
     model_variables = []
     var_types = {}
     nom_rstr = ''
@@ -79,6 +79,35 @@ def impute(num_imputed, train_filename, aggr_filename, incheck_opt = False, resa
 
     robjects.r('imdat <- amelia(trdat, m=' + str(num_imputed) + ', noms=nom_vars, bounds=num_bounds, max.resample = ' + str(resamples_opt) + ', incheck=' + incheck_str + ')')
     robjects.r('write.amelia(obj=imdat, file.stem="./data/training-data-", format="csv", row.names=FALSE)')
+    
+    if gen_plots:
+        if not os.path.exists("./out"): os.makedirs("./out")
+        robjects.r('pdf("./out/missingness.pdf", useDingbats=FALSE)')
+        robjects.r('missmap(imdat)')
+        robjects.r('dev.off()')
+        for i in range(0, len(model_variables)):
+            name = model_variables[i]
+            # Compare observed density with imputed density
+            robjects.r('pdf("./out/obs-vs-imp-' + name+ '.pdf", useDingbats=FALSE)')
+            robjects.r('compare.density(imdat, var = "' + name + '")')
+            robjects.r('dev.off()')
+            if not var_types[name]:
+                # Numerical variable, we can generate the quality of imputation plot
+                robjects.r('pdf("./out/quality-imp-' + name+ '.pdf", useDingbats=FALSE)')
+                robjects.r('overimpute(imdat, var = "' + name + '")')
+                robjects.r('dev.off()')
+        print "Saved Amelia plots to out folder"
+    
+# Compare observed density with imputed density
+# %R compare.density(imputed, var = "PROTIME")
+# %R compare.density(imputed, var = "ALBUMIN")
+# %R compare.density(imputed, var = "ASCITES")
+# 
+# # "Quality" of imputation (cannot be generated for nominal variables)
+# %R overimpute(imputed, var = "PROTIME")
+# %R overimpute(imputed, var = "ALBUMIN") 
+
+
     print "Success!"
 
     print "Aggregating imputed datasets..."
@@ -124,9 +153,13 @@ if __name__ == "__main__":
                         help="number of resamples")
     parser.add_argument("-c", "--check", action="store_true",
                         help="check input data")
+    parser.add_argument("-p", "--plots", action="store_true",
+                        help="generate plots")
+                        
     args = parser.parse_args()
     impute(num_imputed=args.number[0],
            train_filename=args.train[0],
            aggr_filename=args.aggregated[0],
            incheck_opt=args.check,
-           resamples_opt=args.resamples[0])
+           resamples_opt=args.resamples[0],
+           gen_plots=args.plots)

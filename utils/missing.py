@@ -1,8 +1,6 @@
 """
 This script gives information on the missingness in the input file.
 
-TODO: generate some plots with Amelia
-
 @copyright: The Broad Institute of MIT and Harvard 2015
 """
 
