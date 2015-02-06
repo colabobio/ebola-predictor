@@ -1,33 +1,18 @@
-'''
-Utility functions for the decision tree classifier.
-'''
+"""
+Utility functions for the Ebola Prognosis Score.
+
+@copyright: The Broad Institute of MIT and Harvard 2015
+"""
 
 import csv
 import numpy as np
 import pandas as pd
-import pickle
 
-use_naive_classifier = False
-
-def design_matrix(df):
-	M = df.shape[0]
-	N = df.shape[1]
-	
-	y = df.values[:,0]
-	# Building the (normalized) design matrix
-	X = np.ones((M, N))
-	for j in range(1, N):
-		# Computing i-th column. The pandas dataframe
-		# contains all the values as numpy arrays that
-		# can be handled individually:
-		values = df.values[:, j]
-		minv = values.min()
-		maxv = values.max()
-		X[:, j] = (values - minv) / (maxv - minv)
-		
-	return X, y
-	
-def eps_dataframe(data_filename, threshold_filename="./eps/thresholds.txt"):
+"""
+Loads a datafile a constructs a dataframe for EPS where there are only two columns: output 
+and score.
+"""
+def load_dataframe(data_filename, threshold_filename="./eps/thresholds.txt"):
     thresh_variables = []
     model_variables = []
     with open(threshold_filename, "rb") as tfile:
@@ -63,33 +48,19 @@ def eps_dataframe(data_filename, threshold_filename="./eps/thresholds.txt"):
     df = pd.DataFrame(data, index=index, columns=columns)
     return df
 
-def eps_pred(testing_filename = "./data/testing-data.csv", model_filename = "./data/eps-model.p"):
-	# Runs predictors on test sets, returns scores (probabilities).
-	
-	# Load the test data
-# 	df = pd.read_csv(testing_filename, delimiter=",", na_values="?")
-	df = eps_dataframe(testing_filename)
-	X, y = design_matrix(df)
-	
-	if use_naive_classifier:
-		probs = [0 if s < 2 else 1 for s in df["SCORE"]]
-	else:
-		# Load the classifier
-		clf = pickle.load(open( model_filename, "rb" ) )
-		# Make predictions
-		scores = clf.predict_proba(X)	
-		probs = [x[1] for x in scores]
-	
-	return probs, y
-	
-def eps_pred_model(model_filename = "./data/eps-model.p"):
+def design_matrix(df):
+    M = df.shape[0]
+    N = df.shape[1]
+    y = df.values[:,0]
+    X = np.ones((M, N))
+    for j in range(1, N):
+        X[:, j] = df.values[:, j]
+    return X, y
 
-	# Load the decision tree
-	clf = pickle.load(open( model_filename, "rb" ) )
-
-	def pred_model(X):
-		scores = clf.predict_proba(X)
-		probs = [x[1] for x in scores]
-		return probs
-
-	return pred_model
+def gen_predictor(cutoff=0):
+    def predictor(X):
+        scores = []
+        for i in range(0, len(X)):
+            scores.extend([0 if x <= cutoff else 1 for x in X[i,1:]])
+        return scores
+    return predictor

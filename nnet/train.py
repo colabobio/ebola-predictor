@@ -252,7 +252,11 @@ def train(train_filename, param_filename, L=1, hf=1, gamma=0.002, threshold=1E-5
         values = df.values[:, j]
         minv = values.min()
         maxv = values.max()
-        X[:, j] = (values - minv) / (maxv - minv)
+#         X[:, j] = (values - minv) / (maxv - minv)
+        if maxv > minv:
+            X[:, j] = np.clip((values - minv) / (maxv - minv), 0, 1)
+        else:
+            X[:, j] = 1.0 / M
 
    # Number of training runs
     iter = 1

@@ -1,5 +1,5 @@
 """
-Run variety of evaluation metrics on nnet predictive model.
+Run variety of evaluation metrics on dtree predictive model.
 
 @copyright: The Broad Institute of MIT and Harvard 2015
 """
@@ -56,7 +56,7 @@ def evaluate(test_filename, train_filename, param_filename, method):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('-train', nargs=1, default=["./data/training-data-completed.csv"])
-    parser.add_argument('-test', nargs=1, default=["./data/training-data.csv"])
+    parser.add_argument('-test', nargs=1, default=["./data/testing-data.csv"])
     parser.add_argument('-param', nargs=1, default=["./data/dtree-params"])
     parser.add_argument('-method', nargs=1, default=["report"])
     args = parser.parse_args()
