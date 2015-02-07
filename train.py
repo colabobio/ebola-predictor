@@ -8,7 +8,7 @@ evaluation.
 import sys, os, argparse, glob
 from importlib import import_module
 
-def train(predictor):
+def train(predictor, **kwparams):
     module_path = os.path.abspath(predictor)
     module_filename = "train"
     sys.path.insert(0, module_path)
@@ -30,12 +30,17 @@ def train(predictor):
         start_idx = tfile.find("training-data-completed-") + len("training-data-completed-")
         stop_idx = tfile.find(".csv")
         id = tfile[start_idx:stop_idx]
-        module.train(train_filename=tfile, param_filename="./data/" + module.prefix() + "-params-" + str(id))
+        module.train(train_filename=tfile, param_filename="./data/" + module.prefix() + "-params-" + str(id), **kwparams)
     print "Done."
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     # Evaluate the model with given method(s)
     parser.add_argument('pred', nargs=1, default=["nnet"], help="Folder containing predictor to evaluate")
+    parser.add_argument('vars', nargs='*')
     args = parser.parse_args()
-    train(args.pred[0])
+    kwargs = {}
+    for var in args.vars:
+        [k, v] = var.split("=")
+        kwargs[k] = v
+    train(args.pred[0], **kwargs)

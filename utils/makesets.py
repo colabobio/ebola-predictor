@@ -129,6 +129,6 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('-train', nargs=1, default=["./data/training-data.csv"])
     parser.add_argument('-test', nargs=1, default=["./data/testing-data.csv"])
-    parser.add_argument('-p', type=int, nargs=1, default=[70])
+    parser.add_argument('-p', type=int, nargs=1, default=[50])
     args = parser.parse_args()
     makesets(args.p[0], args.test[0], args.train[0])

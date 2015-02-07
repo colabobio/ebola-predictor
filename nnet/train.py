@@ -206,7 +206,37 @@ Trains the neural net given the specified parameters
 :param show: show minimization plot
 :param debug: gradient check
 """
-def train(train_filename, param_filename, L=1, hf=1, gamma=0.002, threshold=1E-5, show=False, debug=False):
+def train(train_filename, param_filename, **kwparams):
+    if "L" in kwparams:
+        L = int(kwparams["L"])
+    else:
+        L = 1
+
+    if "hf" in kwparams:
+        hf = float(kwparams["hf"])
+    else:
+        hf = 1
+
+    if "gamma" in kwparams:
+        gamma = float(kwparams["gamma"])
+    else:
+        gamma = 0.002
+
+    if "threshold" in kwparams:
+        threshold = float(kwparams["threshold"])
+    else:
+        threshold = 1E-5
+
+    if "show" in kwparams:
+        show = True if kwparams["show"].lower() == "true" else False
+    else:
+        show = False
+
+    if "debug" in kwparams:
+        debug = True if kwparams["debug"].lower() == "true" else False
+    else:
+        debug = False
+
     global gcheck
     global params
     global values
@@ -225,7 +255,7 @@ def train(train_filename, param_filename, L=1, hf=1, gamma=0.002, threshold=1E-5
     N = df.shape[1]
     S = int((N - 1) * hf) # includes the bias unit on each layer, so the number of units is S-1
     print "Number of data samples          :", M
-    print "Number of independent variables :", N-1 
+    print "Number of independent variables :", N-1
     print "Number of hidden layers         :", L-1
     print "Number of units per hidden layer:", S-1
     print "Number of output classes        :", K
@@ -316,11 +346,17 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-t", "--train", nargs=1, default=["./data/training-data-completed.csv"], help="File containing training set")
     parser.add_argument("-p", "--param", nargs=1, default=["./data/nnet-params"], help="Output file to save the parameters of the neural net")
-    parser.add_argument("-l", "--layers", type=int, nargs=1, default=[1], help="Number of hidden layers")
-    parser.add_argument("-f", "--hfactor", type=float, nargs=1, default=[1], help="Hidden units factor")
-    parser.add_argument("-g", "--gamma", type=float, nargs=1, default=[0.002], help="Regularization coefficient")
-    parser.add_argument("-c", "--convergence", type=float, nargs=1, default=[1E-5], help="Convergence threshold for the BFGS minimizer")
+    parser.add_argument("-l", "--layers", nargs=1, default=["1"], help="Number of hidden layers")
+    parser.add_argument("-f", "--hfactor", nargs=1, default=["1"], help="Hidden units factor")
+    parser.add_argument("-g", "--gamma", nargs=1, default=["0.002"], help="Regularization coefficient")
+    parser.add_argument("-c", "--convergence", nargs=1, default=["1E-5"], help="Convergence threshold for the BFGS minimizer")
     parser.add_argument("-s", "--show", action="store_true", help="Shows minimization plot")
     parser.add_argument("-d", "--debug", action="store_true", help="Debugs gradient calculation")
     args = parser.parse_args()
-    train(args.train[0], args.param[0], args.layers[0], args.hfactor[0], args.gamma[0], args.convergence[0], args.show, args.debug)
+    train(args.train[0], args.param[0],
+          L=args.layers[0],
+          hf=args.hfactor[0],
+          gamma=args.gamma[0],
+          threshold=args.convergence[0],
+          show=str(args.show),
+          debug=str(args.debug))
