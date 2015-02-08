@@ -17,9 +17,11 @@ def load_dataframe(data_filename, threshold_filename="./eps/thresholds.txt"):
     model_variables = []
     with open(threshold_filename, "rb") as tfile:
         for line in tfile.readlines():
-            parts = line.strip().split()        
+            line = line.strip()
+            if not line: continue
+            parts = line.split()
             thresh_variables.append({"name":parts[0], "type":parts[1], "threshold":parts[2]})
-            model_variables.append(parts[0])    
+            model_variables.append(parts[0])
     data = []
     index = []
     columns = ["OUT", "SCORE"]

@@ -90,6 +90,8 @@ if __name__ == "__main__":
     var_types = {}
     with open(var_file, "rb") as vfile:
         for line in vfile.readlines():
+            line = line.strip()
+            if not line: continue
             [name, type] = line.split()[0:2]
             var_types[name] = type == "category"
 

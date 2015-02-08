@@ -53,7 +53,9 @@ args = parser.parse_args()
 
 model_variables = []
 with open(var_file, "rb") as vfile:
-    for line in vfile.readlines(): 
+    for line in vfile.readlines():
+        line = line.strip()
+        if not line: continue
         name = line.split()[0]
         model_variables.append(name)
 model_variables[0] = "Bias"

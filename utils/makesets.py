@@ -54,13 +54,18 @@ def makesets(test_percentage, test_filename, train_filename):
     model_variables = []
     with open(var_file, "rb") as vfile:
         for line in vfile.readlines():
+            line = line.strip()
+            if not line: continue
             model_variables.append(line.split()[0])
 
     range_variables = [] 
     with open(range_file, "rb") as rfile:
         for line in rfile.readlines():
+            line = line.strip()
+            if not line: continue
             parts = line.strip().split()
-            range_variables.append({"name":parts[0], "type":parts[1], "range":parts[2].split(",")})
+            if 2 < len(parts):
+                range_variables.append({"name":parts[0], "type":parts[1], "range":parts[2].split(",")})
 
     ids = []
     all_data = []

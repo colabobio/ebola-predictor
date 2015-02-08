@@ -17,6 +17,8 @@ with open(src_file, "rb") as sfile:
 model_variables = []
 with open(var_file, "rb") as vfile:
     for line in vfile.readlines():
+        line = line.strip()
+        if not line: continue
         model_variables.append(line.split()[0])
 
 total_count = 0

@@ -18,6 +18,8 @@ def impute(num_imputed, train_filename, aggr_filename, incheck_opt = False, resa
     nom_rstr = ''
     with open(var_file, "rb") as vfile:
         for line in vfile.readlines():
+            line = line.strip()
+            if not line: continue
             [name, type] = line.split()[0:2]
             model_variables.append(name)
             var_types[name] = type == "category"
