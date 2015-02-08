@@ -14,19 +14,19 @@ one missing value
 :param in_file: input file with all the data
 :param out_file: output file with only complete rows
 """
-def listdel(in_file, out_file):
-    print "Removing incomplete rows from",in_file
+def listdel(in_filename, out_filename):
+    print "Removing incomplete rows from",in_filename
     titles = []
     data = []
-    with open(in_file, "rb") as ifile:
+    with open(in_filename, "rb") as ifile:
         reader = csv.reader(ifile)
         titles = reader.next()
         for row in reader:
             if "?" in row: continue
             data.append(row)
-            
-    print "Writing complete data to",out_file
-    with open(out_file, "wb") as trfile:
+
+    print "Writing complete data to",out_filename
+    with open(out_filename, "wb") as trfile:
         writer = csv.writer(trfile, delimiter=",", quotechar='"', quoting=csv.QUOTE_MINIMAL)
         writer.writerow(titles)
         for row in data: writer.writerow(row)

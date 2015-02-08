@@ -12,7 +12,7 @@ import rpy2.robjects as robjects
 
 var_file = "./data/variables.txt"
 
-def impute(num_imputed, train_filename, aggr_filename, incheck_opt = False, resamples_opt = 10000, gen_plots = False):
+def impute(train_filename, aggr_filename, num_imputed=5, incheck_opt=False, resamples_opt=10000, gen_plots=False):
     model_variables = []
     var_types = {}
     nom_rstr = ''
@@ -99,16 +99,6 @@ def impute(num_imputed, train_filename, aggr_filename, incheck_opt = False, resa
                 robjects.r('overimpute(imdat, var = "' + name + '")')
                 robjects.r('dev.off()')
         print "Saved Amelia plots to out folder"
-    
-# Compare observed density with imputed density
-# %R compare.density(imputed, var = "PROTIME")
-# %R compare.density(imputed, var = "ALBUMIN")
-# %R compare.density(imputed, var = "ASCITES")
-# 
-# # "Quality" of imputation (cannot be generated for nominal variables)
-# %R overimpute(imputed, var = "PROTIME")
-# %R overimpute(imputed, var = "ALBUMIN") 
-
 
     print "Success!"
 
@@ -145,19 +135,19 @@ def impute(num_imputed, train_filename, aggr_filename, incheck_opt = False, resa
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-n", "--number", type=int, nargs=1, default=[10],
-                        help="number of imputed datasets")
     parser.add_argument("-t", "--train", nargs=1, default=["./data/training-data.csv"],
                         help="name of traning file")
     parser.add_argument("-a", "--aggregated", nargs=1, default=["./data/training-data-completed.csv"],
                         help="name of aggregated file")
+    parser.add_argument("-n", "--number", type=int, nargs=1, default=[5],
+                        help="number of imputed datasets")
     parser.add_argument("-r", "--resamples", type=int, nargs=1, default=[10000],
                         help="number of resamples")
     parser.add_argument("-c", "--check", action="store_true",
                         help="check input data")
     parser.add_argument("-p", "--plots", action="store_true",
                         help="generate plots")
-                        
+
     args = parser.parse_args()
     impute(num_imputed=args.number[0],
            train_filename=args.train[0],
