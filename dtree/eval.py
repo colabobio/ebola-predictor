@@ -22,8 +22,11 @@ def eval(test_filename, train_filename, param_filename, method, **kwparams):
     return run_eval(probs, y, method, **kwparams)
 
 def miss(test_filename, train_filename, param_filename):
-    with open(test_filename.replace("-data", "-index"), "r") as idxfile:
-        lines = idxfile.readlines()
+    fn = test_filename.replace("-data", "-index")
+    meta = None
+    if os.path.exists(fn):
+        with open(fn, "r") as idxfile:
+            meta = idxfile.readlines()
 
     X, y, df = design_matrix(test_filename, train_filename, get_df=True)
     predictor = gen_predictor(param_filename)
@@ -31,7 +34,7 @@ def miss(test_filename, train_filename, param_filename):
     indices = get_misses(probs, y)
     for i in indices:
         print "----------------"
-        print "META:",",".join(lines[i].split(",")).strip()
+        if meta: print "META:",",".join(lines[i].split(",")).strip()
         print df.ix[i]
     return indices
 
