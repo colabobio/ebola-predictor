@@ -28,10 +28,9 @@ def create_sets(iter_count, id_start, test_percentage, impute_method, **kwparams
         idx_files = glob.glob("./data/*-idx*")
         if test_files or train_files or idx_files:
             print "Removing old sets..."
-        for file in test_files: os.remove(file)
-        for file in train_files: os.remove(file)
-        for file in idx_files: os.remove(file)
-        if test_files or train_files or idx_files:
+            for file in test_files: os.remove(file)
+            for file in train_files: os.remove(file)
+            for file in idx_files: os.remove(file)
             print "Done."
 
     module_path = os.path.abspath("./utils")
