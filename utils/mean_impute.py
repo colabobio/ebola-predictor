@@ -2,6 +2,8 @@
 This script imputes the missing values using means.
 It should not be used in practice! Just for dev purposes.
 
+FIX: binary variables are assigned fractional values between 0 and 1 due to average
+
 @copyright: The Broad Institute of MIT and Harvard 2015
 """
 

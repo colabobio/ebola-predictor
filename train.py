@@ -36,7 +36,8 @@ def train(predictor, **kwparams):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     # Evaluate the model with given method(s)
-    parser.add_argument('pred', nargs=1, default=["nnet"], help="Folder containing predictor to evaluate")
+    parser.add_argument('pred', nargs=1, default=["nnet"],
+                        help="Folder containing predictor to evaluate")
     parser.add_argument('vars', nargs='*')
     args = parser.parse_args()
     kwargs = {}
