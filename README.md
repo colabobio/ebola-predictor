@@ -35,7 +35,54 @@ The source dataset must be contained in a standard CSV file where each column ho
 variable and each row represents a distinct data sample. The first row in the data file must 
 contain the names of the variables stored in each column. The location of the data file must 
 be indicated in the file _sources.txt_ inside the _data_ folder. This location can be relative 
-or absolute.
+or absolute, for example the default sources file simply points to a csv file already inside the
+_data_ folder:
+
+```
+./data/data.csv
+```
+
+The list of variables to include in the predictive model are listed in the _variables.txt_
+file:
+
+```
+OUT category
+PCR float
+TEMP float
+DIARR category
+AST_1 float
+Cr_1 float
+```
+
+Each row in this file must contain two values separated by a space: the variable name (as 
+it appears in first row of the CSV file), and the type. The supported types are category 
+(for nominal or ordinal variables), and int and float (for numerical variables). The first 
+row in the variables file *must* be response variable to predict, which must also be not 
+only of category type, but also binary, and in particular adopting the values 1 and 0. 
+This limitation currently applies to any other category variable to include in the model.
+
+In order to restrict the application of the model to a subset of the entire data, ranges
+can be defined on the variables. This ranges are set in the *ranges.txt* file:
+
+```
+DIAG category 1
+AGE int 0,50
+```
+
+In this case, only rows where the DIAG category variable adopts the value 1 and AGE is 
+between 0 and 50 will be used to construct the training and test sets.
+
+As mentioned before, missing values can be handled by the pipeline using different methods
+(see next section). However, it is required that the missing values in the source CSV file 
+are identified by the "\N" string (backslash + N character).
+
+Finally, some evaluation methods display labels for the two possible values of the outcome 
+variable. These labels can be set in the labels.txt file as follows:
+
+```
+0 Discharged
+1 Died
+```
 
 
 
@@ -46,7 +93,6 @@ or absolute.
 
 
 
-Algorithms to predict outcome of Ebola patients given their clinical and lab symptoms. Based on the metadata available at http://fathom.info/mirador/ebola/datarelease.html
 
 ##Dependencies
 * Pandas
