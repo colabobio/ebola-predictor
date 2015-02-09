@@ -43,8 +43,9 @@ def create_sets(iter_count, id_start, test_percentage, impute_method, **kwparams
         print "Creating training/test sets #" + str(id) + "..."
         test_filename = "./data/testing-data-"+str(id)+".csv"
         train_filename = "./data/training-data-"+str(id)+".csv"
+        idx_filename = "./data/idx-" + str(id)
         completed_filename = "./data/training-data-completed-"+str(id)+".csv"
-        makesets(test_percentage, test_filename, train_filename)
+        makesets(test_percentage, test_filename, train_filename, idx_filename)
         module.process(in_filename=train_filename, out_filename=completed_filename, **kwparams)
         print "Done."
 

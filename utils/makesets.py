@@ -45,7 +45,7 @@ source data
 :param test_filename: name of file to store test set
 :param train_filename: name of file to store training set
 """
-def makesets(test_percentage, test_filename, train_filename):
+def makesets(test_percentage, test_filename, train_filename, index_filename):
     input_file = ""
     with open(src_file, "rb") as sfile:
         for line in sfile.readlines():
@@ -69,12 +69,14 @@ def makesets(test_percentage, test_filename, train_filename):
 
     ids = []
     all_data = []
+    orig_idx = []
     complete_rows = []
     with open(input_file, "rb") as ifile:
         reader = csv.reader(ifile)
         titles = reader.next()
         model_idx = [titles.index(var) for var in model_variables]
-        r = 0 
+        r0 = 0
+        r = 0
         for row in reader:
             all_missing = True
             some_missing = False
@@ -102,9 +104,11 @@ def makesets(test_percentage, test_filename, train_filename):
 
             if not all_missing and not missing_dvar and inside_range:
                 ids.append(row[0])
+                orig_idx.append(r0)
                 all_data.append([row[idx].replace("\\N", "?") for idx in model_idx])
                 if not some_missing: complete_rows.append(r)
-                r = r + 1
+                r += 1
+            r0 += 1
 
     test_idx = test_set(all_data, complete_rows, test_percentage)
     training_data = []
@@ -116,11 +120,14 @@ def makesets(test_percentage, test_filename, train_filename):
         else:
             training_data.append(row)
 
-    with open("./data/test-idx.txt", "w") as idxfile:
-        if r in test_idx: idxfile.write(str(r) + '\n')
-
-    with open("./data/train-idx.txt", "w") as idxfile:
-        if not r in test_idx: idxfile.write(str(r) + '\n')
+    # Saving original indices
+    [dir, fn] = os.path.split(index_filename)
+    with open(os.path.join(dir, "testing-" + fn), "w") as idxfile:
+        for r in range(0, len(all_data)):
+            if r in test_idx: idxfile.write(str(orig_idx[r]) + '\n')
+    with open(os.path.join(dir, "training-" + fn), "w") as idxfile:
+        for r in range(0, len(all_data)):
+            if not r in test_idx: idxfile.write(str(orig_idx[r]) + '\n')
         
     with open(train_filename, "wb") as trfile:
         writer = csv.writer(trfile, delimiter=",", quotechar='"', quoting=csv.QUOTE_MINIMAL)
@@ -142,7 +149,9 @@ if __name__ == "__main__":
                         help="Filename for training set")
     parser.add_argument('-T', '--test', nargs=1, default=["./data/testing-data.csv"],
                         help="Filename for test set")
+    parser.add_argument('-i', '--index', nargs=1, default=["./data/idx"],
+                        help="Filename to store original indices")
     parser.add_argument('-p', '--percentage', type=int, nargs=1, default=[50],
                         help="Percentage of complete data to use in test set")
     args = parser.parse_args()
-    makesets(args.percentage[0], args.test[0], args.train[0])
+    makesets(args.percentage[0], args.test[0], args.train[0], args.index[0])
