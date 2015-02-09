@@ -116,6 +116,12 @@ def makesets(test_percentage, test_filename, train_filename):
         else:
             training_data.append(row)
 
+    with open("./data/test-idx.txt", "w") as idxfile:
+        if r in test_idx: idxfile.write(str(r) + '\n')
+
+    with open("./data/train-idx.txt", "w") as idxfile:
+        if not r in test_idx: idxfile.write(str(r) + '\n')
+        
     with open(train_filename, "wb") as trfile:
         writer = csv.writer(trfile, delimiter=",", quotechar='"', quoting=csv.QUOTE_MINIMAL)
         writer.writerow(model_variables)
