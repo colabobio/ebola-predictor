@@ -6,6 +6,7 @@ data/testing-data-*.csv
 data/testing-data.csv
 data/training-data.csv
 data/*-index*.csv
+data/notes.txt
 out
 store
 utils/*.pyc
