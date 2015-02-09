@@ -15,9 +15,8 @@ args = parser.parse_args()
 data_files = glob.glob("./data/*")
 
 if not os.path.exists("./store"): os.makedirs("./store")
-     
+
 zip_filename = os.path.join("./store", args.name[0] + ".zip")     
-print zip_filename  
      
 if os.path.exists(zip_filename):
     print "The file",zip_filename,"already exists, choose another name!"
