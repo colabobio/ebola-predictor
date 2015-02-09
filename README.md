@@ -1,11 +1,44 @@
-##Ebola Prognosis Predictor
+##Ebola Prognosis Prediction Pipeline
 
-This collection of scripts allows to easily train and evaluate various Machine Learning 
-predictors on a provided dataset where one of the variables is a binary response or output 
-variable we wish to predict using a combination of independent variables.
+This collection of scripts allows to train and evaluate various Machine Learning predictors 
+on a provided dataset in CSV format where one of the variables is a binary response or 
+output  variable we wish to predict using a subset of the remaining variables.
 
-Here the pipeline is customized to run on a dataset comprising clinical and laboratory 
-records of Ebola patients.
+These scripts are meant to be used in a specific order, effectively defining a 
+"prediction pipeline" that takes a number of inputs (data, variables, ranges) and outputs 
+a trained predictor that can be evaluated with several metrics for model performance. This 
+pipeline has been designed to facilitate systematic and reproducible model building.
+
+The pipeline is customized to run on a dataset comprising of clinical and laboratory 
+records of Ebola Virus Disease (EVD) patients, however it is completely general and can be 
+applied to other dataset with virtually no modifications.
+
+###Basic concepts
+
+The pipeline roughly involves three stages: defining training and test sets, fitting the
+desired predictor using the training set, and evaluating the predictor on the test set. The 
+pipeline includes a number of built-in predictors (a Decision Tree and a Neural Network), 
+but  additional predictors can be added to it by following a few coding conventions. 
+
+Because missing values is a typical problem in survey and health data, the pipeline allows 
+to "complete" an incomplete training set by using a variety of methods. Some of them are 
+already built into the pipeline, but additional methods can be implemented also by following
+a number of conventions.
+
+Let's go over a simple usage case in order to exemplify how all these stages work together.
+
+**1) Model preparation.** This preliminary stage involves setting up the source data file, 
+the variables to include in the predictor, restricting the data to a specific subset of 
+interest, and a few other adjustments. 
+
+The source dataset must be contained in a standard CSV file where each column holds a separate 
+variable and each row represents a distinct data sample. The first row in the data file must 
+contain the names of the variables stored in each column. The location of the data file must 
+be indicated in the file _sources.txt_ inside the _data_ folder. This location can be relative 
+or absolute.
+
+
+
 
 
 
@@ -43,9 +76,47 @@ python utils/makesets.py -p 100
 ```
 
 ```bash
-python eps/eval.py -cutoff 0 -method report
+python eps/eval.py --cutoff 0 --method report
 ```
 cutoff sets the EPS score above which a patient is predicted to die.
+
+
+
+
+
+##Batch mode
+
+1) Create training/test sets
+
+```bash
+python init.py -n [number of iterations] -t [test percentage] -i [number of imputed files to run MI on] -s [starting id]
+```
+
+```bash
+python init.py -n 100 -s 0 -t 50 -m amelia [num_imputed=5 num_resamples=10000 --in_check --gen_plots]
+```
+
+2) Train the predictors
+
+```bash
+python train.py nnet
+python train.py dtree 
+```
+
+3) Evaluate the predictors
+
+```bash
+python eval.py -p nnet -m caldis
+python eval.py -p nnet -m calplot
+python eval.py -p nnet -m report
+python eval.py -p nnet -m roc
+python eval.py -p nnet -m confusion
+python eval.py -p nnet -m misses
+
+
+
+
+
 
 
 
