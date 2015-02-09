@@ -78,6 +78,8 @@ def makesets(test_percentage, test_filename, train_filename, index_filename):
         r0 = 0
         r = 0
         for row in reader:
+            r0 += 1 # Starts at 1, because of titles
+
             all_missing = True
             some_missing = False
             missing_dvar = row[model_idx[0]] == "\\N"
@@ -108,7 +110,6 @@ def makesets(test_percentage, test_filename, train_filename, index_filename):
                 all_data.append([row[idx].replace("\\N", "?") for idx in model_idx])
                 if not some_missing: complete_rows.append(r)
                 r += 1
-            r0 += 1
 
     test_idx = test_set(all_data, complete_rows, test_percentage)
     training_data = []
