@@ -153,4 +153,4 @@ if __name__ == "__main__":
     parser.add_argument('-p', '--percentage', type=int, nargs=1, default=[50],
                         help="Percentage of complete data to use in test set")
     args = parser.parse_args()
-    makesets(args.percentage[0], args.test[0], args.train[0], args.index[0])
+    makesets(args.percentage[0], args.test[0], args.train[0])
