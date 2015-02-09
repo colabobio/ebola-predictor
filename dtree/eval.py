@@ -22,12 +22,16 @@ def eval(test_filename, train_filename, param_filename, method, **kwparams):
     return run_eval(probs, y, method, **kwparams)
 
 def miss(test_filename, train_filename, param_filename):
+    with open(test_filename.replace("-data", "-index"), "r") as idxfile:
+        lines = idxfile.readlines()
+
     X, y, df = design_matrix(test_filename, train_filename, get_df=True)
     predictor = gen_predictor(param_filename)
     probs = predictor(X)
     indices = get_misses(probs, y)
     for i in indices:
         print "----------------"
+        print "META:",",".join(lines[i].split(",")).strip()
         print df.ix[i]
     return indices
 

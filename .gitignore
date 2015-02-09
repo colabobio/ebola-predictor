@@ -5,7 +5,7 @@ data/training-data-*.csv
 data/testing-data-*.csv
 data/testing-data.csv
 data/training-data.csv
-data/*-idx*
+data/*-index*.csv
 out
 utils/*.pyc
 nnet/*.pyc

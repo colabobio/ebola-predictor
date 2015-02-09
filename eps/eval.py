@@ -24,6 +24,10 @@ def eval(test_filename, train_filename, param_filename, method, cutoff=0, **kwpa
 
 def miss(test_filename, train_filename, param_filename, cutoff=0):
     _, _, df0 = design_matrix_full(test_filename=test_filename, train_filename="", get_df=True)
+
+    with open(test_filename.replace("-data", "-index"), "r") as idxfile:
+        lines = idxfile.readlines()
+
     df = load_dataframe(test_filename)
     X, y = design_matrix(df)
     predictor = gen_predictor(cutoff)
@@ -31,6 +35,7 @@ def miss(test_filename, train_filename, param_filename, cutoff=0):
     indices = get_misses(probs, y)
     for i in indices:
         print "----------------"
+        print "META:",",".join(lines[i].split(",")).strip()
         print "SCORE:", df.ix[i][1]
         print df0.ix[i]
     return indices

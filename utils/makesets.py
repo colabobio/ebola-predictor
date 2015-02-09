@@ -69,7 +69,7 @@ def makesets(test_percentage, test_filename, train_filename, index_filename):
 
     ids = []
     all_data = []
-    orig_idx = []
+    idx_info = []
     complete_rows = []
     with open(input_file, "rb") as ifile:
         reader = csv.reader(ifile)
@@ -79,7 +79,6 @@ def makesets(test_percentage, test_filename, train_filename, index_filename):
         r = 0
         for row in reader:
             r0 += 1 # Starts at 1, because of titles
-
             all_missing = True
             some_missing = False
             missing_dvar = row[model_idx[0]] == "\\N"
@@ -106,7 +105,7 @@ def makesets(test_percentage, test_filename, train_filename, index_filename):
 
             if not all_missing and not missing_dvar and inside_range:
                 ids.append(row[0])
-                orig_idx.append(r0)
+                idx_info.append([r0, row[0], row[model_idx[0]]])
                 all_data.append([row[idx].replace("\\N", "?") for idx in model_idx])
                 if not some_missing: complete_rows.append(r)
                 r += 1
@@ -121,14 +120,15 @@ def makesets(test_percentage, test_filename, train_filename, index_filename):
         else:
             training_data.append(row)
 
-    # Saving original indices
-    [dir, fn] = os.path.split(index_filename)
-    with open(os.path.join(dir, "testing-" + fn), "w") as idxfile:
+    # Saving index information
+    with open(test_filename.replace("-data", "-index"), "wb") as idxfile:
+        writer = csv.writer(idxfile, delimiter=",", quotechar='"', quoting=csv.QUOTE_MINIMAL)
         for r in range(0, len(all_data)):
-            if r in test_idx: idxfile.write(str(orig_idx[r]) + '\n')
-    with open(os.path.join(dir, "training-" + fn), "w") as idxfile:
+            if r in test_idx: writer.writerow(idx_info[r])
+    with open(train_filename.replace("-data", "-index"), "wb") as idxfile:
+        writer = csv.writer(idxfile, delimiter=",", quotechar='"', quoting=csv.QUOTE_MINIMAL)
         for r in range(0, len(all_data)):
-            if not r in test_idx: idxfile.write(str(orig_idx[r]) + '\n')
+            if not r in test_idx: writer.writerow(idx_info[r])
         
     with open(train_filename, "wb") as trfile:
         writer = csv.writer(trfile, delimiter=",", quotechar='"', quoting=csv.QUOTE_MINIMAL)
