@@ -188,6 +188,6 @@ if __name__ == "__main__":
     parser.add_argument('-p', nargs=1, default=["nnet"], 
                         help="Folder containing predictor to evaluate")
     parser.add_argument('-m', nargs=1, default=["report"], 
-                        help="Supported evaluation methods: caldis, calplot, report, roc, confusion, misses")
+                        help="Evaluation method: caldis, calplot, report, roc, confusion, misses")
     args = parser.parse_args()
     evaluate(args.p[0], args.m[0])

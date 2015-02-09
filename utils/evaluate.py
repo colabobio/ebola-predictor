@@ -58,7 +58,7 @@ def design_matrix(test_filename="", train_filename="", get_df=False):
                 X[:, j] = np.clip((values - minv) / (maxv - minv), 0, 1)
             else:
                 X[:, j] = 1.0 / M
-    
+
     if get_df:
         return X, y, df
     else:

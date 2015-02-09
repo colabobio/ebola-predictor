@@ -67,7 +67,7 @@ python init.py -n [number of iterations] -t [test percentage] -i [number of impu
 ```
 
 ```bash
-python init.py -n 20 -t 50 -i 5 -s 0
+python init.py -n 20 -s 0 -t 50 -m amelia [*]
 ```
 
 2) Train the predictors
