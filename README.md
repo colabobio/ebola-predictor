@@ -1,15 +1,45 @@
-##Ebola Outcome Predictors
+##Ebola Prognosis Predictor
 
 Algorithms to predict outcome of Ebola patients given their clinical and lab symptoms. Based on the metadata available at http://fathom.info/mirador/ebola/datarelease.html
 
 ##Dependencies
-RPy2
-Pandas
-Numpy
-matplotlib
-scikit-learn
-pydot, Graphviz
-R (Amelia II, PredictABEL)
+* Pandas
+* Numpy
+* matplotlib
+* scikit-learn
+
+* RPy2
+* R (Amelia II, PredictABEL)
+* pydot, Graphviz
+
+
+
+
+
+
+
+
+
+
+##Reference prediction: EPS
+
+Use either variables-eps7 or variables-eps10, set ranges to all ages then:
+
+```bash
+python utils/makesets.py -p 100
+```
+
+```bash
+python eps/eval.py -cutoff 0 -method report
+```
+cutoff sets the EPS score above which a patient is predicted to die.
+
+
+
+
+
+
+
 
 
 ##Steps for setting model:
@@ -27,29 +57,36 @@ View scatterplot matrix for given dataset
 python utils/scatterplot.py ./data/training-data-completed-9.csv
 ```
 
-##Reference prediction: EPS
-
-Use either variables-eps7 or variables-eps10, set ranges to all ages then:
-
-```bash
-python utils/makesets.py -p 100
-```
-
-```bash
-python eps/eval.py -cutoff 0 -method report
-```
-cutoff sets the EPS score above which a patient is predicted to die.
 
 ##Batch mode
+
 1) Create training/test sets
+
 ```bash
 python init.py -n [number of iterations] -t [test percentage] -i [number of imputed files to run MI on] -s [starting id]
 ```
 
 ```bash
-python init.py -n 10 -t 70 -i 10 -s 0
+python init.py -n 20 -t 50 -i 5 -s 0
 ```
 
+2) Train the predictors
+
+```bash
+python train.py nnet
+python train.py dtree
+```
+
+3) Evaluate the predictors
+
+```bash
+python eval.py -p nnet -m caldis
+python eval.py -p nnet -m calplot
+python eval.py -p nnet -m report
+python eval.py -p nnet -m roc
+python eval.py -p nnet -m confusion
+python eval.py -p nnet -m misses
+```
 
 
 number of iterations = number of sets
