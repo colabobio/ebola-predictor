@@ -26,7 +26,7 @@ try:
     for name in zf.namelist():
         outpath = "./"    
         fn = os.path.join(outpath, name)
-        print "  Extracting file" + fn
+        print "  Extracting file", fn
         zf.extract(name, outpath)
 finally:
     zf.close()

@@ -26,7 +26,7 @@ zf = zipfile.ZipFile(zip_filename, mode='w')
 print "Compressing data folder into " + zip_filename + "..."
 try:
     for file in data_files:
-        print "  Adding file" + file
+        print "  Adding file", file
         zf.write(file, compress_type=zipfile.ZIP_DEFLATED)
 finally:
     zf.close()
