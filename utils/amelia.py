@@ -17,7 +17,7 @@ var_file = "./data/variables.txt"
 :param in_filename: input file with all the data
 :param out_filename: output file with only complete rows
 :param kwparams: optional arguments for Amelia: num_imputed (number of imputed dataframes),
-                 resamples_opt (number of resamples), incheck_opt (enable/disable input check),
+                 num_resamples (number of resamples), in_check (enable/disable input check),
                  gen_plots (enable/disable imputation plots)
 """
 def process(in_filename, out_filename, **kwparams):
@@ -26,13 +26,13 @@ def process(in_filename, out_filename, **kwparams):
     else:
         num_imputed = 5
 
-    if "resamples_opt" in kwparams:
-        resamples_opt = int(kwparams["resamples_opt"])
+    if "num_resamples" in kwparams:
+        resamples_opt = int(kwparams["num_resamples"])
     else:
         resamples_opt = 10000
 
-    if "incheck_opt" in kwparams:
-        incheck_opt = True if kwparams["incheck_opt"].lower() == "true" else False
+    if "in_check" in kwparams:
+        incheck_opt = True if kwparams["in_check"].lower() == "true" else False
     else:
         incheck_opt = False
 
@@ -167,18 +167,18 @@ if __name__ == "__main__":
                         help="name of input training file")
     parser.add_argument("-o", "--output", nargs=1, default=["./data/training-data-completed.csv"],
                         help="name of output training file afer imputation")
-    parser.add_argument("-n", "--number", type=int, nargs=1, default=[5],
+    parser.add_argument("-n", "--num_imputed", type=int, nargs=1, default=[5],
                         help="number of imputed datasets")
-    parser.add_argument("-r", "--resamples", type=int, nargs=1, default=[10000],
+    parser.add_argument("-r", "--num_resamples", type=int, nargs=1, default=[10000],
                         help="number of resamples")
-    parser.add_argument("-c", "--check", action="store_true",
+    parser.add_argument("-c", "--in_check", action="store_true",
                         help="check input data")
-    parser.add_argument("-p", "--plots", action="store_true",
+    parser.add_argument("-p", "--gen_plots", action="store_true",
                         help="generate plots")
 
     args = parser.parse_args()
     process(in_filename=args.input[0], out_filename=args.output[0],
-            num_imputed=str(args.number[0]),
-            resamples_opt=str(args.resamples[0]),
-            incheck_opt=str(args.check),
-            gen_plots=str(args.plots))
+            num_imputed=str(args.num_imputed[0]),
+            resamples_opt=str(args.num_resamples[0]),
+            incheck_opt=str(args.in_check),
+            gen_plots=str(args.gen_plots))
