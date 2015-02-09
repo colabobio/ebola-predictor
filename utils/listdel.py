@@ -5,8 +5,7 @@ values are removed from the output.
 @copyright: The Broad Institute of MIT and Harvard 2015
 """
 
-import argparse
-import csv
+import argparse, csv
 
 """Creates a complete output file by removing any rows in the input file with at least
 one missing value
