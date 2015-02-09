@@ -25,7 +25,7 @@ def create_sets(iter_count, id_start, test_percentage, impute_method, **kwparams
         # remove old data
         test_files = glob.glob("./data/testing-data*.csv")
         train_files = glob.glob("./data/training-data*.csv")
-        idx_files = glob.glob("./data/*-idx*")
+        idx_files = glob.glob("./data/*-index*.csv")
         if test_files or train_files or idx_files:
             print "Removing old sets..."
             for file in test_files: os.remove(file)

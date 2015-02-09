@@ -45,7 +45,7 @@ source data
 :param test_filename: name of file to store test set
 :param train_filename: name of file to store training set
 """
-def makesets(test_percentage, test_filename, train_filename, index_filename):
+def makesets(test_percentage, test_filename, train_filename):
     input_file = ""
     with open(src_file, "rb") as sfile:
         for line in sfile.readlines():
@@ -150,8 +150,6 @@ if __name__ == "__main__":
                         help="Filename for training set")
     parser.add_argument('-T', '--test', nargs=1, default=["./data/testing-data.csv"],
                         help="Filename for test set")
-    parser.add_argument('-i', '--index', nargs=1, default=["./data/idx"],
-                        help="Filename to store original indices")
     parser.add_argument('-p', '--percentage', type=int, nargs=1, default=[50],
                         help="Percentage of complete data to use in test set")
     args = parser.parse_args()

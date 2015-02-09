@@ -9,7 +9,7 @@ import os, glob
 test_files = glob.glob("./data/testing-data*.csv")
 train_files = glob.glob("./data/training-data*.csv")
 param_files = glob.glob("./data/*-params*")
-idx_files = glob.glob("./data/*-idx*")
+idx_files = glob.glob("./data/*-index*.csv")
 out_files = glob.glob("./out/*")
 
 if test_files or train_files or param_files or idx_files or out_files:
