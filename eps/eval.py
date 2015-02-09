@@ -67,9 +67,13 @@ def evaluate(test_filename, train_filename, param_filename, method, cutoff=0):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('-train', nargs=1, default=[""])
-    parser.add_argument('-test', nargs=1, default=["./data/testing-data.csv"])
-    parser.add_argument('-cutoff', nargs=1, type=int, default=[0])
-    parser.add_argument('-method', nargs=1, default=["report"])
+    parser.add_argument('-t', '--train', nargs=1, default=[""],
+                        help="Filename for training set, not needed in EPS")
+    parser.add_argument('-T', '--test', nargs=1, default=["./data/testing-data.csv"],
+                        help="Filename for testing set")
+    parser.add_argument('-cutoff', nargs=1, type=int, default=[0],
+                        help="Cutoff for prediction in EPS, score less than or equal to cutoff results in survival prediction")
+    parser.add_argument('-m', '--method', nargs=1, default=["report"],
+                        help="Evaluation method: caldis, calplot, report, roc, confusion, misses")
     args = parser.parse_args()
     evaluate(args.test[0], args.train[0], "", args.method[0], args.cutoff[0])

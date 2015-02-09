@@ -1,5 +1,18 @@
 ##Ebola Prognosis Predictor
 
+This collection of scripts allows to easily train and evaluate various Machine Learning 
+predictors on a provided dataset where one of the variables is a binary response or output 
+variable we wish to predict using a combination of independent variables.
+
+Here the pipeline is customized to run on a dataset comprising clinical and laboratory 
+records of Ebola patients.
+
+
+
+
+
+
+
 Algorithms to predict outcome of Ebola patients given their clinical and lab symptoms. Based on the metadata available at http://fathom.info/mirador/ebola/datarelease.html
 
 ##Dependencies
