@@ -84,12 +84,69 @@ variable. These labels can be set in the labels.txt file as follows:
 1 Died
 ```
 
+**2) Creating training/test sets.** Once the variables and other model settings are defined,
+a pair of training/test sets can be constructed. This can be achieved using the *utils/makesets.py*
+script:
 
+```bash
+python utils/makesets.py
+```
 
+The output of the execution of this command should be two files created inside the *data* 
+folder, *training-data.csv* and *testing-data.csv*. The script will assign a percentage of 
+the **complete** rows (without missing values) to the test file. The rest of the rows, 
+including those with missing entries, will be stored in the training file. By default, the
+percentage is 50%, but this value, as well as the name of the files, can be set using the 
+following command line arguments:
 
+```bash
+makesets.py [-h] [-t TRAIN] [-T TEST] [-p PERCENTAGE]
+```
 
+The -h flag can be used to get help about each argument, and in general all scripts in 
+the pipeline support the help flag. So, to store 70% of the complete rows in the test set, 
+and the remaining 30% plus any other rows containing missing values one would use:
 
+```bash
+makesets.py -p 70
+```
 
+Since a prediction algorithm will, in general, require a training set without missing values,
+an additional step is required to either remove missing values or impute them using some 
+algorithm. The pipeline provides two built-in methods to handle missing values: list-wise 
+deletion, and Multiple Imputation using the [Amelia](http://gking.harvard.edu/amelia) 
+package for R.
+
+List-wise deletion (where a row is removed if it has at least one missing entry) can be 
+applied using the *utils/listdel.py* script, which by default will read the original 
+training set file from write the training set 
+with the missing values removed to *data/training-data-completed.csv*:
+
+```bash
+python utils/listdel.py [-h] [-i INPUT] [-o OUTPUT]
+```
+
+Amelia, in contrast, generates m values for each missing entry and thus it can create m 
+completed datasets. These imputed values are drawn from a multivariate Gaussian distribution 
+that it is estimated by an Expectation-Maximization algorithm from the known data. The 
+*data/amelia.py* script calls the Amelia routines in R through the [RPy2 package](http://rpy.sourceforge.net/) 
+(read the dependencies for more details on the dependencies required by the pipeline), and
+by default it will generate 5 imputed datasets, wich are then aggregated to create an 
+augmented training set without missing values. The known values in the original file are 
+not affected and are the same across all the imputed datasets. The default filenames of the 
+amelia scrip are the same as with listdel. However, it accepts several additional arguments
+that can be used to control the imputation procedure:
+
+```bash
+python amelia.py [-h] [-i INPUT] [-o OUTPUT] [-n NUM_IMPUTED] [-r NUM_RESAMPLES] [-c] [-p]
+```
+
+* -n, --num_imputed sets the number of imputed datasets to aggregated into the completed training set file
+* -r, --num_resamples sets the number of resample until a value inside the bounds defined for each variable is found
+* -c, --in_check enables checking the input data to detect highly co-linear variables
+* -p, --get_plots enables the genration of plots characterizing the imputation results, which are saved to the *out* folder.
+  This plots include a missingness map, comparisons between the observed and imputed densities, and the quality of imputation
+  plot (only for numerical variables)
 
 
 
