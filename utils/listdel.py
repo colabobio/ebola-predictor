@@ -11,10 +11,10 @@ import csv
 """Creates a complete output file by removing any rows in the input file with at least
 one missing value
 
-:param in_file: input file with all the data
-:param out_file: output file with only complete rows
+:param in_filename: input file with all the data
+:param out_filename: output file with only complete rows
 """
-def listdel(in_filename, out_filename):
+def process(in_filename, out_filename):
     print "Removing incomplete rows from",in_filename
     titles = []
     data = []
@@ -33,7 +33,9 @@ def listdel(in_filename, out_filename):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('-i', nargs=1, default=["./data/training-data.csv"])
-    parser.add_argument('-o', nargs=1, default=["./data/training-data-completed.csv"])
+    parser.add_argument('-i', '--input', nargs=1, default=["./data/training-data.csv"],
+                        help="name of input training file")
+    parser.add_argument('-o', '--output', nargs=1, default=["./data/training-data-completed.csv"],
+                        help="name of output training file afer list-wise deletion")
     args = parser.parse_args()
-    listdel(args.i[0], args.o[0])
+    process(args.input[0], args.output[0])

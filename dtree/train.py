@@ -37,7 +37,9 @@ def train(train_filename, param_filename):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-t", "--train", nargs=1, default=["./data/training-data-completed.csv"], help="File containing training set")
-    parser.add_argument("-p", "--param", nargs=1, default=["./data/dtree-params"], help="Output file to save the parameters of the decision tree")
+    parser.add_argument("-t", "--train", nargs=1, default=["./data/training-data-completed.csv"],
+                        help="File containing training set")
+    parser.add_argument("-p", "--param", nargs=1, default=["./data/dtree-params"], 
+                        help="Output file to save the parameters of the decision tree")
     args = parser.parse_args() 
     train(args.train[0], args.param[0])

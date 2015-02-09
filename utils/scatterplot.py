@@ -84,7 +84,8 @@ def scatterplot_matrix(data, names=[], types={}, **kwargs):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("data", nargs=1, default=["./data/training-data-completed.csv"], help="data file to plot")
+    parser.add_argument("data", nargs=1, default=["./data/training-data-completed.csv"], 
+                        help="data file to plot")
     args = parser.parse_args()
 
     var_types = {}

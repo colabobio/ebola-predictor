@@ -199,12 +199,12 @@ def save_theta(filename, theta, N, L, S, K):
 """
 Trains the neural net given the specified parameters
 
-:param L: number of hidden layers
-:param hf: factor to calculate number of hidden units given the number of variables
-:param gamma: regularization coefficient
-:param threshold: default convergence threshold
-:param show: show minimization plot
-:param debug: gradient check
+: param train_filename: name of file containing training set
+: param param_filename: name of file to store resulting neural network parameters
+: param kwparams: custom arguments for neural network: L (number of hidden layers), hf 
+                  (factor to calculate number of hidden units given the number of variables),
+                  gamma (regularization coefficient), threshold (default convergence threshold),
+                  show (show minimization plot), debug (gradient check)
 """
 def train(train_filename, param_filename, **kwparams):
     if "L" in kwparams:
@@ -344,19 +344,27 @@ def train(train_filename, param_filename, **kwparams):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-t", "--train", nargs=1, default=["./data/training-data-completed.csv"], help="File containing training set")
-    parser.add_argument("-p", "--param", nargs=1, default=["./data/nnet-params"], help="Output file to save the parameters of the neural net")
-    parser.add_argument("-l", "--layers", nargs=1, default=["1"], help="Number of hidden layers")
-    parser.add_argument("-f", "--hfactor", nargs=1, default=["1"], help="Hidden units factor")
-    parser.add_argument("-g", "--gamma", nargs=1, default=["0.002"], help="Regularization coefficient")
-    parser.add_argument("-c", "--convergence", nargs=1, default=["1E-5"], help="Convergence threshold for the BFGS minimizer")
-    parser.add_argument("-s", "--show", action="store_true", help="Shows minimization plot")
-    parser.add_argument("-d", "--debug", action="store_true", help="Debugs gradient calculation")
+    parser.add_argument("-t", "--train", nargs=1, default=["./data/training-data-completed.csv"],
+                        help="File containing training set")
+    parser.add_argument("-p", "--param", nargs=1, default=["./data/nnet-params"],
+                        help="Output file to save the parameters of the neural net")
+    parser.add_argument("-l", "--layers", nargs=1, type=int, default=[1],
+                        help="Number of hidden layers")
+    parser.add_argument("-f", "--hfactor", nargs=1, type=int, default=[1],
+                        help="Hidden units factor")
+    parser.add_argument("-g", "--gamma", nargs=1, type=float, default=[0.002],
+                        help="Regularization coefficient")
+    parser.add_argument("-c", "--convergence", nargs=1, type=float, default=[1E-5],
+                        help="Convergence threshold for the BFGS minimizer")
+    parser.add_argument("-s", "--show", action="store_true",
+                        help="Shows minimization plot")
+    parser.add_argument("-d", "--debug", action="store_true",
+                        help="Debugs gradient calculation")
     args = parser.parse_args()
     train(args.train[0], args.param[0],
-          L=args.layers[0],
-          hf=args.hfactor[0],
-          gamma=args.gamma[0],
-          threshold=args.convergence[0],
+          L=str(args.layers[0]),
+          hf=str(args.hfactor[0]),
+          gamma=str(args.gamma[0]),
+          threshold=str(args.convergence[0]),
           show=str(args.show),
           debug=str(args.debug))

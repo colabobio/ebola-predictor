@@ -132,8 +132,11 @@ def makesets(test_percentage, test_filename, train_filename):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('-train', nargs=1, default=["./data/training-data.csv"])
-    parser.add_argument('-test', nargs=1, default=["./data/testing-data.csv"])
-    parser.add_argument('-p', type=int, nargs=1, default=[50])
+    parser.add_argument('-t', '--train', nargs=1, default=["./data/training-data.csv"],
+                        help="Filename for training set")
+    parser.add_argument('-T', '--test', nargs=1, default=["./data/testing-data.csv"],
+                        help="Filename for test set")
+    parser.add_argument('-p', '--percentage', type=int, nargs=1, default=[50],
+                        help="Percentage of complete data to use in test set")
     args = parser.parse_args()
-    makesets(args.p[0], args.test[0], args.train[0])
+    makesets(args.percentage[0], args.test[0], args.train[0])
