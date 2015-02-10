@@ -363,7 +363,7 @@ generated in the previous step:
 python train.py [-h] pred [predictor arguments]
 ```
 
-* pred: the name of the predictor to train (dtree for Decision Tree, nnet for Neural Network)
+* pred: name of the predictor to train (dtree for Decision Tree, nnet for Neural Network)
 * predictor arguments: any argument accepted by the predictor, in the format name=value
 
 For instance, in order to train the Decision Tree using the entropy criterion and 5 as 
@@ -373,19 +373,15 @@ max_depth we need:
 python train.py dtree criterion=entropy max_depth=5
 ```
 
-**3) Evaluation.**
-
+**3) Evaluation.** The evaluation step will run the selected evaluation method for all the
+predictor parameters generated during training, using the corresponding test sets:
 
 ```bash
-python eval.py -p nnet -m caldis
-python eval.py -p nnet -m calplot
-python eval.py -p nnet -m report
-python eval.py -p nnet -m roc
-python eval.py -p nnet -m confusion
-python eval.py -p nnet -m misses
+python eval.py [-h] [-p P] [-m M]
 ```
-
-
+* -p, --predictor: name of the predictor to evaluate (dtree for Decision Tree, nnet for Neural Network)
+* -m, --method: evaluation method. Must be one from the following: caldis, calplot, report, 
+  roc, confusion, misses (default report)
 
 ###Packing/unpacking models
 
