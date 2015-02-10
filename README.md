@@ -135,7 +135,7 @@ completed datasets. These imputed values are drawn from a multivariate Gaussian 
 that it is estimated by an Expectation-Maximization algorithm from the known data. The 
 *data/amelia.py* script calls the Amelia routines in R through the [RPy2 package](http://rpy.sourceforge.net/) 
 (read the dependencies for more details on the dependencies required by the pipeline), and
-by default it will generate 5 imputed datasets, wich are then aggregated to create an 
+by default it will generate 5 imputed datasets, which are then aggregated to create an 
 augmented training set without missing values. The known values in the original file are 
 not affected and are the same across all the imputed datasets. The default filenames of the 
 amelia scrip are the same as with listdel. However, it accepts several additional arguments
