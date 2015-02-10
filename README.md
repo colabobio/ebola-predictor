@@ -276,8 +276,22 @@ missingness plots from Amelia, the pipeline provides some additional graphical o
 visualize the training and test sets and the parameters of the Decision Tree and Neural 
 Network predictors.
 
+* Scatterplot matrix of a data file:
+
 ```bash
-python utils/scatterplot.py ./data/training-data-completed-9.csv
+python utils/scatterplot.py [-h] [data]
+```
+
+* Graph of Neural Network given parameters file:
+
+```bash
+python nnet/view.py [-h] [param]
+```
+
+* Graph of Decision Tree given parameters file:
+
+```bash
+python dtree/view.py [-h] [param]
 ```
 
 ###Dependencies
@@ -285,10 +299,10 @@ python utils/scatterplot.py ./data/training-data-completed-9.csv
 The pipeline has been tested on Python 2.7.5. The basic dependencies are the following Python
 packages:
 
-* [Numpy](http://www.numpy.org/)
-* [Pandas](http://pandas.pydata.org/)
+* [numpy](http://www.numpy.org/)
+* [pandas](http://pandas.pydata.org/)
 * [matplotlib](http://matplotlib.org/)
-* [scikit-learn](http://scikit-learn.org/stable/)
+* [scikit-learn](http://scikit-learn.org/)
 
 Additional dependencies:
 
