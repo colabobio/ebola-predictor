@@ -385,28 +385,203 @@ python eval.py [-h] [-p P] [-m M]
 
 ###Packing/unpacking models
 
+All the information that defines a predictive model, together with the training/test sets
+and generated parameters are stored inside the *data* folder, so a few utility additional
+scripts are provided to ease cleaning, backing up, and restoring its contents.
 
+* Cleaning data: Use *clean.py* script to remove any generated files in *data* and restore it
+to its original state:
 
+```bash
+python clean.py
+```
+
+* Packing data: The data folder can be packed into a zip file inside the *store* folder 
+with the *pack.py* script:
+
+```bash
+python pack.py [name of zip file]
+```
+
+* Unpacking data: A zip file generated with pack can be restored into the *data* folder 
+using *unpack.py*. All previous files in *data* are removed:
+
+```bash
+python unpack.py [name of zip file]
+```
 
 ###Reference prediction: EPS
 
-Use either variables-eps7 or variables-eps10, set ranges to all ages then:
+The EPS (Ebola Prognosis Score) is provided as a predictor, although it does not require 
+training. It is included to provide a baseline reference to all predictors trained on the 
+[Ebola dataset](http://fathom.info/mirador/ebola/datarelease).
+
+EPS is defined on two sets of variables, one comprising only PCR and clinical symptoms 
+(EPS7), and another including lab results (EPS10). The files containing these sets are
+*data/variables-eps7.txt* and *data/variables-eps10.txt*, which need to be copied into 
+*data/variables.txt* prior to any analysis using EPS.
+
+Since no training is needed, all the (complete) data can be allocated to the test set:
 
 ```bash
 python utils/makesets.py -p 100
 ```
 
+The evaluation script works similarly to the Decision Tree and Neural Network ones:
+
 ```bash
 python eps/eval.py --cutoff 0 --method report
 ```
-cutoff sets the EPS score above which a patient is predicted to die.
 
+but it has a cutoff argument, which sets the EPS score at or below which the outcome prediction 
+is survival.
 
+##Advanced: implementing custom modules
 
-###Advanced: implementing custom modules
+New data imputation and machine learning algorithms can be added to the pipeline by 
+providing the corresponding scripts. These scripts need to follow a few coding conventions
+so they can be integrated into the pipeline properly.
 
+###Custom data imputation scripts
 
+They need to be placed inside the *utils* folder. They requirement is that they need to have
+a *process(in_filename, out_filename)* method which at least accepts two arguments: the name
+of the input file holding the original training set, and the name of the output file where
+the completed dataset will be stored:
 
+```python
+# Template for data imputation script
+
+import argparse
+
+def process(in_filename, out_filename):
+    print "Imputing missing data in",in_filename
+    print "Saving imputed data to",in_filename
+    
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-i', '--input', nargs=1, default=["./data/training-data.csv"],
+                        help="name of input training file")
+    parser.add_argument('-o', '--output', nargs=1, default=["./data/training-data-completed.csv"],
+                        help="name of completed training file")
+    args = parser.parse_args()
+    process(args.input[0], args.output[0])
+```
+
+###Custom predictors
+
+New predictors need to have their own folder, and at least two scripts inside their folder, 
+train.py and eval.py, which should implement the training and testing stages. Templates for
+these scripts are provided below:
+
+```python
+# Template for predictor training script
+
+import argparse
+
+# Predictor prefix
+def prefix():
+    return "pred"
+
+# Predictor full name
+def title():
+    return "Predictor"
+
+def train(train_filename, param_filename):
+    print "Training..."
+
+if __name__ == "__main__":
+    parser.add_argument("-t", "--train", nargs=1, default=["./data/training-data-completed.csv"],
+                        help="File containing training set")
+    parser.add_argument("-p", "--param", nargs=1, default=["./data/pred-params"],
+                        help="File contaning predictor parameters")
+    args = parser.parse_args()
+    train(parser.train[0], parser.param[0])
+```
+
+```python
+# Template for predictor evaluation script
+
+import os, argparse
+sys.path.append(os.path.abspath('./utils'))
+from evaluate import design_matrix, run_eval, get_misses
+
+# Predictor prefix
+def prefix():
+    return "pred"
+
+# Predictor full name
+def title():
+    return "Predictor"
+
+# Prints and returns the output of the evaluation
+def eval(test_filename, train_filename, param_filename, method, **kwparams):
+    X, y = design_matrix(test_filename, train_filename)
+    
+    # Need to compute the probability of output = 1 for each row of the design matrix:
+    probs = []
+    for i in range(0, len(X)):
+        probs.extend(random.random() for x in X[i,1:]]) # Dummy calculation
+    
+    return run_eval(probs, y, method, **kwparams)
+    
+# Prints miss-classifications, returns indices
+def miss(test_filename, train_filename, param_filename):
+    fn = test_filename.replace("-data", "-index")
+    meta = None
+    if os.path.exists(fn):
+        with open(fn, "r") as idxfile:
+            meta = idxfile.readlines()
+
+    X, y, df = design_matrix(test_filename, train_filename, get_df=True)
+    
+    # Need to compute the probability of output = 1 for each row of the design matrix:
+    probs = []
+    for i in range(0, len(X)):
+        probs.extend(random.random() for x in X[i,1:]]) # Dummy calculation
+    
+    indices = get_misses(probs, y)
+    for i in indices:
+        print "----------------"
+        if meta: print "META:",",".join(lines[i].split(",")).strip()
+        print df.ix[i]
+    return indices
+
+def evaluate(test_filename, train_filename, param_filename, method):
+    # Average calibrations and discriminations
+    if method == "caldis":
+        eval(test_filename, train_filename, param_filename, 1)
+    # Plot each method on same calibration plot
+    elif method == "calplot":
+        eval(test_filename, train_filename, param_filename, 2, test_file=test_filename)
+    # Average precision, recall, and F1 scores
+    elif method == "report":
+        eval(test_filename, train_filename, param_filename, 3)
+    # Plot each method on same ROC plot
+    elif method == "roc":
+        eval(test_filename, train_filename, param_filename, 4, pltshow=True)
+    # Average confusion matrix
+    elif method == "confusion":
+        eval(test_filename, train_filename, param_filename, 5)
+    # Method not defined:
+    elif method == "misses":
+        miss(test_filename, train_filename, param_filename)
+    else:
+        raise Exception("Invalid method given")
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-t', '--train', nargs=1, default=["./data/training-data-completed.csv"],
+                        help="Filename for training set")
+    parser.add_argument('-T', '--test', nargs=1, default=["./data/testing-data.csv"],
+                        help="Filename for testing set")
+    parser.add_argument('-p', '--param', nargs=1, default=["./data/pred-params"],
+                        help="Filename for predictor parameters")
+    parser.add_argument('-m', '--method', nargs=1, default=["report"],
+                        help="Evaluation method: caldis, calplot, report, roc, confusion, misses")
+    args = parser.parse_args()
+    evaluate(args.test[0], args.train[0], args.param[0], args.method[0])
+```
 
 
 
