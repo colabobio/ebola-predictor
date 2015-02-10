@@ -84,7 +84,7 @@ def scatterplot_matrix(data, names=[], types={}, **kwargs):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("data", nargs=1, default=["./data/training-data-completed.csv"],
+    parser.add_argument("data", nargs='?', default="./data/training-data-completed.csv",
                         help="data file to plot")
     args = parser.parse_args()
 
@@ -96,7 +96,7 @@ if __name__ == "__main__":
             [name, type] = line.split()[0:2]
             var_types[name] = type == "category"
 
-    df = pd.read_csv(args.data[0], delimiter=',', na_values="?")
+    df = pd.read_csv(args.data, delimiter=',', na_values="?")
     M = df.shape[0]
     N = df.shape[1]
     names = df.columns.values[1: N].tolist()

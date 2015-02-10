@@ -48,7 +48,8 @@ def thetaMatrix(theta, N, L, S, K):
 ##########################################################################################
 
 parser = argparse.ArgumentParser()
-parser.add_argument("param", nargs=1, default=["./data/nnet-params"], help="parameters of neural network")
+parser.add_argument("param", nargs='?', default="./data/nnet-params",
+                    help="parameters of neural network")
 args = parser.parse_args()
 
 model_variables = []
@@ -60,7 +61,7 @@ with open(var_file, "rb") as vfile:
         model_variables.append(name)
 model_variables[0] = "Bias"
 
-with open(args.param[0], "rb") as pfile:
+with open(args.param, "rb") as pfile:
     i = 0
     for line in pfile.readlines():
         [name, value] = line.strip().split(":")

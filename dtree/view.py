@@ -13,7 +13,7 @@ from sklearn import tree
 from sklearn.externals.six import StringIO 
 
 parser = argparse.ArgumentParser()
-parser.add_argument("param", nargs=1, default=["./data/dtree-params"], 
+parser.add_argument("param", nargs='?', default="./data/dtree-params",
                     help="parameters of decision tree")
 args = parser.parse_args()
 
@@ -21,7 +21,7 @@ if not os.path.exists("./out"): os.makedirs("./out")
 out_file = './out/dtree.pdf'
 
 # Load the decision tree
-clf = pickle.load(open(args.param[0], "rb" ))
+clf = pickle.load(open(args.param, "rb" ))
 
 # Draw and save decision tree
 data = StringIO()
