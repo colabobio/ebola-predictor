@@ -112,6 +112,9 @@ and the remaining 30% plus any other rows containing missing values one would us
 makesets.py -p 70
 ```
 
+The makesets script also makes sure that the same proportion of output classes are present 
+in the training and test sets.
+
 Since a prediction algorithm will, in general, require a training set without missing values,
 an additional step is required to either remove missing values or impute them using some 
 algorithm. The pipeline provides two built-in methods to handle missing values: list-wise 
@@ -314,24 +317,54 @@ as well as [GraphViz](http://www.graphviz.org/) installed in the system.
 
 ###Batch Mode
 
-1) Create training/test sets
+Sometimes it could be useful to re-train the predictor several times, evaluate the performance
+for each training round, and finally present an average evaluation. This is possible using 
+the batch mode scripts: *init*, *train*, and *eval*. The *init* script generates as many 
+training/test set pairs as specified, and applies a data completion method on the training set.
+The *train* script will train a specific predictor using all the available training sets, and
+will save the resulting parameters into separate files. Finally, the *eval* script runs one
+evaluation method on all the parameters available for the selected predictor, and calculates
+the average results. All these scripts are separate so costly steps (data imputation, model 
+training) need to be run only once.
+
+**1) Initialization.**
+
+This steps involves generating the training/test sets, and completing the training data:
 
 ```bash
-python init.py -n [number of iterations] -t [test percentage] -i [number of imputed files to run MI on] -s [starting id]
+python init.py [-h] [-n NUMBER] [-s START] [-t TEST] 
+               [-m METHOD] [data completion arguments]
 ```
+
+* -n, --number: number of training/test pairs to generate
+* -s, --start: starting id of first training/test pair. This can be useful when a previous
+  init run was interrupted midway through, and we need to pick up where it stopped in order
+  to reach a certain number of sets. When starting from zero, all existing training/test sets
+  are removed.
+* -t, --test: percentage of complete rows to build the test sets
+* -m, --method: data completion method, must be the name of the scrip implementing the method
+  (without the .py extension)
+* data completion arguments: any argument that the data completion script is able to accept
+
+For example, if we want to generate 20 training/test sets, starting from zero, using 60% of 
+the complete rows for the test sets, and imputing missing values in the training data using 
+10 imputed datasets from Amelia, then we would do:
 
 ```bash
-python init.py -n 20 -s 0 -t 50 -m amelia [*]
+python init.py -n 20 -s 0 -t 60 -m amelia num_imputed=10
 ```
 
-2) Train the predictors
+All the Amelia arguments desribed earlier can be added to the init script using the name=value
+syntax.
+
+**2) Training.**
 
 ```bash
 python train.py nnet
 python train.py dtree
 ```
 
-3) Evaluate the predictors
+**2) Evaluation.**
 
 ```bash
 python eval.py -p nnet -m caldis
@@ -344,15 +377,12 @@ python eval.py -p nnet -m misses
 
 
 
+###Packing/unpacking models
 
 
 
 
-
-
-
-
-##Reference prediction: EPS
+###Reference prediction: EPS
 
 Use either variables-eps7 or variables-eps10, set ranges to all ages then:
 
@@ -365,13 +395,9 @@ python eps/eval.py --cutoff 0 --method report
 ```
 cutoff sets the EPS score above which a patient is predicted to die.
 
-###Packing/unpacking models
 
 
-
-
-
-
+###Advanced: implementing custom modules
 
 
 
