@@ -237,13 +237,36 @@ eval.py [-h] [-t TRAIN] [-T TEST] [-p PARAM] [-m METHOD]
   normalization in the training step)
 * -T, --test: name of testing file
 * -p, --param: name of parameters file
-* -m, --method: evaluation method. Must be one from caldis, calplot, report, roc, confusion, 
-  misses (default report)
+* -m, --method: evaluation method. Must be one from the following: caldis, calplot, report, 
+  roc, confusion, misses (default report)
 
+The evaluation methods are briefly described below:
 
+* caldis: [calibration and discrimination](http://blog.yhathq.com/posts/predicting-customer-churn-with-sklearn.html#calibration-and-descrimination) 
+  calculations. Calibration quantifies how far is the frequency of positive outcomes from 
+  the actual probability of those outcomes (so lower
+  values are better), while the discrimination measures how far from the base probability 
+  is the true frequency each output category (so higher values are better).  
+* calplot: calibration plot and [Hosmer-Lemeshow test statistic](http://en.wikipedia.org/wiki/Hosmer%E2%80%93Lemeshow_test), 
+  as computed by [preditABEL](http://www.genabel.org/PredictABEL/plotCalibration.html). 
+  These measures allow to compare observed and predicted risks.
+* report: [precision](http://en.wikipedia.org/wiki/Precision_and_recall), 
+  [recall](http://en.wikipedia.org/wiki/Precision_and_recall) 
+  (also called sensitivity) and [F1-scores](http://en.wikipedia.org/wiki/F1_score). These
+  are standard measures in Machine Learning to characterize the performance of a binary
+  classifier. A high precision means that the predictor yields few false 
+  positives, while a high recall or sensitivity indicates that the is able to return most
+  of positive outcomes (few false negatives). The F1-score is a weighted average of the 
+  precision and recall.
+* roc: [receiver operating characteristic curve](http://en.wikipedia.org/wiki/Receiver_operating_characteristic),
+  represents the ratio of the [sensitivity](http://en.wikipedia.org/wiki/Sensitivity_and_specificity) 
+  to the fall-out ([1-specificity](http://en.wikipedia.org/wiki/Sensitivity_and_specificity)), for
+  different discrimination thresholds.
+* confusion: [confusion matrix](http://en.wikipedia.org/wiki/Confusion_matrix), showing the
+  counts of true positives, true negatives, false positives, and false negatives.
+* misses: list of miss-classified elements (false positives, and false negatives) in the test set.
 
-
-
+In all cases when the evaluation generates a plot, they are saved in pdf format in the *out* folder.
 
 ###Plotting
 ```bash
