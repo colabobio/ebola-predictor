@@ -185,9 +185,9 @@ def evaluate(predictor, method):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     # Evaluate the model with given method(s)
-    parser.add_argument('-p', nargs=1, default=["nnet"], 
+    parser.add_argument('-p', '--predictor', nargs=1, default=["nnet"], 
                         help="Folder containing predictor to evaluate")
-    parser.add_argument('-m', nargs=1, default=["report"], 
+    parser.add_argument('-m', '--method', nargs=1, default=["report"], 
                         help="Evaluation method: caldis, calplot, report, roc, confusion, misses")
     args = parser.parse_args()
-    evaluate(args.p[0], args.m[0])
+    evaluate(args.predictor[0], args.method[0])
