@@ -217,9 +217,38 @@ python nnet/train.py [-h] [-t TRAIN] [-p PARAM] [-l LAYERS] [-f HFACTOR] [-g GAM
 * -d, --debug: debugs the gradient calculation by comparing the result of the analytical formula
   with the numerical estimation
 
+**4) Testing the predictor.** A trained predictor is evaluated on the testing set, however
+there are several measures that can be used to quantify its performance. Both the Decision 
+Tree and the Neural Network provide evaluation scripts:
+
+```bash
+python dtree/eval.py
+python nnet/eval.py
+```
+
+which by default will use the default training and test set filenames from previous steps. 
+The available options are the same in both cases:
+
+```bash
+eval.py [-h] [-t TRAIN] [-T TEST] [-p PARAM] [-m METHOD]
+```
+
+* -t, --train: name of training file (it is needed to determine the value ranges used for 
+  normalization in the training step)
+* -T, --test: name of testing file
+* -p, --param: name of parameters file
+* -m, --method: evaluation method. Must be one from caldis, calplot, report, roc, confusion, 
+  misses (default report)
 
 
 
+
+
+
+###Plotting
+```bash
+python utils/scatterplot.py ./data/training-data-completed-9.csv
+```
 
 ###Dependencies
 * Pandas
@@ -231,10 +260,6 @@ python nnet/train.py [-h] [-t TRAIN] [-p PARAM] [-l LAYERS] [-f HFACTOR] [-g GAM
 * R (Amelia II, PredictABEL)
 * pydot, Graphviz
 
-###Plotting
-```bash
-python utils/scatterplot.py ./data/training-data-completed-9.csv
-```
 
 
 
