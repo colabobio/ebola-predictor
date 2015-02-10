@@ -327,9 +327,8 @@ evaluation method on all the parameters available for the selected predictor, an
 the average results. All these scripts are separate so costly steps (data imputation, model 
 training) need to be run only once.
 
-**1) Initialization.**
-
-This steps involves generating the training/test sets, and completing the training data:
+**1) Initialization.** This step involves generating the training/test sets, and completing 
+the training data:
 
 ```bash
 python init.py [-h] [-n NUMBER] [-s START] [-t TEST] 
@@ -357,14 +356,25 @@ python init.py -n 20 -s 0 -t 60 -m amelia num_imputed=10
 All the Amelia arguments desribed earlier can be added to the init script using the name=value
 syntax.
 
-**2) Training.**
+**2) Training.** The train script will train the selected predictor on each training file
+generated in the previous step:
 
 ```bash
-python train.py nnet
-python train.py dtree
+python train.py [-h] pred [predictor arguments]
 ```
 
-**2) Evaluation.**
+* pred: the name of the predictor to train (dtree for Decision Tree, nnet for Neural Network)
+* predictor arguments: any argument accepted by the predictor, in the format name=value
+
+For instance, in order to train the Decision Tree using the entropy criterion and 5 as 
+max_depth we need:
+
+```bash
+python train.py dtree criterion=entropy max_depth=5
+```
+
+**3) Evaluation.**
+
 
 ```bash
 python eval.py -p nnet -m caldis
