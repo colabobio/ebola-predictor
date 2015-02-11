@@ -1,6 +1,8 @@
 import argparse, glob, os, sys
+import numpy as np
 from matplotlib import pyplot as plt
 from importlib import import_module
+from scipy.interpolate import interp1d
 
 label_file = "./data/labels.txt"
 target_names = []
@@ -85,7 +87,9 @@ def roc_plots(module):
     test_files = glob.glob("./data/testing-data-*.csv")
     print "Calculating ROC curves for " + module.title() + "..."
     count = 0
-    total_roc_auc = 0
+    total_fpr = np.array([])
+    total_tpr = np.array([])
+    total_auc = 0
     plt.clf()
     fig = plt.figure()
     for testfile in test_files:
@@ -96,11 +100,32 @@ def roc_plots(module):
         trainfile = "./data/training-data-completed-" + str(id) + ".csv"
         if os.path.exists(testfile) and os.path.exists(pfile) and os.path.exists(trainfile):
             print "Report for test set " + id + " ----------------------------------"
-            count = count + 1
-            total_roc_auc += module.eval(testfile, trainfile, pfile, 4, pltshow=False)
-    ave_roc_auc = (total_roc_auc)/(count)
+            fpr, tpr, auc = module.eval(testfile, trainfile, pfile, 4, pltshow=False)
+#             if fpr.size < 3: continue
+            if total_fpr.size:
+                if total_fpr.size != fpr.size: continue
+                total_fpr = np.add(total_fpr, fpr)
+                total_tpr = np.add(total_tpr, tpr)
+            else: 
+                total_fpr = fpr
+                total_tpr = tpr
+            total_auc += auc
+            count += 1
+    ave_auc = (total_auc)/(count)
     print "********************************************"
-    print "Average area under the ROC curve for " + module.title() + ": " + str(ave_roc_auc)
+    ave_fpr = total_fpr / count
+    ave_tpr = total_tpr / count
+#    f2 = interp1d(ave_fpr, ave_tpr, kind='cubic')
+    plt.plot(ave_fpr, ave_tpr, c="grey")
+#     print f2(ave_fpr)
+#     plt.plot(ave_fpr, f2(ave_fpr), c="red")
+    plt.plot([0, 1], [0, 1], 'k--')
+    plt.xlim([-0.1, 1.1])
+    plt.ylim([-0.1, 1.1])
+    plt.xlabel('False Positive Rate')
+    plt.ylabel('True Positive Rate')
+    plt.title('Receiver operating characteristic')
+    print "Average area under the ROC curve for " + module.title() + ": " + str(ave_auc)
     fig.savefig('./out/roc.pdf')
     print "Saved ROC curve to ./out/roc.pdf"
     
