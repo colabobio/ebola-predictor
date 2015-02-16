@@ -123,7 +123,7 @@ def roc_plots(module):
 #     print f2(ave_fpr)
 #     plt.plot(ave_fpr, f2(ave_fpr), c="red")
     plt.plot([0, 1], [0, 1], 'k--')
-    plt.errorbar(ave_fpr, ave_tpr, std_tpr, linestyle='None', marker='^')
+    plt.fill_between(ave_fpr, ave_tpr-std_tpr, ave_tpr+std_tpr, alpha=0.5)
     plt.xlim([-0.1, 1.1])
     plt.ylim([-0.1, 1.1])
     plt.xlabel('False Positive Rate')
