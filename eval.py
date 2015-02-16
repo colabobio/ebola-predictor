@@ -104,22 +104,26 @@ def roc_plots(module):
 #             if fpr.size < 3: continue
             if total_fpr.size:
                 if total_fpr.size != fpr.size: continue
-                total_fpr = np.add(total_fpr, fpr)
-                total_tpr = np.add(total_tpr, tpr)
-            else: 
-                total_fpr = fpr
-                total_tpr = tpr
+                total_fpr = np.append(total_fpr, np.array([fpr]), axis=0)
+                total_tpr = np.append(total_tpr, np.array([tpr]), axis=0)
+            else:
+                total_fpr = np.array([fpr])
+                total_tpr = np.array([tpr])
             total_auc += auc
             count += 1
     ave_auc = (total_auc)/(count)
     print "********************************************"
-    ave_fpr = total_fpr / count
-    ave_tpr = total_tpr / count
+    ave_fpr = np.mean(total_fpr, axis=0)
+    ave_tpr = np.mean(total_tpr, axis=0)
+#     std_fpr = np.std(total_fpr, axis=0)
+    std_tpr = np.std(total_tpr, axis=0)
+    
 #    f2 = interp1d(ave_fpr, ave_tpr, kind='cubic')
     plt.plot(ave_fpr, ave_tpr, c="grey")
 #     print f2(ave_fpr)
 #     plt.plot(ave_fpr, f2(ave_fpr), c="red")
     plt.plot([0, 1], [0, 1], 'k--')
+    plt.errorbar(ave_fpr, ave_tpr, std_tpr, linestyle='None', marker='^')
     plt.xlim([-0.1, 1.1])
     plt.ylim([-0.1, 1.1])
     plt.xlabel('False Positive Rate')
