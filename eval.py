@@ -56,9 +56,9 @@ def avg_report(module):
     test_files = glob.glob("./data/testing-data-*.csv")
     print "Calculating average report for " + module.title() + "..."
     count = 0
-    total_prec = 0
-    total_rec = 0
-    total_f1 = 0
+    total_prec = []
+    total_rec = []
+    total_f1 = []
     for testfile in test_files:
         start_idx = testfile.find("./data/testing-data-") + len("./data/testing-data-")
         stop_idx = testfile.find('.csv')
@@ -69,19 +69,29 @@ def avg_report(module):
             count = count + 1
             print "Report for test set " + id + " ----------------------------------"
             p, r, f, _ = module.eval(testfile, trainfile, pfile, 3)
-            total_prec += p
-            total_rec += r
-            total_f1 += f
+            total_prec.append(p)
+            total_rec.append(r)
+            total_f1.append(f)
 
-    avg_prec = (total_prec)/(count)
-    avg_rec = (total_rec)/(count)
-    avg_f1 = (total_f1)/(count)
+    avg_prec = np.mean(np.array(total_prec), axis=0)
+    avg_rec = np.mean(np.array(total_rec), axis=0)
+    avg_f1 = np.mean(np.array(total_f1), axis=0)
+    
+    std_prec = np.std(np.array(total_prec), axis=0)
+    std_rec = np.std(np.array(total_rec), axis=0)
+    std_f1 = np.std(np.array(total_f1), axis=0)
 
     print "Average report for " + module.title() + " ********************************************"
     print "{:10s} {:10s} {:10s} {:10s}".format("", "precision", "recall", "f1-score")
     print "{:10s}      {:2.2f}    {:2.2f}        {:2.2f}".format(target_names[0], avg_prec[0], avg_rec[0], avg_f1[0])
     print "{:10s}      {:2.2f}    {:2.2f}        {:2.2f}".format(target_names[1], avg_prec[1], avg_rec[1], avg_f1[1])
     print "{:10s}      {:2.2f}    {:2.2f}        {:2.2f}".format("Total", (avg_prec[0] + avg_prec[1])/2, (avg_rec[0]+avg_rec[1])/2, (avg_f1[0]+avg_f1[1])/2)
+    print
+    print "Standard Deviation report for " + module.title() + " ********************************************"
+    print "{:10s} {:10s} {:10s} {:10s}".format("", "precision", "recall", "f1-score")
+    print "{:10s}      {:2.2f}    {:2.2f}        {:2.2f}".format(target_names[0], std_prec[0], std_rec[0], std_f1[0])
+    print "{:10s}      {:2.2f}    {:2.2f}        {:2.2f}".format(target_names[1], std_prec[1], std_rec[1], std_f1[1])
+    print "{:10s}      {:2.2f}    {:2.2f}        {:2.2f}".format("Total", (std_prec[0] + std_prec[1])/2, (std_rec[0]+std_rec[1])/2, (std_f1[0]+std_f1[1])/2)
 
 def roc_plots(module):
     test_files = glob.glob("./data/testing-data-*.csv")
