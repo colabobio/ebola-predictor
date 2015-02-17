@@ -2,14 +2,14 @@
 This script imputes the missing values using means.
 It should not be used in practice! Just for dev purposes.
 
-FIX: binary variables are assigned fractional values between 0 and 1 due to average
-
 @copyright: The Broad Institute of MIT and Harvard 2015
 """
 
 import argparse, csv
 import numpy as np
 import pandas as pd
+
+var_file = "./data/variables.txt"
 
 """Creates a complete output file by imputing the missing values using the mean value for
 each column.
@@ -21,12 +21,27 @@ def process(in_filename, out_filename):
     print "Imputing missing values in",in_filename
     training = pd.DataFrame.from_csv(in_filename)
     training.reset_index(inplace=True)
-
+    
+    categorical_vars = []
+    float_vars = []
+    with open(var_file, "rb") as vfile:
+        for line in vfile.readlines():
+            line = line.strip()
+            if not line: continue
+            [name, type] = line.split()[0:2]
+            if type == "category":
+            	categorical_vars.append(unicode(name))
+            else:
+            	float_vars.append(unicode(name))
+                
     mean_training = training.replace('?', '0')
     mean_training = mean_training.applymap(lambda x:float(x))
     means = mean_training.mean()
-
-    training.replace('?', means, inplace=True)
+    float_means = means[float_vars]
+    cat_means = means[categorical_vars].round()
+    combined_means = pd.concat([float_means, cat_means])
+        
+    training.replace('?', combined_means, inplace=True)
     print "Writing complete data to",out_filename
     training.to_csv(out_filename, index=False)
 
