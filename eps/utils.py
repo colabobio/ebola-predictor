@@ -9,22 +9,35 @@ import numpy as np
 import pandas as pd
 
 thr_file = "./eps/thresholds.txt"
+threshold_names = []
+threshold_infos = []
+with open(thr_file, "rb") as tfile:
+    for line in tfile.readlines():
+        line = line.strip()
+        if not line: continue
+        parts = line.split()
+        threshold_names.append(parts[0])
+        threshold_infos.append({"type":parts[1], "threshold":parts[2]})
+
+def var_score(name, value):
+    if not name in threshold_names: return 0
+    idx = threshold_names.index(name)
+    info = threshold_infos[idx]
+    str = info["threshold"]
+    if info["type"] == "category":
+        return 1 if int(float(value)) == int(str) else 0
+    else:
+        if str[0] == "<":
+            str = str[1:]
+            return 1 if float(value) <= float(str) else 0
+        else:
+            return 1 if float(value) >= float(str) else 0
 
 """
 Loads a datafile a constructs a dataframe for EPS where there are only two columns: output 
 and score.
 """
 def load_dataframe(data_filename):
-    threshold_name = []
-    threshold_info = []
-    with open(thr_file, "rb") as tfile:
-        for line in tfile.readlines():
-            line = line.strip()
-            if not line: continue
-            parts = line.split()
-            threshold_name.append(parts[0])
-            threshold_info.append({"type":parts[1], "threshold":parts[2]})
-
     data = []
     index = []
     columns = ["OUT", "SCORE"]
@@ -36,18 +49,7 @@ def load_dataframe(data_filename):
             out = row[0]
             score = 0
             for i in range(1, len(row)):
-                if not titles[i] in threshold_name: continue
-                idx = threshold_name.index(titles[i])
-                info = threshold_info[idx]
-                if info["type"] == "category":
-                    score = score + (1 if row[i] == info["threshold"] else 0)
-                else:
-                    str = info["threshold"]
-                    if str[0] == "<":
-                        str = str[1:]
-                        score = score + (1 if float(row[i]) <= float(str) else 0) 
-                    else:
-                        score = score + (1 if float(row[i]) >= float(str) else 0)
+                score = score + var_score(titles[i], row[i])
             index.append(count)
             data.append([float(out), float(score)])
             count = count + 1

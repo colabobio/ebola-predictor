@@ -38,7 +38,7 @@ def miss(test_filename, train_filename, param_filename, cutoff=0):
     indices = get_misses(probs, y)
     for i in indices:
         print "----------------"
-        if meta: print "META:",",".join(lines[i].split(",")).strip()
+        if meta: print "META:",",".join(meta[i].split(",")).strip()
         print "SCORE:", df.ix[i][1]
         print df0.ix[i]
     return indices

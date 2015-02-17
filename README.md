@@ -449,13 +449,15 @@ die otherwise.
 The script is run as
 
 ```bash
-stats.py [-h] [-c CUTOFF] [test]
+stats.py [-h] [-t TEST] [-o OUT] [-c CUTOFF] [-n NAME]
 ```
 
 with:
 
-* test: name of test file containing the cases
-* -c, -cutoff: it can be used as the cutoff of the EPS prediction instead of mean + std.  
+* -t, --test: name of test file containing the cases
+* -o, --out: name of csv file to save the cases and the components of the EPS score
+* -n, --name: name of the EPS being used
+* -c, -cutoff: it can be used as the cutoff of the EPS prediction, overriding of mean + std.
 
 ##Advanced: implementing custom modules
 
