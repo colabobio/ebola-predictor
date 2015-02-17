@@ -436,6 +436,27 @@ python eps/eval.py --cutoff 0 --method report
 but it has a cutoff argument, which sets the EPS score at or below which the outcome prediction 
 is survival.
 
+The *stats.py* script is also provided in the EPS folder to calculate some basic statistics:
+
+* A [T-test](http://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.ttest_ind.html) 
+to determine if the mean score for surviving and deceased Ebola patients is significantly different.
+
+* A [Fisher-exact](http://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.fisher_exact.html) 
+test on the a 2x2 contingency table that results from cross tabulating observed outcome with
+a calculated EPS "prediction" defined as survival if the score is < score mean + score std,
+die otherwise.
+
+The script is run as
+
+```bash
+stats.py [-h] [-c CUTOFF] [test]
+```
+
+with:
+
+* test: name of test file containing the cases
+* -c, -cutoff: it can be used as the cutoff of the EPS prediction instead of mean + std.  
+
 ##Advanced: implementing custom modules
 
 New data imputation and machine learning algorithms can be added to the pipeline by 
