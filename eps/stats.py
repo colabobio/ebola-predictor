@@ -1,5 +1,7 @@
 """
-Calculates ....
+Calculates a number of basic statistics for the EPS: T-test to check if the difference
+between the mean score between surviving and deceased patients, and Fisher test for the
+2x2 contingency table with outcome and EPS prediction.
 
 @copyright: The Broad Institute of MIT and Harvard 2015
 """
@@ -29,7 +31,7 @@ def calculate(test_filename, def_thresh=None):
     # Builds the 2x2 contingency table by defining the EPS prediction as:
     # Survive: score <= mean(survival) + std(survival)
     # Die: otherwise
-    if def_thresh: surv_thresh = def_thresh
+    if not def_thresh == None: surv_thresh = def_thresh
     else: surv_thresh = np.mean(surival_scores) + np.std(surival_scores) 
     df["PRED"] = df["SCORE"].map(lambda x: 0 if x <= surv_thresh else 1)
     print df    
@@ -54,6 +56,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("test", nargs='?', default="./data/testing-data.csv",
                         help="test file")
-
+    parser.add_argument('-c', '--cutoff', nargs=1, type=int, default=[None],
+                        help="Cutoff for prediction in EPS, score less than or equal to cutoff results in survival prediction")                        
     args = parser.parse_args()
-    calculate(args.test)
+    print args
+    calculate(args.test, args.cutoff[0])
