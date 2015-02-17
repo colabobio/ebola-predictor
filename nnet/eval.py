@@ -34,7 +34,7 @@ def miss(test_filename, train_filename, param_filename):
     indices = get_misses(probs, y)
     for i in indices:
         print "----------------"
-        if meta: print "META:",",".join(lines[i].split(",")).strip()
+        if meta: print "META:",",".join(meta[i].split(",")).strip()
         print df.ix[i]
     return indices
 
