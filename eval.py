@@ -113,7 +113,7 @@ def roc_plots(module):
             fpr, tpr, auc = module.eval(testfile, trainfile, pfile, 4, pltshow=False)
 #             if fpr.size < 3: continue
             if total_fpr.size:
-                if total_fpr.size != fpr.size: continue
+                if total_fpr.size[0] != fpr.size: continue
                 total_fpr = np.append(total_fpr, np.array([fpr]), axis=0)
                 total_tpr = np.append(total_tpr, np.array([tpr]), axis=0)
             else:
