@@ -76,23 +76,35 @@ def avg_report(module):
     avg_prec = np.mean(np.array(total_prec), axis=0)
     avg_rec = np.mean(np.array(total_rec), axis=0)
     avg_f1 = np.mean(np.array(total_f1), axis=0)
-    
+
     std_prec = np.std(np.array(total_prec), axis=0)
     std_rec = np.std(np.array(total_rec), axis=0)
     std_f1 = np.std(np.array(total_f1), axis=0)
+
+    tot_prec_mean = (avg_prec[0] + avg_prec[1])/2
+    tot_rec_mean = (avg_rec[0]+avg_rec[1])/2
+    tot_f1_mean = (avg_f1[0]+avg_f1[1])/2
+
+    tot_prec_std = (std_prec[0] + std_prec[1])/2 
+    tot_rec_std = (std_rec[0]+std_rec[1])/2
+    tot_f1_std = (std_f1[0]+std_f1[1])/2
 
     print "Average report for " + module.title() + " ********************************************"
     print "{:10s} {:10s} {:10s} {:10s}".format("", "precision", "recall", "f1-score")
     print "{:10s}      {:2.2f}    {:2.2f}        {:2.2f}".format(target_names[0], avg_prec[0], avg_rec[0], avg_f1[0])
     print "{:10s}      {:2.2f}    {:2.2f}        {:2.2f}".format(target_names[1], avg_prec[1], avg_rec[1], avg_f1[1])
-    print "{:10s}      {:2.2f}    {:2.2f}        {:2.2f}".format("Total", (avg_prec[0] + avg_prec[1])/2, (avg_rec[0]+avg_rec[1])/2, (avg_f1[0]+avg_f1[1])/2)
+    print "{:10s}      {:2.2f}    {:2.2f}        {:2.2f}".format("Total", tot_prec_mean, tot_rec_mean, tot_f1_mean)
     print
     print "Standard Deviation report for " + module.title() + " ********************************************"
     print "{:10s} {:10s} {:10s} {:10s}".format("", "precision", "recall", "f1-score")
     print "{:10s}      {:2.2f}    {:2.2f}        {:2.2f}".format(target_names[0], std_prec[0], std_rec[0], std_f1[0])
     print "{:10s}      {:2.2f}    {:2.2f}        {:2.2f}".format(target_names[1], std_prec[1], std_rec[1], std_f1[1])
-    print "{:10s}      {:2.2f}    {:2.2f}        {:2.2f}".format("Total", (std_prec[0] + std_prec[1])/2, (std_rec[0]+std_rec[1])/2, (std_f1[0]+std_f1[1])/2)
-
+    print "{:10s}      {:2.2f}    {:2.2f}        {:2.2f}".format("Total", tot_prec_std, tot_rec_std, tot_f1_std)
+    print
+    print "Summary ********************************************"
+    print "Total,"+str(tot_prec_mean)+","+str(tot_rec_mean)+","+str(tot_f1_mean)+","+str(tot_prec_std)+","+str(tot_rec_std)+","+str(tot_f1_std)
+          
+    
 def roc_plots(module):
     test_files = glob.glob("./data/testing-data-*.csv")
     print "Calculating ROC curves for " + module.title() + "..."
