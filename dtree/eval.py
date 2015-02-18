@@ -15,6 +15,12 @@ def prefix():
 def title():
     return "Decision Tree"
 
+def pred(test_filename, train_filename, param_filename):
+    X, y = design_matrix(test_filename, train_filename)
+    predictor = gen_predictor(param_filename)
+    probs = predictor(X)
+    return probs, y
+
 def eval(test_filename, train_filename, param_filename, method, **kwparams):
     X, y = design_matrix(test_filename, train_filename)
     predictor = gen_predictor(param_filename)

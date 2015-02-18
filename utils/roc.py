@@ -13,7 +13,7 @@ from sklearn.metrics import roc_curve, auc
 
 def roc(probs, y_test, **kwparams):
     # Compute ROC curve and area the curve
-    r = [random.random() for x in probs]
+#     r = [random.random() for x in probs]
     roc_fpr, roc_tpr, thresholds = roc_curve(y_test, probs)
     roc_auc = auc(roc_fpr, roc_tpr)
     print "Area under the ROC curve : %f" % roc_auc

@@ -16,6 +16,12 @@ def prefix():
 def title():
     return "Ebola Prognosis Score"
 
+def pred(test_filename, train_filename, param_filename, cutoff=0):
+    X, y = design_matrix(load_dataframe(test_filename))
+    predictor = gen_predictor(cutoff)
+    probs = predictor(X)
+    return probs, y
+
 def eval(test_filename, train_filename, param_filename, method, cutoff=0, **kwparams):
     X, y = design_matrix(load_dataframe(test_filename))
     predictor = gen_predictor(cutoff)

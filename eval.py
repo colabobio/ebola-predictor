@@ -1,4 +1,4 @@
-import argparse, glob, os, sys
+import argparse, glob, os, sys, csv
 import numpy as np
 from matplotlib import pyplot as plt
 from importlib import import_module
@@ -109,6 +109,8 @@ def roc_plots(module):
     test_files = glob.glob("./data/testing-data-*.csv")
     print "Calculating ROC curves for " + module.title() + "..."
     count = 0
+    all_prob = []
+    all_y = []
     total_fpr = np.array([])
     total_tpr = np.array([])
     total_auc = 0
@@ -123,6 +125,9 @@ def roc_plots(module):
         if os.path.exists(testfile) and os.path.exists(pfile) and os.path.exists(trainfile):
             print "Report for test set " + id + " ----------------------------------"
             fpr, tpr, auc = module.eval(testfile, trainfile, pfile, 4, pltshow=False)
+            p, y = module.pred(testfile, trainfile, pfile)
+            all_prob.extend(p)
+            all_y.extend(y)
 #             if fpr.size < 3: continue
             if total_fpr.size:
                 if total_fpr[0].size != fpr.size: continue
@@ -155,6 +160,13 @@ def roc_plots(module):
     fig.savefig('./out/roc.pdf')
     print "Saved ROC curve to ./out/roc.pdf"
     
+    with open("./out/roc.csv", "wb") as rfile:
+        writer = csv.writer(rfile, delimiter=",")
+        writer.writerow(["Y", "P"])
+        for i in range(0, len(all_prob)):
+            writer.writerow([all_y[i], all_prob[i]])
+    print "Saved aggregated ROC data to ./out/roc.csv"
+
 def avg_conf_mat(module):
     test_files = glob.glob("./data/testing-data-*.csv")
     print "Calculating average report for " + module.title() + "..."

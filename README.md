@@ -537,6 +537,16 @@ def prefix():
 def title():
     return "Predictor"
 
+def pred(test_filename, train_filename, param_filename):
+    X, y = design_matrix(test_filename, train_filename)
+
+    # Need to compute the probability of output = 1 for each row of the design matrix:
+    probs = []
+    for i in range(0, len(X)):
+        probs.extend(random.random() for x in X[i,1:]]) # Dummy calculation
+
+    return probs, y
+
 # Prints and returns the output of the evaluation
 def eval(test_filename, train_filename, param_filename, method, **kwparams):
     X, y = design_matrix(test_filename, train_filename)
