@@ -315,6 +315,9 @@ and [PredictABEL](http://cran.r-project.org/web/packages/PredictABEL/index.html)
 * The view script in the Decision Tree requires the python package [pydot](https://pypi.python.org/pypi/pydot), 
 as well as [GraphViz](http://www.graphviz.org/) installed in the system.
 
+One way to install all dependencies is to use one of the Python scientific software collections that are now available.
+The pipeline has been tested with [Anaconda](https://store.continuum.io/cshop/anaconda/) from [Continuum Analytics](http://continuum.io/).
+
 ###Batch Mode
 
 Sometimes it could be useful to re-train the predictor several times, evaluate the performance
