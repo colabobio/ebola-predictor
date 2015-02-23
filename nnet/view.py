@@ -12,6 +12,7 @@ http://www.astroml.org/book_figures/appendix/fig_neural_network.html
 Important: Only works for 1 hidden layer!
 """
 
+import os
 import numpy as np
 import argparse
 from matplotlib import pyplot as plt
@@ -185,4 +186,8 @@ plt.text(x3, 2.7, "Output\nLayer", ha='center', va='top', fontsize=16)
 ax.set_aspect('equal')
 plt.xlim(-4, 4)
 plt.ylim(-3, 3)
-plt.show()
+# plt.show()
+if not os.path.exists("./out"): os.makedirs("./out")
+out_file = './out/nnet.pdf'
+fig.savefig(out_file)
+print "Saved graphical representation of neural network to",out_file
