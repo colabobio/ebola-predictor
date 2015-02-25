@@ -462,6 +462,15 @@ with:
 * -n, --name: name of the EPS being used
 * -c, -cutoff: it can be used as the cutoff of the EPS prediction, overriding of mean + std.
 
+###Neural Network with PCR test
+
+The nnet-pcr module is provided as a customized version of the Neural Network predictor,
+which adds an additional step to the prediction after evaluating the probabilities. This
+test consists in switching the prediction from 0 to 1 when the PCR value is higher than
+a threshold set in the code of eval.py. This module doesn't implement the training stage,
+since it is identical to the default Neural Network. It only provides the evaluation 
+methods that operate on the modified predictor, which uses the available nnet parameters.
+
 ##Advanced: implementing custom modules
 
 New data imputation and machine learning algorithms can be added to the pipeline by 
