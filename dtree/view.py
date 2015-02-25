@@ -25,17 +25,21 @@ out_file = './out/dtree.pdf'
 clf = pickle.load(open(args.param, "rb" ))
 
 # Get the names of the features
-train_filename = "./data/training-data-completed.csv"
-df = pd.read_csv(train_filename, delimiter=",", na_values="?")
-features = df.columns.values
+var_file = "./data/variables.txt"
+features = []
+with open(var_file, "rb") as vfile:
+    for line in vfile.readlines():
+        line = line.strip()
+        if not line: continue
+        features.append(line.split()[0])
 
 # Draw and save decision tree
 data = StringIO()
 tree.export_graphviz(clf, out_file=data, feature_names=features) 
 graph = pydot.graph_from_dot_data(data.getvalue())
 for node in graph.get_nodes():
-	node.add_style('filled')
-	node.set('fillcolor', 'lightblue')
+    node.add_style('filled')
+    node.set('fillcolor', 'lightblue')
 graph.write_pdf(out_file)
 
 print "Saved graphical representation of decision tree to",out_file
