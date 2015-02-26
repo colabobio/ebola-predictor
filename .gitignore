@@ -9,7 +9,6 @@ data/*-index*.csv
 data/notes.txt
 out
 store
-utils/*.pyc
-nnet/*.pyc
-dtree/*.pyc
-eps/*.pyc
+*.pyc
+*/*.pyc
+
