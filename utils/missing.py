@@ -8,6 +8,7 @@ import os, csv
 
 src_file = "./data/sources.txt"
 var_file = "./data/variables.txt"
+range_file = "./data/ranges.txt"
 
 input_file = ""
 with open(src_file, "rb") as sfile:
@@ -20,6 +21,16 @@ with open(var_file, "rb") as vfile:
         line = line.strip()
         if not line: continue
         model_variables.append(line.split()[0])
+
+range_variables = [] 
+with open(range_file, "rb") as rfile:
+    for line in rfile.readlines():
+        line = line.strip()
+        if not line: continue
+        parts = line.strip().split()
+        if 2 < len(parts):
+            range_variables.append({"name":parts[0], "type":parts[1], "range":parts[2].split(",")})
+
 
 total_count = 0
 miss_dep_var = 0
@@ -41,7 +52,22 @@ with open(input_file, "rb") as ifile:
                  some_missing = True
              else:
                  all_missing = False
-        if not all_missing and not missing_dvar:
+                 
+             inside_range = True
+             for var in range_variables:
+                 idx = titles.index(var["name"])
+                 val = row[idx]
+                 if val == "\\N": continue
+                 vtype = var["type"]
+                 vrang = var["range"]
+                 test = True
+                 if vtype == "category":
+                     test = val in vrang
+                 else:
+                     test = float(vrang[0]) <= float(val) and float(val) < float(vrang[1])
+                 inside_range = inside_range and test
+
+        if not all_missing and not missing_dvar and inside_range:
             total_count = total_count + 1
             if not some_missing: complete_count = complete_count + 1
             for i in range(0, len(model_variables)):
