@@ -13,9 +13,9 @@ with open(label_file, "rb") as vfile:
 def avg_cal_dis(module):
     test_files = glob.glob("./data/testing-data-*.csv")
     print "Calculating Calibration/Discrimination for " + module.title() + "..."
-    count = 0
-    total_cal = 0
-    total_dis = 0
+#     count = 0
+    total_cal = []
+    total_dis = []
     for testfile in test_files:
         start_idx = testfile.find("./data/testing-data-") + len("./data/testing-data-")
         stop_idx = testfile.find('.csv')
@@ -23,17 +23,26 @@ def avg_cal_dis(module):
         pfile = "./data/" + module.prefix() + "-params-" + str(id)
         trainfile = "./data/training-data-completed-" + str(id) + ".csv"
         if os.path.exists(testfile) and os.path.exists(pfile) and os.path.exists(trainfile):
-            count = count + 1
+#             count = count + 1
             print "Calibration/Discrimination for test set " + id + " ----------------------------------"
             cal, dis = module.eval(testfile, trainfile, pfile, 1)
-            total_cal += cal
-            total_dis += dis
-    avg_cal = (total_cal)/(count)
-    avg_dis = (total_dis)/(count)
+#             total_cal += cal
+#             total_dis += dis
+            total_cal.append(cal)
+            total_dis.append(dis)
 
-    print module.title() + " Average Calibration/Discrimination ********************************************"
+    avg_cal = np.mean(np.array(total_cal), axis=0)
+    avg_dis = np.mean(np.array(total_dis), axis=0)
+    std_cal = np.std(np.array(total_cal), axis=0)
+    std_dis = np.std(np.array(total_dis), axis=0)
+
+    print module.title() + " Calibration/Discrimination Average ********************************************"
     print "Calibration   : " + str(avg_cal)
     print "Discrimination: " + str(avg_dis)
+    print module.title() + " Calibration/Discrimination Error ********************************************"
+    print "Calibration   : " + str(std_cal)
+    print "Discrimination: " + str(std_dis)
+
 
 def cal_plots(module):
     test_files = glob.glob("./data/testing-data-*.csv")
