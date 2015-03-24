@@ -39,7 +39,7 @@ tree.export_graphviz(clf, out_file=data, feature_names=features)
 graph = pydot.graph_from_dot_data(data.getvalue())
 for node in graph.get_nodes():
     node.add_style('filled')
-    node.set('fillcolor', 'lightblue')
+    node.set('fillcolor', 'white')
 graph.write_pdf(out_file)
 
 print "Saved graphical representation of decision tree to",out_file
