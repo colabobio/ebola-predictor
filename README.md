@@ -217,7 +217,7 @@ In both cases the name of the training and parameter files can be customized wit
 -t and -p arguments, while the rest of the arguments affecting the Logistic Regression and 
 the Decision Tree algorithms are documented in the corresponding scikit-learn documentation 
 pages, [LogisticRegression](http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html) 
-and [DecisionTreeClassifier](http://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeClassifier.html)
+and [DecisionTreeClassifier](http://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeClassifier.html).
 
 The Neural Network allows to tweak several elements of the algorithm as well:
 
