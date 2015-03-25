@@ -17,9 +17,9 @@ applied to other dataset with virtually no modifications.
 
 The pipeline roughly involves four stages: defining predictive model, constructing training 
 and test sets, fitting the desired predictor using the training set, and evaluating the 
-predictor on the test set. The pipeline includes a number of built-in predictors (a Decision 
-Tree and a Neural Network), but additional predictors can be added to it by following a few 
-coding conventions. 
+predictor on the test set. The pipeline includes a number of built-in predictors (Logistic 
+Regression, Decision Tree, and Neural Network classifiers), but additional predictors can 
+be added to it by following a few coding conventions. 
 
 Because missing values is a typical problem in survey and health data, the pipeline allows 
 to "complete" an incomplete training set by using a variety of methods. Some of them are 
@@ -172,24 +172,39 @@ visual idea of the amount of missingness across variables.
 
 **3) Training the predictor.** Once a completed training set is constructed in the previous 
 step, the desired Machine Learning predictor can be trained. The pipeline currently includes
-two predictors: the [Decision Tree classifier](http://scikit-learn.org/stable/modules/tree.html) 
-from [scikit-learn](http://scikit-learn.org/), and a custom Neural Network. Both are trained 
-in a similar way. When using the default options, it is enough to do:
+three predictors: the [Decision Tree classifier](http://scikit-learn.org/stable/modules/tree.html) 
+from [scikit-learn](http://scikit-learn.org/), the [Logistic Regression classifier](http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html) 
+also from [scikit-learn](http://scikit-learn.org/), and a standard single-layer Neural Network. 
+All are trained in a similar way. When using the default options, it is enough to do:
 
 ```bash
 python dtree/train.py 
 ```
-for the Decision Tree, and
+for the Decision Tree,
+
+```bash
+python lreg/train.py 
+```
+
+for the Logistic Regression, and
 
 ```bash
 python nnet/train.py 
 ```
 
-for the Neural Network. In both cases, the training set is expected to be located in *data/training-data-completed.csv*.
-The parameters of the trained Decision Tree and Neural Network predictors are saved by default 
-to *data/dtree-params* and *data/nnet-params*, respectively.
+for the Neural Network. In all cases, the training set is expected to be located in *data/training-data-completed.csv*.
+The parameters of the trained Logistic Regression, Decision Tree and Neural Network predictors 
+are saved by default to *data/lreg-params*, *data/dtree-params*, and *data/nnet-params*, respectively.
 
-Each predictor has several additional arguments. In the case of the Decision Tree:
+Each predictor has several additional arguments. The Logistic Regression classifier:
+
+```bash
+python lreg/train.py [-h] [-t TRAIN] [-p PARAM] [-y PENALTY] [-d DUAL] [-c INV_REG]
+                     [-f FIT_INTERCEPT] [-s INTERCEPT_SCALING] [-w CLASS_WEIGHT]
+                     [-r RANDOM_STATE] [-l TOL]
+```
+
+In the case of the Decision Tree:
 
 ```bash
 python dtree/train.py [-h] [-t TRAIN] [-p PARAM] [-c CRITERION] [-s SPLITTER]
@@ -198,9 +213,11 @@ python dtree/train.py [-h] [-t TRAIN] [-p PARAM] [-c CRITERION] [-s SPLITTER]
                       [-maxl MAX_LEAF_NODES]
 ```
 
-The name of the training and parameter files can be customized with the -t and -p arguments, 
-while the rest of the arguments affect the Decision Tree algorithm itself, and are 
-documented in the scikit-learn documentation page for the [DecisionTreeClassifier](http://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeClassifier.html)
+In both cases the name of the training and parameter files can be customized with the 
+-t and -p arguments, while the rest of the arguments affecting the Logistic Regression and 
+the Decision Tree algorithms are documented in the corresponding scikit-learn documentation 
+pages, [LogisticRegression](http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html) 
+and [DecisionTreeClassifier](http://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeClassifier.html)
 
 The Neural Network allows to tweak several elements of the algorithm as well:
 
@@ -221,10 +238,11 @@ python nnet/train.py [-h] [-t TRAIN] [-p PARAM] [-l LAYERS] [-f HFACTOR] [-g GAM
   with the numerical estimation
 
 **4) Testing the predictor.** A trained predictor is evaluated on the testing set, however
-there are several measures that can be used to quantify its performance. Both the Decision 
-Tree and the Neural Network provide evaluation scripts:
+there are several measures that can be used to quantify its performance. The Logistic 
+Regression, Decision Tree and the Neural Network predictors provide evaluation scripts:
 
 ```bash
+python lreg/eval.py
 python dtree/eval.py
 python nnet/eval.py
 ```
@@ -366,7 +384,8 @@ generated in the previous step:
 python train.py [-h] pred [predictor arguments]
 ```
 
-* pred: name of the predictor to train (dtree for Decision Tree, nnet for Neural Network)
+* pred: name of the predictor to train (lreg for Logistic Regression, dtree for Decision Tree, 
+nnet for Neural Network)
 * predictor arguments: any argument accepted by the predictor, in the format name=value
 
 For instance, in order to train the Decision Tree using the entropy criterion and 5 as 
@@ -382,7 +401,8 @@ predictor parameters generated during training, using the corresponding test set
 ```bash
 python eval.py [-h] [-p P] [-m M]
 ```
-* -p, --predictor: name of the predictor to evaluate (dtree for Decision Tree, nnet for Neural Network)
+* -p, --predictor: name of the predictor to evaluate (lreg for Logistic Regression, dtree for Decision Tree, 
+nnet for Neural Network)
 * -m, --method: evaluation method. Must be one from the following: caldis, calplot, report, 
   roc, confusion, misses (default report)
 
@@ -430,7 +450,7 @@ Since no training is needed, all the (complete) data can be allocated to the tes
 python utils/makesets.py -p 100
 ```
 
-The evaluation script works similarly to the Decision Tree and Neural Network ones:
+The evaluation script works similarly to the ones available for the built-in predictors:
 
 ```bash
 python eps/eval.py --cutoff 0 --method report
