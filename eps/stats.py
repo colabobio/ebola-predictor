@@ -40,7 +40,7 @@ def calculate(test_filename, def_thresh=None, score_name="EPS", case_filename=".
     # Survive: score <= mean(survival) + std(survival)
     # Die: otherwise
     if not def_thresh == None: surv_thresh = def_thresh
-    else: surv_thresh = np.mean(surival_scores) + np.std(surival_scores) 
+    else: surv_thresh = np.mean(surival_scores) + np.std(surival_scores)
     df["PRED"] = df["SCORE"].map(lambda x: 0 if x <= surv_thresh else 1)
     print df
     df["VALUE"] = pd.Series(np.ones(df.shape[0]), index=df.index)
