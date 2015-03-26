@@ -27,8 +27,8 @@ Trains the logistic regression classifier given the specified parameters
                   http://scikit-learn.org/stable/modules/generated/sklearn.svm.SVC.html
 """
 def train(train_filename, param_filename, **kwparams):
-    if "C" in kwparams:
-        C = float(kwparams["C"])
+    if "error" in kwparams:
+        C = float(kwparams["error"])
     else:
         C = 1.0
         
