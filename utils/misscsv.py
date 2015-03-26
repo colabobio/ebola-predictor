@@ -28,7 +28,7 @@ with open(var_file, "rb") as vfile:
         vars.append(line.split()[0])
 
 cases = {}
-
+total = 0
 with open(input_filename, "r") as txtfile:
     lines = txtfile.readlines()
     open_case = {}
@@ -36,24 +36,34 @@ with open(input_filename, "r") as txtfile:
         line = line.strip()
         if line == "********************************************": break
         if line == "----------------":
-            open_case = {}
+            open_case = {"COUNT":1}
+            total += 1
         else:
             parts = line.split(" ")
             if parts[0] == "Name:": continue
             if parts[0] == "META:":
                 id = parts[1].split(",")[1]
-                cases[id] = open_case
-            else:
+                if id in cases:
+                    case = cases[id]
+                    case["COUNT"] = case["COUNT"] + 1
+                    open_case = None
+                else: 
+                    cases[id] = open_case
+            elif open_case:
                 key = parts[0]
                 val = parts[len(parts) - 1]
                 open_case[key] = val
 
+vars.extend(["COUNT", "FRAC"])
+
+for id in cases:
+    case = cases[id]
+    case["FRAC"] = float(case["COUNT"]) / float(total)
 
 data = []
 cases = collections.OrderedDict(sorted(cases.items()))
 for id in cases:
     row = [id]
-    print id
     for v in vars: 
         s = str(float(cases[id][v]))
         row.append(s)
