@@ -38,8 +38,8 @@ def train(train_filename, param_filename, **kwparams):
     else:
         dual = False
 
-    if "C" in kwparams:
-        C = float(kwparams["C"])
+    if "inv_reg" in kwparams:
+        C = float(kwparams["inv_reg"])
     else:
         C = 1.0
 
