@@ -207,13 +207,13 @@ Trains the neural net given the specified parameters
                   show (show minimization plot), debug (gradient check)
 """
 def train(train_filename, param_filename, **kwparams):
-    if "L" in kwparams:
-        L = int(kwparams["L"])
+    if "layers" in kwparams:
+        L = int(kwparams["layers"])
     else:
         L = 1
 
-    if "hf" in kwparams:
-        hf = float(kwparams["hf"])
+    if "hfactor" in kwparams:
+        hf = float(kwparams["hfactor"])
     else:
         hf = 1
 
@@ -362,8 +362,8 @@ if __name__ == "__main__":
                         help="Debugs gradient calculation")
     args = parser.parse_args()
     train(args.train[0], args.param[0],
-          L=str(args.layers[0]),
-          hf=str(args.hfactor[0]),
+          layers=str(args.layers[0]),
+          hfactor=str(args.hfactor[0]),
           gamma=str(args.gamma[0]),
           threshold=str(args.convergence[0]),
           show=str(args.show),
