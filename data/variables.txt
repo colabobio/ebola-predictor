@@ -1,6 +1,4 @@
 OUT category
 PCR float
+TEMP float
 AST_1 float
-WEAK category
-TCo2_1 float
-DIARR category
