@@ -1,10 +1,13 @@
 import os, threading
 import time, glob, time
 import itertools
+import operator
 
-total_sets = 10
+total_sets = 5
 test_prec = 50
-model_size = 5
+model_sizes = [2]
+predictors = ["lreg"]
+pred_options = {"lreg":""}
 impute_meth = "amelia"
 master_file = "./data/variables-master.txt"
 var_file = "./data/variables.txt"
@@ -43,7 +46,22 @@ def worker(count, first):
     os.system("python init.py -n " + str(count) + " -s " + str(first) + " -t " + str(test_prec) + " -m " + impute_meth + " > super.out")
     return
 
-def run_model(mdl_count):
+def create_var_file():
+    with open(var_file, "w") as vfile:
+        vfile.write(out_var + " " + var_dict[out_var] + "\n")
+        if fix_var: vfile.write(fix_var + " " + var_dict[fix_var] + "\n")
+        for v in vars:
+            vfile.write(v + " " + var_dict[v] + "\n")
+
+def run_model(fix_var, vars, mdl_count, pred_name, pred_opt):
+    mdl_name = "model-" + pred_name + "-" +str(mdl_count)
+    vdict = [] 
+    if fix_var: vdict = [fix_var]
+    vdict.extend(vars)
+    model_vars[mdl_name] = vdict
+        
+    print "running model", pred, mdl_count, vdict
+
     count = total_sets
     start = 0
     nrest = 0
@@ -75,38 +93,58 @@ def run_model(mdl_count):
         else:
             print "Done! Number of restarts:", nrest
             break
-    os.system("python train.py lreg")
-    os.system("python eval.py -p lreg -m report")
-    os.system("python pack.py model-" + str(mdl_count))
+    os.system("python train.py " + pred_name + " "+ pred_opt)
+    os.system("python eval.py -p " + pred_name + " -m report > report.out")
+    os.system("python pack.py " + mdl_name)
+
+    with open("report.out", "r") as report:
+        last = report.readlines()[-1]
+        parts = last.split(",")
+        print "------------------------>",float(parts[3]), float(parts[6])
+        model_f1_scores[mdl_name] = float(parts[3])
+        model_f1_dev[mdl_name] = float(parts[6])
 
 ##########################################################################################
 
 all_vars = []
 var_dict = {}
+fix_var = None
 with open(master_file, "rb") as mfile:
     for line in mfile.readlines():
         line = line.strip()
         if not line: continue
-        nam, typ = line.split()
-        all_vars.append(nam)
-        var_dict[nam] = typ
-
+        parts = line.split()
+        name = parts[0]
+        type = parts[1]
+        if len(parts) == 3 and parts[2] == "*": fix_var = name
+        all_vars.append(name)
+        var_dict[name] = type
 out_var = all_vars[0]
 mdl_vars = all_vars[1:]
-# print out_var
-# print mdl_vars
+if fix_var: mdl_vars.remove(fix_var)
 
+model_f1_scores = {}
+model_f1_dev = {}
+model_vars = {}
 
-model_count = 0
-var_comb = itertools.combinations(mdl_vars, model_size)
-for vars in var_comb:
-    with open(var_file, "w") as vfile:
-        vfile.write(out_var + " " + var_dict[out_var] + "\n")
-        for v in vars:
-            vfile.write(v + " " + var_dict[v] + "\n")
-    print "running model",vars,"**************************************" 
-    run_model(model_count)
-    model_count += 1
+for pred in predictors:
+    opt = pred_options[pred]
+    model_count = 0
+    for size in model_sizes:
+        var_comb = itertools.combinations(mdl_vars, size)
+        for vars in var_comb:
+            create_var_file()
+            run_model(fix_var,vars, model_count, pred, opt)
+            model_count += 1
 
+print model_f1_scores 
+print model_f1_dev
 
+sorted_preds = reversed(sorted(model_f1_scores.items(), key=operator.itemgetter(1)))
 
+for pair in sorted_preds:
+    pred_name = pair[0]
+    pred_f1_score = pair[1]
+    pred_f1_std = model_f1_dev[pred_name]
+    vars = model_vars[pred_name]
+    print pred_name, ",".join(vars), pred_f1_score, pred_f1_std
