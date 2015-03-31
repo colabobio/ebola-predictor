@@ -1,5 +1,5 @@
 """
-Run variety of evaluation metrics on nnet predictive model.
+Run variety of evaluation metrics on Logistic Regression classifier.
 
 @copyright: The Broad Institute of MIT and Harvard 2015
 """
@@ -10,10 +10,10 @@ sys.path.append(os.path.abspath('./utils'))
 from evaluate import design_matrix, run_eval, get_misses
 
 def prefix():
-    return "nnet"
+    return "lreg0"
 
 def title():
-    return "Neural Network"
+    return "Logistic Regression Zero"
 
 def pred(test_filename, train_filename, param_filename):
     X, y = design_matrix(test_filename, train_filename)
@@ -72,7 +72,7 @@ if __name__ == "__main__":
                         help="Filename for training set")
     parser.add_argument('-T', '--test', nargs=1, default=["./data/testing-data.csv"],
                         help="Filename for testing set")
-    parser.add_argument('-p', '--param', nargs=1, default=["./data/nnet-params"],
+    parser.add_argument('-p', '--param', nargs=1, default=["./data/lreg0-params"],
                         help="Filename for neural network parameters")
     parser.add_argument('-m', '--method', nargs=1, default=["report"],
                         help="Evaluation method: caldis, calplot, report, roc, confusion, misses")
