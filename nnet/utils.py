@@ -84,7 +84,7 @@ def predict(x, theta, N, L, S, K):
     thetam = thetaMatrix(theta, N, L, S, K)
     a = forwardProp(x, thetam, L) 
     h = a[L]
-    return h;
+    return h
 
 """Return a function that gives a prediction from a design matrix row
 """
