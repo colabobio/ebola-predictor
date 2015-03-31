@@ -288,6 +288,27 @@ def train(train_filename, param_filename, **kwparams):
         else:
             X[:, j] = 1.0 / M
 
+    theta0 = np.random.rand(R)
+    params = (X, y, N, L, S, K, gamma)
+
+    # http://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.fmin_bfgs.html
+    print "Training Neural Network..."
+    values = np.array([])
+    theta = fmin_bfgs(cost, theta0, fprime=gradient, args=params, gtol=threshold, callback=add_value)
+    print "Done!"
+
+    best_theta = theta
+
+    plt.plot(np.arange(values.shape[0]), values)
+    plt.xlabel("Step number")
+    plt.ylabel("Cost function")
+
+    if show:
+        plt.show()
+
+
+
+'''
    # Number of training runs
     iter = 1
 
@@ -311,6 +332,9 @@ def train(train_filename, param_filename, **kwparams):
 
         Xtrain = X[itrain,:]
         ytrain = y[itrain]
+        print i0
+        print "*****************"
+        print ri1
 
         theta0 = np.random.rand(R)
         params = (Xtrain, ytrain, N, L, S, K, gamma)
@@ -335,12 +359,8 @@ def train(train_filename, param_filename, **kwparams):
 
     if show:
         plt.show()
+'''
 
-    print ""
-    print "***************************************"
-    print "Best predictor:"
-    print_theta(best_theta, N, L, S, K)
-    save_theta(param_filename, best_theta, N, L, S, K)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
