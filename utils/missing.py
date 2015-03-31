@@ -31,12 +31,12 @@ with open(range_file, "rb") as rfile:
         if 2 < len(parts):
             range_variables.append({"name":parts[0], "type":parts[1], "range":parts[2].split(",")})
 
-
 total_count = 0
 miss_dep_var = 0
 complete_count = 0
 missing_count = [0] * len(model_variables)
 
+complete_data = []
 with open(input_file, "rb") as ifile:
     reader = csv.reader(ifile)
     titles = reader.next()
@@ -69,7 +69,13 @@ with open(input_file, "rb") as ifile:
 
         if not all_missing and not missing_dvar and inside_range:
             total_count = total_count + 1
-            if not some_missing: complete_count = complete_count + 1
+            if not some_missing:
+                complete_row = []
+                for i in range(0, len(model_variables)):
+                    var_idx = model_idx[i]
+                    complete_row.append(row[var_idx])
+                complete_data.append(complete_row)
+                complete_count = complete_count + 1
             for i in range(0, len(model_variables)):
                 var_idx = model_idx[i]
                 if row[var_idx] == "\\N":
@@ -82,3 +88,6 @@ print "Missing counts and precentages for each independent variable:"
 for i in range(1, len(model_variables)):
     miss_frac = 100.0 * float(missing_count[i])/ total_count
     print "{:7s} {:2.0f}/{:2.0f} {:2.2f}%".format(model_variables[i], missing_count[i], total_count, miss_frac)
+
+for row in complete_data:
+    print row
