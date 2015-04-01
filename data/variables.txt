@@ -1,4 +1,6 @@
 OUT category
 PCR float
-TEMP float
+VOMIT category
 AST_1 float
+Ca_1 float
+TEMP float

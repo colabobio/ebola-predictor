@@ -1,2 +1,2 @@
 DIAG category 1
-AGE int 0,50
+AGE int 10,50
