@@ -24,7 +24,7 @@ zf = zipfile.ZipFile(zip_filename, "r")
 print "Extracting " + zip_filename + " into data folder..."
 try:
     for name in zf.namelist():
-        outpath = "./"    
+        outpath = "./"
         fn = os.path.join(outpath, name)
         print "  Extracting file", fn
         zf.extract(name, outpath)

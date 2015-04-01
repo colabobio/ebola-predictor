@@ -1,37 +1,44 @@
+"""
+Exhaustive generation of models
+
+@copyright: The Broad Institute of MIT and Harvard 2015
+"""
+
 import os, threading
 import time, glob, time
 import itertools
 import operator
 
-total_sets = 5
+total_sets = 10
 test_prec = 50
-model_sizes = [2]
-predictors = ["lreg"]
-pred_options = {"lreg":""}
+model_sizes = [2, 3]
+predictors = ["lreg0", "lreg"]
+pred_options = {"lreg0":"", "lreg":""}
 impute_meth = "amelia"
 master_file = "./data/variables-master.txt"
 var_file = "./data/variables.txt"
+max_restarts = 10
 
-import ctypes
+# import ctypes
 
-def terminate_thread(thread):
-    """Terminates a python thread from another thread.
-
-    :param thread: a threading.Thread instance
-    """
-    if not thread.isAlive():
-        return
-
-    exc = ctypes.py_object(SystemExit)
-    res = ctypes.pythonapi.PyThreadState_SetAsyncExc(
-        ctypes.c_long(thread.ident), exc)
-    if res == 0:
-        raise ValueError("nonexistent thread id")
-    elif res > 1:
-        # """if it returns a number greater than one, you're in trouble,
-        # and you should call it again with exc=NULL to revert the effect"""
-        ctypes.pythonapi.PyThreadState_SetAsyncExc(thread.ident, None)
-        raise SystemError("PyThreadState_SetAsyncExc failed")
+# def terminate_thread(thread):
+#     """Terminates a python thread from another thread.
+# 
+#     :param thread: a threading.Thread instance
+#     """
+#     if not thread.isAlive():
+#         return
+# 
+#     exc = ctypes.py_object(SystemExit)
+#     res = ctypes.pythonapi.PyThreadState_SetAsyncExc(
+#         ctypes.c_long(thread.ident), exc)
+#     if res == 0:
+#         raise ValueError("nonexistent thread id")
+#     elif res > 1:
+#         # """if it returns a number greater than one, you're in trouble,
+#         # and you should call it again with exc=NULL to revert the effect"""
+#         ctypes.pythonapi.PyThreadState_SetAsyncExc(thread.ident, None)
+#         raise SystemError("PyThreadState_SetAsyncExc failed")
 
 def get_last():
     train_files = glob.glob("./data/training-data-completed*.csv")
@@ -43,7 +50,7 @@ def get_last():
 def worker(count, first):
     print "Start"
     os.system("python clean.py")
-    os.system("python init.py -n " + str(count) + " -s " + str(first) + " -t " + str(test_prec) + " -m " + impute_meth + " > super.out")
+    os.system("python init.py -n " + str(count) + " -s " + str(first) + " -t " + str(test_prec) + " -m " + impute_meth)
     return
 
 def create_var_file():
@@ -53,56 +60,61 @@ def create_var_file():
         for v in vars:
             vfile.write(v + " " + var_dict[v] + "\n")
 
-def run_model(fix_var, vars, mdl_count, pred_name, pred_opt):
-    mdl_name = "model-" + pred_name + "-" +str(mdl_count)
+def run_model(fix_var, vars, mdl_count):
     vdict = [] 
     if fix_var: vdict = [fix_var]
     vdict.extend(vars)
-    model_vars[mdl_name] = vdict
-        
-    print "running model", pred, mdl_count, vdict
+    print "running model", mdl_count, vdict
 
     count = total_sets
     start = 0
     nrest = 0
     while True:
-        n0 = 0
-        t0 = time.time() 
+#         n0 = 0
+#         t0 = time.time() 
         thread = threading.Thread(target=worker, args=(count, start))
         thread.start()
         while True:
             time.sleep(0.1)
-            n = get_last()
-            t = time.time() 
-            if n == n0:
-                if 30 < t - t0:
-                    print "amelia seems unable to converge, will try to terminate..."
-                    terminate_thread(thread)
-                    break
-            else:
-                t0 = time.time()
-            n0 = n
+#             n = get_last()
+#             t = time.time() 
+#             if n == n0:
+#                 if 30 < t - t0:
+#                     print "amelia seems unable to converge, will try to terminate..."
+#                     terminate_thread(thread)
+#                     break
+#             else:
+#                 t0 = time.time()
+#             n0 = n
             if not thread.isAlive():
                 break
 
         n = get_last()
         if n < total_sets - 1:
+            if max_restarts < nrest:
+                print "Model cannot be succesfully imputed, skipping!"
+                return 
             start = n + 1
             count = total_sets - start
             nrest += 1
         else:
             print "Done! Number of restarts:", nrest
             break
-    os.system("python train.py " + pred_name + " "+ pred_opt)
-    os.system("python eval.py -p " + pred_name + " -m report > report.out")
-    os.system("python pack.py " + mdl_name)
-
-    with open("report.out", "r") as report:
-        last = report.readlines()[-1]
-        parts = last.split(",")
-        print "------------------------>",float(parts[3]), float(parts[6])
-        model_f1_scores[mdl_name] = float(parts[3])
-        model_f1_dev[mdl_name] = float(parts[6])
+            
+    for pred_name in predictors:
+        print "PREDICTOR",pred_name,"---------------"
+        mdl_name = "model-" +str(mdl_count) + "-" + pred_name
+        model_vars[mdl_name] = vdict
+        pred_opt = pred_options[pred_name]
+        os.system("python train.py " + pred_name + " "+ pred_opt)
+        os.system("python eval.py -p " + pred_name + " -m report > report.out")
+        with open("report.out", "r") as report:
+            last = report.readlines()[-1]
+            parts = last.split(",")
+            print "------------------------>",float(parts[3]), float(parts[6])
+            model_f1_scores[mdl_name] = float(parts[3])
+            model_f1_dev[mdl_name] = float(parts[6])
+    os.system("python pack.py model-" +str(mdl_count))
 
 ##########################################################################################
 
@@ -127,15 +139,14 @@ model_f1_scores = {}
 model_f1_dev = {}
 model_vars = {}
 
-for pred in predictors:
-    opt = pred_options[pred]
-    model_count = 0
-    for size in model_sizes:
-        var_comb = itertools.combinations(mdl_vars, size)
-        for vars in var_comb:
-            create_var_file()
-            run_model(fix_var,vars, model_count, pred, opt)
-            model_count += 1
+
+model_count = 0
+for size in model_sizes:
+    var_comb = itertools.combinations(mdl_vars, size)
+    for vars in var_comb:
+        create_var_file()
+        run_model(fix_var,vars, model_count)
+        model_count += 1
 
 print model_f1_scores 
 print model_f1_dev
