@@ -31,6 +31,11 @@ def process(in_filename, out_filename, **kwparams):
     else:
         resamples_opt = 10000
 
+    if "max_iter" in kwparams:
+        max_iter = int(kwparams["max_iter"])
+    else:
+        max_iter = 10000
+
     if "in_check" in kwparams:
         incheck_opt = True if kwparams["in_check"].lower() == "true" else False
     else:
@@ -107,7 +112,7 @@ def process(in_filename, out_filename, **kwparams):
     else:
          incheck_str = "FALSE"
 
-    robjects.r('imdat <- amelia(trdat, m=' + str(num_imputed) + ', noms=nom_vars, bounds=num_bounds, max.resample = ' + str(resamples_opt) + ', incheck=' + incheck_str + ')')
+    robjects.r('imdat <- amelia(trdat, m=' + str(num_imputed) + ', noms=nom_vars, bounds=num_bounds, max.resample = ' + str(resamples_opt) + ', incheck=' + incheck_str + ', emburn = c(5,' + str(max_iter) +'))')
     robjects.r('write.amelia(obj=imdat, file.stem="./data/training-data-", format="csv", row.names=FALSE)')
     
     if gen_plots:
@@ -171,6 +176,8 @@ if __name__ == "__main__":
                         help="number of imputed datasets")
     parser.add_argument("-r", "--num_resamples", type=int, nargs=1, default=[10000],
                         help="number of resamples")
+    parser.add_argument("-x", "--max_iter", type=int, nargs=1, default=[10000],
+                        help="maximum number of EM iterations")
     parser.add_argument("-c", "--in_check", action="store_true",
                         help="check input data")
     parser.add_argument("-p", "--gen_plots", action="store_true",
@@ -180,5 +187,6 @@ if __name__ == "__main__":
     process(in_filename=args.input[0], out_filename=args.output[0],
             num_imputed=str(args.num_imputed[0]),
             resamples_opt=str(args.num_resamples[0]),
+            max_iter=str(args.max_iter[0]),
             incheck_opt=str(args.in_check),
             gen_plots=str(args.gen_plots))
