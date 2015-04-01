@@ -4,7 +4,12 @@ This script gives information on the missingness in the input file.
 @copyright: The Broad Institute of MIT and Harvard 2015
 """
 
-import os, csv
+import os, csv, argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument("-s", "--show_complete", action="store_true",
+                    help="show complete data")
+args = parser.parse_args()
 
 src_file = "./data/sources.txt"
 var_file = "./data/variables.txt"
@@ -89,5 +94,8 @@ for i in range(1, len(model_variables)):
     miss_frac = 100.0 * float(missing_count[i])/ total_count
     print "{:7s} {:2.0f}/{:2.0f} {:2.2f}%".format(model_variables[i], missing_count[i], total_count, miss_frac)
 
-for row in complete_data:
-    print row
+if args.show_complete:
+    print "Complete entries (" + str(len(complete_data)) + ")"
+    print model_variables
+    for row in complete_data:
+        print row
