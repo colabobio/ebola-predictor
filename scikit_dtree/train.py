@@ -13,16 +13,16 @@ sys.path.append(os.path.abspath('./utils'))
 from evaluate import design_matrix
 
 def prefix():
-    return "dtree"
+    return "scikit_dtree"
 
 def title():
-    return "Decision Tree"
+    return "Decision Tree from scikit-learn"
 
 """
 Trains the decision tree given the specified parameters
 
 : param train_filename: name of file containing training set
-: param param_filename: name of file to store resulting neural network parameters
+: param param_filename: name of file to store resulting decision tree parameters
 : param kwparams: custom arguments for decision tree. Same as listed in
                   http://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeClassifier.html
                   with the exception of random_state (not supported)
@@ -98,7 +98,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-t", "--train", nargs=1, default=["./data/training-data-completed.csv"],
                         help="File containing training set")
-    parser.add_argument("-p", "--param", nargs=1, default=["./data/dtree-params"], 
+    parser.add_argument("-p", "--param", nargs=1, default=["./data/scikit_dtree-params"], 
                         help="Output file to save the parameters of the decision tree")
     parser.add_argument("-c", "--criterion", nargs=1, default=["gini"],
                         help="The function to measure the quality of a split")

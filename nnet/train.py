@@ -203,8 +203,9 @@ Trains the neural net given the specified parameters
 : param param_filename: name of file to store resulting neural network parameters
 : param kwparams: custom arguments for neural network: L (number of hidden layers), hf 
                   (factor to calculate number of hidden units given the number of variables),
-                  gamma (regularization coefficient), threshold (default convergence threshold),
-                  show (show minimization plot), debug (gradient check)
+                  inv_reg (inverse of regularization coefficient), threshold 
+                  (default convergence threshold), show (show minimization plot), debug 
+                  (gradient check)
 """
 def train(train_filename, param_filename, **kwparams):
     if "layers" in kwparams:
@@ -217,8 +218,8 @@ def train(train_filename, param_filename, **kwparams):
     else:
         hf = 1
 
-    if "gamma" in kwparams:
-        gamma = float(kwparams["gamma"])
+    if "inv_reg" in kwparams:
+        gamma = 1.0 / float(kwparams["inv_reg"])
     else:
         gamma = 0.002
 
@@ -269,9 +270,6 @@ def train(train_filename, param_filename, **kwparams):
     # * K x S, for the last transition into the output layer with K nodes
     R = (S - 1) * N + (L - 2) * (S - 1) * S + K * S
 
-    best_theta = np.ones(R)
-    best_rate = 0
-
     y = df.values[:,0]
     # Building the (normalized) design matrix
     X = np.ones((M, N))
@@ -297,8 +295,6 @@ def train(train_filename, param_filename, **kwparams):
     theta = fmin_bfgs(cost, theta0, fprime=gradient, args=params, gtol=threshold, callback=add_value)
     print "Done!"
 
-    best_theta = theta
-
     plt.plot(np.arange(values.shape[0]), values)
     plt.xlabel("Step number")
     plt.ylabel("Cost function")
@@ -306,61 +302,11 @@ def train(train_filename, param_filename, **kwparams):
     if show:
         plt.show()
 
-
-
-'''
-   # Number of training runs
-    iter = 1
-
-    # Fraction of rows from training data to use in each training iteration.
-    # The rest of rows are used to calculate the accuracy of the parameters,
-    # so that the final parameters are chosen to be those that maximize
-    # the accuracy.
-    trainf = 1
-
-    for n in range(0, iter):
-        print "-------> Training iteration",n
-
-        # Create training set by randomly choosing 70% of rows from each output
-        # category
-        i0 = np.where(y == 0)
-        i1 = np.where(y == 1)
-        ri0 = np.random.choice(i0[0], size=0.7*i0[0].shape[0], replace=False)
-        ri1 = np.random.choice(i1[0], size=0.7*i1[0].shape[0], replace=False)
-        itrain = np.concatenate((ri1, ri0))
-        itrain.sort()
-
-        Xtrain = X[itrain,:]
-        ytrain = y[itrain]
-        print i0
-        print "*****************"
-        print ri1
-
-        theta0 = np.random.rand(R)
-        params = (Xtrain, ytrain, N, L, S, K, gamma)
-
-        # http://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.fmin_bfgs.html
-        print "Training Neural Network..."
-        values = np.array([])
-        theta = fmin_bfgs(cost, theta0, fprime=gradient, args=params, gtol=threshold, callback=add_value)
-        print "Done!"
-
-        if trainf < 1:
-            [rate, rrate] = evaluate(X, y, itrain, theta)
-            if best_rate < rate:
-                best_rate = rate
-                best_theta = theta
-        else:
-            best_theta = theta
-
-        plt.plot(np.arange(values.shape[0]), values)
-        plt.xlabel("Step number")
-        plt.ylabel("Cost function")
-
-    if show:
-        plt.show()
-'''
-
+    print ""
+    print "***************************************"
+    print "Best predictor:"
+    print_theta(theta, N, L, S, K)
+    save_theta(param_filename, theta, N, L, S, K)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -372,8 +318,8 @@ if __name__ == "__main__":
                         help="Number of hidden layers")
     parser.add_argument("-f", "--hfactor", nargs=1, type=int, default=[1],
                         help="Hidden units factor")
-    parser.add_argument("-g", "--gamma", nargs=1, type=float, default=[0.002],
-                        help="Regularization coefficient")
+    parser.add_argument("-r", "--inv_reg", nargs=1, type=float, default=[500],
+                        help="Inverse of regularization coefficient, larger values represent lower penalty")
     parser.add_argument("-c", "--convergence", nargs=1, type=float, default=[1E-5],
                         help="Convergence threshold for the BFGS minimizer")
     parser.add_argument("-s", "--show", action="store_true",
@@ -384,7 +330,7 @@ if __name__ == "__main__":
     train(args.train[0], args.param[0],
           layers=str(args.layers[0]),
           hfactor=str(args.hfactor[0]),
-          gamma=str(args.gamma[0]),
+          inv_reg=str(args.inv_reg[0]),
           threshold=str(args.convergence[0]),
           show=str(args.show),
           debug=str(args.debug))

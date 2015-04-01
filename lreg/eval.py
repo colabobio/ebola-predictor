@@ -1,5 +1,5 @@
 """
-Run variety of evaluation metrics on logistic regression classifier.
+Run variety of evaluation metrics on Logistic Regression classifier.
 
 @copyright: The Broad Institute of MIT and Harvard 2015
 """
@@ -73,7 +73,7 @@ if __name__ == "__main__":
     parser.add_argument('-T', '--test', nargs=1, default=["./data/testing-data.csv"],
                         help="Filename for testing set")
     parser.add_argument('-p', '--param', nargs=1, default=["./data/lreg-params"],
-                        help="Filename for decision tree parameters")
+                        help="Filename for neural network parameters")
     parser.add_argument('-m', '--method', nargs=1, default=["report"],
                         help="Evaluation method: caldis, calplot, report, roc, confusion, misses")
     args = parser.parse_args()

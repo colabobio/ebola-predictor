@@ -13,10 +13,10 @@ sys.path.append(os.path.abspath('./utils'))
 from evaluate import design_matrix
 
 def prefix():
-    return "svm"
+    return "scikit_svm"
 
 def title():
-    return "Support Vector Machine"
+    return "Support Vector Machine from scikit-learn"
 
 """
 Trains the logistic regression classifier given the specified parameters
@@ -106,14 +106,14 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-t", "--train", nargs=1, default=["./data/training-data-completed.csv"],
                         help="File containing training set")
-    parser.add_argument("-p", "--param", nargs=1, default=["./data/svm-params"], 
+    parser.add_argument("-p", "--param", nargs=1, default=["./data/scikit_svm-params"], 
                         help="Output file to save the parameters of the SVM classifier")
     parser.add_argument("-c", "--error", nargs=1, type=float, default=[1.0],
                         help="Penalty parameter C of the error term")
     parser.add_argument("-k", "--kernel", nargs=1, default=["rbf"],
                         help="Specifies the kernel type to be used in the algorithm")
     parser.add_argument("-d", "--degree", nargs=1, type=int, default=[3],
-                        help="Degree of the polynomial kernel function")                        
+                        help="Degree of the polynomial kernel function")
     parser.add_argument("-g", "--gamma", nargs=1, type=float, default=[0.0],
                         help="Kernel coefficient for rbf, poly and sigmoid")
     parser.add_argument("-0", "--coef0", nargs=1, type=float, default=[0.0],
