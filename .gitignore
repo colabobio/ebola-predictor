@@ -9,6 +9,7 @@ data/*-index*.csv
 data/notes.txt
 out
 store
+report.out
 *.pyc
 */*.pyc
 
