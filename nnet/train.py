@@ -254,7 +254,7 @@ def train(train_filename, param_filename, **kwparams):
     df = pd.read_csv(train_filename, delimiter=",", na_values="?")
     M = df.shape[0]
     N = df.shape[1]
-    S = int((N - 1) * hf) # includes the bias unit on each layer, so the number of units is S-1
+    S = int(N * hf) # includes the bias unit on each layer, so the number of units is S-1
     print "Number of data samples          :", M
     print "Number of independent variables :", N-1
     print "Number of hidden layers         :", L-1
