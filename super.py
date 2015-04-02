@@ -9,9 +9,9 @@ import time, glob, time
 import itertools
 import operator
 
-total_sets = 10
+total_sets = 100
 test_prec = 50
-model_sizes = [2]
+model_sizes = [2, 3, 4, 5]
 predictors = ["lreg", "nnet", "scikit_lreg", "scikit_dtree", "scikit_svm", "scikit_randf"]
 pred_options = {"lreg":"", 
                 "nnet":"", 
