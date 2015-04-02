@@ -11,9 +11,14 @@ import operator
 
 total_sets = 10
 test_prec = 50
-model_sizes = [2, 3]
-predictors = ["lreg0", "lreg"]
-pred_options = {"lreg0":"", "lreg":""}
+model_sizes = [2]
+predictors = ["lreg", "nnet", "scikit_lreg", "scikit_dtree", "scikit_svm", "scikit_randf"]
+pred_options = {"lreg":"", 
+                "nnet":"", 
+                "scikit_lreg":"", 
+                "scikit_dtree":"min_samples_leaf=10 max_depth=5 criterion=entropy",
+                "scikit_svm":"error=10 kernel=rbf",
+                "scikit_randf":"min_samples_leaf=10 max_depth=5 criterion=entropy"}
 impute_meth = "amelia"
 master_file = "./data/variables-master.txt"
 var_file = "./data/variables.txt"
@@ -53,17 +58,17 @@ def worker(count, first):
     os.system("python init.py -n " + str(count) + " -s " + str(first) + " -t " + str(test_prec) + " -m " + impute_meth)
     return
 
-def create_var_file():
+def create_var_file(fix_var, mdl_vars):
     with open(var_file, "w") as vfile:
         vfile.write(out_var + " " + var_dict[out_var] + "\n")
         if fix_var: vfile.write(fix_var + " " + var_dict[fix_var] + "\n")
-        for v in vars:
+        for v in mdl_vars:
             vfile.write(v + " " + var_dict[v] + "\n")
 
-def run_model(fix_var, vars, mdl_count):
+def run_model(fix_var, mdl_vars, mdl_count):
     vdict = [] 
     if fix_var: vdict = [fix_var]
-    vdict.extend(vars)
+    vdict.extend(mdl_vars)
     print "running model", mdl_count, vdict
 
     count = total_sets
@@ -139,23 +144,22 @@ model_f1_scores = {}
 model_f1_dev = {}
 model_vars = {}
 
-
 model_count = 0
 for size in model_sizes:
-    var_comb = itertools.combinations(mdl_vars, size)
-    for vars in var_comb:
-        create_var_file()
-        run_model(fix_var,vars, model_count)
+    fsize = size
+    if fix_var: fsize -= 1
+    var_comb = itertools.combinations(mdl_vars, fsize)
+    for mvars in var_comb:
+        create_var_file(fix_var, mvars)
+        run_model(fix_var, mvars, model_count)
         model_count += 1
-
-print model_f1_scores 
-print model_f1_dev
 
 sorted_preds = reversed(sorted(model_f1_scores.items(), key=operator.itemgetter(1)))
 
-for pair in sorted_preds:
-    pred_name = pair[0]
-    pred_f1_score = pair[1]
-    pred_f1_std = model_f1_dev[pred_name]
-    vars = model_vars[pred_name]
-    print pred_name, ",".join(vars), pred_f1_score, pred_f1_std
+with open("store/ranking.txt", "w") as rfile:
+    for pair in sorted_preds:
+        pred_name = pair[0]
+        pred_f1_score = pair[1]
+        pred_f1_std = model_f1_dev[pred_name]
+        mvars = model_vars[pred_name]
+        rfile.write(pred_name + " " + ",".join(mvars) + " " + str(pred_f1_score) + " " + str(pred_f1_std) + "\n")
