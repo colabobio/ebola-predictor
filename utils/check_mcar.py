@@ -11,14 +11,16 @@ values. Journal of the American Statistical Association, 83 (404), 1198-1202
 @copyright: The Broad Institute of MIT and Harvard 2015
 """
 
+import argparse
 import sys, csv, os
 import rpy2.robjects as robjects
 
 src_file = "./data/sources.txt"
 var_file = "./data/variables-master.txt"
 range_file = "./data/ranges.txt"
+ignore_file = "./data/ignore.txt"
 
-def doit():
+def run_test(pvalue_threshold):
     input_file = ""
     with open(src_file, "rb") as sfile:
         for line in sfile.readlines():
@@ -40,6 +42,13 @@ def doit():
             if 2 < len(parts):
                 range_variables.append({"name":parts[0], "type":parts[1], "range":parts[2].split(",")})
 
+    ignore_records = []
+    with open(ignore_file, "rb") as rfile:
+        for line in rfile.readlines():
+            line = line.strip()
+            if not line: continue
+            ignore_records.append(line)
+
     idx_info = []
     all_data = []
     with open(input_file, "rb") as ifile:
@@ -49,6 +58,8 @@ def doit():
         r0 = 0
         r = 0
         for row in reader:
+            if row[0] in ignore_records: continue
+
             r0 += 1 # Starts at 1, because of titles
             all_missing = True
             some_missing = False
@@ -79,46 +90,42 @@ def doit():
                 all_data.append([row[idx].replace("\\N", "?") for idx in model_idx])
                 r += 1
 
+    test_filename = "./mcar_test.csv"
+
     dvar = model_variables[0]
-    for i in range(1, len(model_variables)):
-        ivar = model_variables[i]
-
-        robjects.r('library(BaylorEdPsych)')
-        with open("test.csv", "w") as trfile:
-            writer = csv.writer(trfile, delimiter=",", quotechar='"', quoting=csv.QUOTE_MINIMAL)
-            writer.writerow([dvar, ivar])
-            for row in all_data:
-                writer.writerow([row[0], row[i]])
-        robjects.r('trdat <- read.table("test.csv", sep=",", header=TRUE, na.strings="?")')
-        print "Test for",dvar,ivar
-        robjects.r('res <- LittleMCAR(trdat)')
-        print ""
-        res = robjects.r['res']
-        print "Value of chi-squared statistic:", res[0][0]
-        print "P-value:", res[2][0]
-
-    print "Multivariate test ************************************************************"
-    with open("test.csv", "w") as trfile:
+    robjects.r('library(BaylorEdPsych)')
+    with open(test_filename, "w") as trfile:
         writer = csv.writer(trfile, delimiter=",", quotechar='"', quoting=csv.QUOTE_MINIMAL)
         writer.writerow(model_variables)
         for row in all_data:
             writer.writerow(row)
-    robjects.r('trdat <- read.table("test.csv", sep=",", header=TRUE, na.strings="?")')
-    robjects.r('res <- LittleMCAR(trdat)')
+    robjects.r('dat <- read.table("' + test_filename + '", sep=",", header=TRUE, na.strings="?")')
+    robjects.r('res <- LittleMCAR(dat)')
     print ""
     res = robjects.r['res']
-    print "Value of chi-squared statistic:", res[0][0]
-    print "P-value:", res[2][0]
-    for patrn in res[5]:
-        print patrn
-#         print patrn
+    chisq = res[0][0]
+    pvalue = res[2][0]
+    print "Value of chi-squared statistic:", chisq
+    print "P-value:", pvalue
+    if pvalue > pvalue_threshold:
+        print ""
+        print "Missingness patterns *****************************************************"
+        print ""
+        i = 0 
+        for patrn in res[5]:
+            print "Pattern",i,"----------------------------------------------------------"
+            i += 1
+            print patrn
+            print "IDs"
+            for rn in patrn.rownames:
+                print idx_info[int(rn) - 1][1]
+            print ""
 
-#     print idx_info
+    os.remove(test_filename)
 
 if __name__ == "__main__":
-    doit()
-
-# in_filename = "./data/data.csv"
-# 
-
-
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-p", "--pvalue", type=float, nargs=1, default=[0.05],
+                        help="P-value for the chi-squared statistic")
+    args = parser.parse_args()
+    run_test(args.pvalue[0])

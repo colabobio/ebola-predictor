@@ -14,6 +14,7 @@ args = parser.parse_args()
 src_file = "./data/sources.txt"
 var_file = "./data/variables.txt"
 range_file = "./data/ranges.txt"
+ignore_file = "./data/ignore.txt"
 
 input_file = ""
 with open(src_file, "rb") as sfile:
@@ -36,6 +37,13 @@ with open(range_file, "rb") as rfile:
         if 2 < len(parts):
             range_variables.append({"name":parts[0], "type":parts[1], "range":parts[2].split(",")})
 
+ignore_records = []
+with open(ignore_file, "rb") as rfile:
+    for line in rfile.readlines():
+        line = line.strip()
+        if not line: continue
+        ignore_records.append(line)
+
 total_count = 0
 miss_dep_var = 0
 complete_count = 0
@@ -48,6 +56,8 @@ with open(input_file, "rb") as ifile:
     model_idx = [titles.index(var) for var in model_variables]
     r = 0 
     for row in reader:
+        if row[0] in ignore_records: continue
+
         all_missing = True
         some_missing = False
         missing_dvar = row[model_idx[0]] == "\\N"

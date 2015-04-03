@@ -11,6 +11,7 @@ import numpy as np
 src_file = "./data/sources.txt"
 var_file = "./data/variables.txt"
 range_file = "./data/ranges.txt"
+ignore_file = "./data/ignore.txt"
 
 """Returns a set of indices for the test set, making sure that both training and test 
 set will have same fraction of outcomes
@@ -67,6 +68,13 @@ def makesets(test_percentage, test_filename, train_filename):
             if 2 < len(parts):
                 range_variables.append({"name":parts[0], "type":parts[1], "range":parts[2].split(",")})
 
+    ignore_records = []
+    with open(ignore_file, "rb") as rfile:
+        for line in rfile.readlines():
+            line = line.strip()
+            if not line: continue
+            ignore_records.append(line)
+
     ids = []
     all_data = []
     idx_info = []
@@ -78,6 +86,8 @@ def makesets(test_percentage, test_filename, train_filename):
         r0 = 0
         r = 0
         for row in reader:
+            if row[0] in ignore_records: continue
+            
             r0 += 1 # Starts at 1, because of titles
             all_missing = True
             some_missing = False
