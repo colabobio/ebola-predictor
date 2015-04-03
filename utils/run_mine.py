@@ -14,7 +14,7 @@ var_file = "./data/variables-master.txt"
 range_file = "./data/ranges.txt"
 ignore_file = "./data/ignore.txt"
 
-def run_test(pvalue_threshold):
+def run_test(cv, exp, c):
     input_file = ""
     with open(src_file, "rb") as sfile:
         for line in sfile.readlines():
@@ -93,12 +93,19 @@ def run_test(pvalue_threshold):
         for row in all_data:
             writer.writerow(row)
 
-    os.system("java -jar utils/MINE.jar " + test_filename + " 0")
+    print cv, exp, c
+
+    os.system("java -jar utils/MINE.jar " + test_filename + " 0 cv=" + str(cv) + " exp=" + str(exp) + " c=" + str(c))
     os.remove(test_filename)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-p", "--pvalue", type=float, nargs=1, default=[0.05],
-                        help="P-value for the chi-squared statistic")
+    parser.add_argument("-cv", "--complete_values", type=float, nargs=1, default=[0],
+                        help="Percentage of the records with data")
+    parser.add_argument("-exp", "--exponent", type=float, nargs=1, default=[0.6],
+                        help="The exponent determining the number of allowed cells")
+    parser.add_argument("-c", "--clumps", type=float, nargs=1, default=[15],
+                        help="Determines by what factor clumps may outnumber columns")
+                        
     args = parser.parse_args()
-    run_test(args.pvalue[0])
+    run_test(args.complete_values[0], args.exponent[0], args.clumps[0])
