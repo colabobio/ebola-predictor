@@ -84,7 +84,7 @@ def scatterplot_matrix(data, names=[], types={}, **kwargs):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("data", nargs='?', default="./data/training-data-completed.csv",
+    parser.add_argument("data", nargs='?', default="./models/nnet/training-data-completed.csv",
                         help="data file to plot")
     args = parser.parse_args()
 
