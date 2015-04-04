@@ -32,9 +32,9 @@ def process(in_filename, out_filename):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('-i', '--input', nargs=1, default=["./data/training-data.csv"],
+    parser.add_argument('-i', '--input', nargs=1, default=["./models/test/training-data.csv"],
                         help="name of input training file")
-    parser.add_argument('-o', '--output', nargs=1, default=["./data/training-data-completed.csv"],
+    parser.add_argument('-o', '--output', nargs=1, default=["./models/test/training-data-completed.csv"],
                         help="name of output training file afer list-wise deletion")
     args = parser.parse_args()
     process(args.input[0], args.output[0])

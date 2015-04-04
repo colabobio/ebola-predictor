@@ -10,18 +10,18 @@ with open(label_file, "rb") as vfile:
     for line in vfile.readlines():
         target_names.append(line.split()[1])
 
-def avg_cal_dis(module):
-    test_files = glob.glob("./data/testing-data-*.csv")
+def avg_cal_dis(dir, module):
+    test_files = glob.glob(dir + "/testing-data-*.csv")
     print "Calculating Calibration/Discrimination for " + module.title() + "..."
 #     count = 0
     total_cal = []
     total_dis = []
     for testfile in test_files:
-        start_idx = testfile.find("./data/testing-data-") + len("./data/testing-data-")
+        start_idx = testfile.find(dir + "/testing-data-") + len(dir + "/testing-data-")
         stop_idx = testfile.find('.csv')
         id = testfile[start_idx:stop_idx]
-        pfile = "./data/" + module.prefix() + "-params-" + str(id)
-        trainfile = "./data/training-data-completed-" + str(id) + ".csv"
+        pfile = dir + "/" + module.prefix() + "-params-" + str(id)
+        trainfile = dir + "/training-data-completed-" + str(id) + ".csv"
         if os.path.exists(testfile) and os.path.exists(pfile) and os.path.exists(trainfile):
 #             count = count + 1
             print "Calibration/Discrimination for test set " + id + " ----------------------------------"
@@ -43,16 +43,15 @@ def avg_cal_dis(module):
     print "Calibration   : " + str(std_cal)
     print "Discrimination: " + str(std_dis)
 
-
-def cal_plots(module):
-    test_files = glob.glob("./data/testing-data-*.csv")
+def cal_plots(dir, module):
+    test_files = glob.glob(dir + "/testing-data-*.csv")
     print "Calculating calibration plots for " + module.title() + "..."
     for testfile in test_files:
-        start_idx = testfile.find("./data/testing-data-") + len("./data/testing-data-")
+        start_idx = testfile.find(dir + "/testing-data-") + len(dir + "/testing-data-")
         stop_idx = testfile.find('.csv')
         id = testfile[start_idx:stop_idx]
-        pfile = "./data/" + module.prefix() + "-params-" + str(id)
-        trainfile = "./data/training-data-completed-" + str(id) + ".csv"
+        pfile = dir + "/" + module.prefix() + "-params-" + str(id)
+        trainfile = dir + "/training-data-completed-" + str(id) + ".csv"
         if os.path.exists(testfile) and os.path.exists(pfile) and os.path.exists(trainfile):
             print "Calibration for test set " + id + " ----------------------------------"
             out_file = "./out/calstats-" + id + ".txt"
@@ -61,19 +60,19 @@ def cal_plots(module):
     print "********************************************"
     print "Saved calibration plot and Hosmer-Lemeshow goodness of fit for " + module.title() + " in out folder."
 
-def avg_report(module):
-    test_files = glob.glob("./data/testing-data-*.csv")
+def avg_report(dir, module):
+    test_files = glob.glob(dir + "/testing-data-*.csv")
     print "Calculating average report for " + module.title() + "..."
     count = 0
     total_prec = []
     total_rec = []
     total_f1 = []
     for testfile in test_files:
-        start_idx = testfile.find("./data/testing-data-") + len("./data/testing-data-")
+        start_idx = testfile.find(dir + "/testing-data-") + len(dir + "/testing-data-")
         stop_idx = testfile.find('.csv')
         id = testfile[start_idx:stop_idx]
-        pfile = "./data/" + module.prefix() + "-params-" + str(id)
-        trainfile = "./data/training-data-completed-" + str(id) + ".csv"
+        pfile = dir + "/" + module.prefix() + "-params-" + str(id)
+        trainfile = dir + "/training-data-completed-" + str(id) + ".csv"
         if os.path.exists(testfile) and os.path.exists(pfile) and os.path.exists(trainfile):
             count = count + 1
             print "Report for test set " + id + " ----------------------------------"
@@ -112,10 +111,9 @@ def avg_report(module):
     print
     print "Summary ********************************************"
     print "Total,"+str(tot_prec_mean)+","+str(tot_rec_mean)+","+str(tot_f1_mean)+","+str(tot_prec_std)+","+str(tot_rec_std)+","+str(tot_f1_std)
-          
-    
-def roc_plots(module):
-    test_files = glob.glob("./data/testing-data-*.csv")
+
+def roc_plots(dir, module):
+    test_files = glob.glob(dir + "/testing-data-*.csv")
     print "Calculating ROC curves for " + module.title() + "..."
     count = 0
     all_prob = []
@@ -126,11 +124,11 @@ def roc_plots(module):
     plt.clf()
     fig = plt.figure()
     for testfile in test_files:
-        start_idx = testfile.find("./data/testing-data-") + len("./data/testing-data-")
+        start_idx = testfile.find(dir + "/testing-data-") + len(dir + "/testing-data-")
         stop_idx = testfile.find('.csv')
         id = testfile[start_idx:stop_idx]
-        pfile = "./data/" + module.prefix() + "-params-" + str(id)
-        trainfile = "./data/training-data-completed-" + str(id) + ".csv"
+        pfile = dir + "/" + module.prefix() + "-params-" + str(id)
+        trainfile = dir + "/training-data-completed-" + str(id) + ".csv"
         if os.path.exists(testfile) and os.path.exists(pfile) and os.path.exists(trainfile):
             print "Report for test set " + id + " ----------------------------------"
             fpr, tpr, auc = module.eval(testfile, trainfile, pfile, 4, pltshow=False)
@@ -176,8 +174,8 @@ def roc_plots(module):
             writer.writerow([all_y[i], all_prob[i]])
     print "Saved aggregated ROC data to ./out/roc.csv"
 
-def avg_conf_mat(module):
-    test_files = glob.glob("./data/testing-data-*.csv")
+def avg_conf_mat(dir, module):
+    test_files = glob.glob(dir + "/testing-data-*.csv")
     print "Calculating average report for " + module.title() + "..."
     count = 0
     total_n_hit = 0
@@ -185,11 +183,11 @@ def avg_conf_mat(module):
     total_n_miss = 0
     total_n_correct_rej = 0
     for testfile in test_files:
-        start_idx = testfile.find("./data/testing-data-") + len("./data/testing-data-")
+        start_idx = testfile.find(dir + "/testing-data-") + len(dir + "/testing-data-")
         stop_idx = testfile.find('.csv')
         id = testfile[start_idx:stop_idx]
-        pfile = "./data/" + module.prefix() + "-params-" + str(id)
-        trainfile = "./data/training-data-completed-" + str(id) + ".csv"
+        pfile = dir + "/" + module.prefix() + "-params-" + str(id)
+        trainfile = dir + "/training-data-completed-" + str(id) + ".csv"
         if os.path.exists(testfile) and os.path.exists(pfile) and os.path.exists(trainfile):
             count = count + 1
             print "Confusion matrix for test set " + id + " ------------------------------"
@@ -209,23 +207,25 @@ def avg_conf_mat(module):
     print "{:25s} {:2.2f}{:17s}{:2.2f}".format("Predicted " + target_names[1], avg_n_hit,"", avg_n_false_alarm)
     print "{:25s} {:2.2f}{:17s}{:2.2f}".format("Predicted " + target_names[0], avg_n_miss,"", avg_n_correct_rej) 
 
-def list_misses(module):
-    test_files = glob.glob("./data/testing-data-*.csv")
+def list_misses(dir, module):
+    test_files = glob.glob(dir + "/testing-data-*.csv")
     print "Miss-classifications for predictor " + module.title() + "..."
     count = 0
     for testfile in test_files:
-        start_idx = testfile.find("./data/testing-data-") + len("./data/testing-data-")
+        start_idx = testfile.find(dir + "/testing-data-") + len(dir + "/testing-data-")
         stop_idx = testfile.find('.csv')
         id = testfile[start_idx:stop_idx]
-        pfile = "./data/" + module.prefix() + "-params-" + str(id)
-        trainfile = "./data/training-data-completed-" + str(id) + ".csv"
+        pfile = dir + "/" + module.prefix() + "-params-" + str(id)
+        trainfile = dir + "/training-data-completed-" + str(id) + ".csv"
         if os.path.exists(testfile) and os.path.exists(pfile) and os.path.exists(trainfile):
             idx = module.miss(testfile, trainfile, pfile)
             count += len(idx)
     print "********************************************"
     print "Total miss-classifications for " + module.title() + ":",count
 
-def evaluate(predictor, method):
+def evaluate(name, predictor, method):
+    dir = "./models/" + name
+    
     module_path = os.path.abspath(predictor)
     module_filename = "eval"
     sys.path.insert(0, module_path)
@@ -235,21 +235,21 @@ def evaluate(predictor, method):
 
     # Average calibrations and discriminations
     if method == "caldis":
-        avg_cal_dis(module)
+        avg_cal_dis(dir, module)
     # Plot each method on same calibration plot
     elif method == "calplot":
-        cal_plots(module)
+        cal_plots(dir, module)
     # Average precision, recall, and F1 scores
     elif method == "report":
-        avg_report(module)
+        avg_report(dir, module)
     # Plot each method on same ROC plot
     elif method == "roc":
-        roc_plots(module)
+        roc_plots(dir, module)
     # Average confusion matrix
     elif method == "confusion":
-       avg_conf_mat(module)
+       avg_conf_mat(dir, module)
     elif method == "misses":
-        list_misses(module)
+        list_misses(dir, module)
     # Method not defined:
     else:
         raise Exception("Invalid method given")
@@ -257,9 +257,11 @@ def evaluate(predictor, method):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     # Evaluate the model with given method(s)
+    parser.add_argument('-N', '--name', nargs=1, default=["test"],
+                        help="Model name")
     parser.add_argument('-p', '--predictor', nargs=1, default=["nnet"], 
                         help="Folder containing predictor to evaluate")
     parser.add_argument('-m', '--method', nargs=1, default=["report"], 
                         help="Evaluation method: caldis, calplot, report, roc, confusion, misses")
     args = parser.parse_args()
-    evaluate(args.predictor[0], args.method[0])
+    evaluate(args.name[0], args.predictor[0], args.method[0])

@@ -130,6 +130,15 @@ def makesets(test_percentage, test_filename, train_filename):
         else:
             training_data.append(row)
 
+    # Creating destination folder
+    test_dir = os.path.split(test_filename)[0]
+    train_dir = os.path.split(train_filename)[0]
+    if test_dir != train_dir:
+        print "Error: testing and training file should be stored in the same directory!"
+        exit(1)
+    if not os.path.exists(test_dir):
+        os.makedirs(test_dir)
+
     # Saving index information
     with open(test_filename.replace("-data", "-index"), "wb") as idxfile:
         writer = csv.writer(idxfile, delimiter=",", quotechar='"', quoting=csv.QUOTE_MINIMAL)
@@ -156,9 +165,9 @@ def makesets(test_percentage, test_filename, train_filename):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('-t', '--train', nargs=1, default=["./data/training-data.csv"],
+    parser.add_argument('-t', '--train', nargs=1, default=["./models/test/training-data.csv"],
                         help="Filename for training set")
-    parser.add_argument('-T', '--test', nargs=1, default=["./data/testing-data.csv"],
+    parser.add_argument('-T', '--test', nargs=1, default=["./models/test/testing-data.csv"],
                         help="Filename for test set")
     parser.add_argument('-p', '--percentage', type=int, nargs=1, default=[50],
                         help="Percentage of complete data to use in test set")

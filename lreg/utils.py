@@ -17,7 +17,7 @@ def predict(x, theta):
 
 """Return a function that gives a prediction from a design matrix row
 """
-def gen_predictor(params_filename="./data/lreg-params"):
+def gen_predictor(params_filename="./models/test/lreg-params"):
     with open(params_filename, "rb") as pfile:
         lines = pfile.readlines()
         N = len(lines)

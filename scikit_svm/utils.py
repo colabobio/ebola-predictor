@@ -10,7 +10,7 @@ import pickle
 
 """Return a function that gives a prediction from a design matrix row
 """
-def gen_predictor(params_filename="./data/svm-params"):
+def gen_predictor(params_filename="./models/test/svm-params"):
     clf = pickle.load(open(params_filename, "rb" ) )
 
     def predictor(X):

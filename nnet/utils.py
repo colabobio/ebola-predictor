@@ -88,7 +88,7 @@ def predict(x, theta, N, L, S, K):
 
 """Return a function that gives a prediction from a design matrix row
 """
-def gen_predictor(params_filename="./data/nnet-params"):
+def gen_predictor(params_filename="./models/test/nnet-params"):
     with open(params_filename, "rb") as pfile:
         i = 0
         for line in pfile.readlines():

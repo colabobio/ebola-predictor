@@ -14,7 +14,7 @@ from sklearn import tree
 from sklearn.externals.six import StringIO 
 
 parser = argparse.ArgumentParser()
-parser.add_argument("param", nargs='?', default="./data/scikit_dtree-params",
+parser.add_argument("param", nargs='?', default="./models/test/scikit_dtree-params",
                     help="parameters of decision tree")
 args = parser.parse_args()
 

@@ -13,6 +13,7 @@ from importlib import import_module
 
 """Creates training/test sets using the provided parameters
 
+:param model_name: model of the name
 :param iter_count: number of training/test sets to create
 :param test_percentage: percentage of complete rows to include in the test set
 :param num_imputed: number of intermediate imputed sets if imputation is selected
@@ -20,12 +21,14 @@ from importlib import import_module
 :param impute_method: name of script in utils folder containing the imputation algorithm
 :param kwparams: custom arguments that the imputation method can receive
 """
-def create_sets(iter_count, id_start, test_percentage, impute_method, **kwparams):
+def create_sets(model_name, iter_count, id_start, test_percentage, impute_method, **kwparams):
+    model_dir = "./models/" + model_name
+
     if id_start == 0:
         # remove old data
-        test_files = glob.glob("./data/testing-data*.csv")
-        train_files = glob.glob("./data/training-data*.csv")
-        idx_files = glob.glob("./data/*-index*.csv")
+        test_files = glob.glob(model_dir + "/testing-data*.csv")
+        train_files = glob.glob(model_dir + "/training-data*.csv")
+        idx_files = glob.glob(model_dir + "/*-index*.csv")
         if test_files or train_files or idx_files:
             print "Removing old sets..."
             for file in test_files: os.remove(file)
@@ -40,15 +43,17 @@ def create_sets(iter_count, id_start, test_percentage, impute_method, **kwparams
     for i in range(iter_count):
         id = i + id_start
         print "Creating training/test sets #" + str(id) + "..."
-        test_filename = "./data/testing-data-"+str(id)+".csv"
-        train_filename = "./data/training-data-"+str(id)+".csv"
-        completed_filename = "./data/training-data-completed-"+str(id)+".csv"
+        test_filename = model_dir + "/testing-data-"+str(id)+".csv"
+        train_filename = model_dir + "/training-data-"+str(id)+".csv"
+        completed_filename = model_dir + "/training-data-completed-"+str(id)+".csv"
         makesets(test_percentage, test_filename, train_filename)
         module.process(in_filename=train_filename, out_filename=completed_filename, **kwparams)
         print "Done."
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
+    parser.add_argument('-N', '--name', nargs=1, default=["test"],
+                        help="Model name")
     parser.add_argument('-n', '--number', type=int, nargs=1, default=[10],
                         help="Number of training/test sets")
     parser.add_argument('-s', '--start', type=int, nargs=1, default=[0],
@@ -61,6 +66,7 @@ if __name__ == "__main__":
                         help="Custom arguments for imputation algorithm")
     args = parser.parse_args()
 
+    model_name = args.name[0]
     iter_count = args.number[0]
     id_start = args.start[0]
     test_percentage = args.test[0]
@@ -69,4 +75,4 @@ if __name__ == "__main__":
     for var in args.vars:
         [k, v] = var.split("=")
         kwargs[k] = v
-    create_sets(iter_count, id_start, test_percentage, impute_method, **kwargs)
+    create_sets(model_name, iter_count, id_start, test_percentage, impute_method, **kwargs)

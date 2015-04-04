@@ -90,9 +90,9 @@ def train(train_filename, param_filename, **kwparams):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-t", "--train", nargs=1, default=["./data/training-data-completed.csv"],
+    parser.add_argument("-t", "--train", nargs=1, default=["./models/test/training-data-completed.csv"],
                         help="File containing training set")
-    parser.add_argument("-p", "--param", nargs=1, default=["./data/scikit_lreg-params"], 
+    parser.add_argument("-p", "--param", nargs=1, default=["./models/test/scikit_lreg-params"], 
                         help="Output file to save the parameters of the logistic regression classifier")
     parser.add_argument("-y", "--penalty", nargs=1, default=["l2"],
                         help="Used to specify the norm used in the penalization")

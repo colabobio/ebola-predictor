@@ -68,11 +68,11 @@ def evaluate(test_filename, train_filename, param_filename, method):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('-t', '--train', nargs=1, default=["./data/training-data-completed.csv"],
+    parser.add_argument('-t', '--train', nargs=1, default=["./models/test/training-data-completed.csv"],
                         help="Filename for training set")
-    parser.add_argument('-T', '--test', nargs=1, default=["./data/testing-data.csv"],
+    parser.add_argument('-T', '--test', nargs=1, default=["./models/test/testing-data.csv"],
                         help="Filename for testing set")
-    parser.add_argument('-p', '--param', nargs=1, default=["./data/scikit_lreg-params"],
+    parser.add_argument('-p', '--param', nargs=1, default=["./models/test/scikit_lreg-params"],
                         help="Filename for decision tree parameters")
     parser.add_argument('-m', '--method', nargs=1, default=["report"],
                         help="Evaluation method: caldis, calplot, report, roc, confusion, misses")

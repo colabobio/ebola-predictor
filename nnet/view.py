@@ -49,7 +49,7 @@ def thetaMatrix(theta, N, L, S, K):
 ##########################################################################################
 
 parser = argparse.ArgumentParser()
-parser.add_argument("param", nargs='?', default="./data/nnet-params",
+parser.add_argument("param", nargs='?', default="./models/test/nnet-params",
                     help="parameters of neural network")
 args = parser.parse_args()
 

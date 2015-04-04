@@ -113,7 +113,7 @@ def process(in_filename, out_filename, **kwparams):
          incheck_str = "FALSE"
 
     robjects.r('imdat <- amelia(trdat, m=' + str(num_imputed) + ', noms=nom_vars, bounds=num_bounds, max.resample = ' + str(resamples_opt) + ', incheck=' + incheck_str + ', emburn = c(5,' + str(max_iter) +'))')
-    robjects.r('write.amelia(obj=imdat, file.stem="./data/training-data-", format="csv", row.names=FALSE)')
+    robjects.r('write.amelia(obj=imdat, file.stem="./temp/training-data-", format="csv", row.names=FALSE)')
     
     if gen_plots:
         if not os.path.exists("./out"): os.makedirs("./out")
@@ -138,7 +138,7 @@ def process(in_filename, out_filename, **kwparams):
     print "Aggregating imputed datasets..."
     aggregated_data = []
     for i in range(1, num_imputed + 1):
-        filename = "./data/training-data-" + str(i) + ".csv"
+        filename = "./temp/training-data-" + str(i) + ".csv"
         print "  Reading " + filename
         with open(filename, "rb") as ifile:
             reader = csv.reader(ifile, delimiter=",")
@@ -168,9 +168,9 @@ def process(in_filename, out_filename, **kwparams):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-i", "--input", nargs=1, default=["./data/training-data.csv"],
+    parser.add_argument("-i", "--input", nargs=1, default=["./models/test/training-data.csv"],
                         help="name of input training file")
-    parser.add_argument("-o", "--output", nargs=1, default=["./data/training-data-completed.csv"],
+    parser.add_argument("-o", "--output", nargs=1, default=["./models/test/training-data-completed.csv"],
                         help="name of output training file afer imputation")
     parser.add_argument("-n", "--num_imputed", type=int, nargs=1, default=[5],
                         help="number of imputed datasets")

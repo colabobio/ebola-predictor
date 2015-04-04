@@ -310,9 +310,9 @@ def train(train_filename, param_filename, **kwparams):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-t", "--train", nargs=1, default=["./data/training-data-completed.csv"],
+    parser.add_argument("-t", "--train", nargs=1, default=["./models/test/training-data-completed.csv"],
                         help="File containing training set")
-    parser.add_argument("-p", "--param", nargs=1, default=["./data/nnet-params"],
+    parser.add_argument("-p", "--param", nargs=1, default=["./models/test/nnet-params"],
                         help="Output file to save the parameters of the neural net")
     parser.add_argument("-l", "--layers", nargs=1, type=int, default=[1],
                         help="Number of hidden layers")
