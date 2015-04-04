@@ -46,10 +46,15 @@ def process(in_filename, out_filename, **kwparams):
     else:
         gen_plots = False
 
+    dir = os.path.split(in_filename)[0]
+    if os.path.exists(dir + "/variables.txt"):
+        fn = dir + "/variables.txt"
+    else:
+        fn = var_file
     model_variables = []
     var_types = {}
     nom_rstr = ''
-    with open(var_file, "rb") as vfile:
+    with open(fn, "rb") as vfile:
         for line in vfile.readlines():
             line = line.strip()
             if not line: continue

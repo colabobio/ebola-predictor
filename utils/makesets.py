@@ -47,13 +47,26 @@ source data
 :param train_filename: name of file to store training set
 """
 def makesets(test_percentage, test_filename, train_filename):
+    # Creating destination folder
+    test_dir = os.path.split(test_filename)[0]
+    train_dir = os.path.split(train_filename)[0]
+    if test_dir != train_dir:
+        print "Error: testing and training file should be stored in the same directory!"
+        exit(1)
+    if not os.path.exists(test_dir):
+        os.makedirs(test_dir)
+
     input_file = ""
     with open(src_file, "rb") as sfile:
         for line in sfile.readlines():
             input_file = os.path.abspath(line.strip())
 
     model_variables = []
-    with open(var_file, "rb") as vfile:
+    if os.path.exists(test_dir + "/variables.txt"):
+        fn = test_dir + "/variables.txt"
+    else:
+        fn = var_file
+    with open(fn, "rb") as vfile:
         for line in vfile.readlines():
             line = line.strip()
             if not line: continue
@@ -129,15 +142,6 @@ def makesets(test_percentage, test_filename, train_filename):
             testing_data.append(row)
         else:
             training_data.append(row)
-
-    # Creating destination folder
-    test_dir = os.path.split(test_filename)[0]
-    train_dir = os.path.split(train_filename)[0]
-    if test_dir != train_dir:
-        print "Error: testing and training file should be stored in the same directory!"
-        exit(1)
-    if not os.path.exists(test_dir):
-        os.makedirs(test_dir)
 
     # Saving index information
     with open(test_filename.replace("-data", "-index"), "wb") as idxfile:
