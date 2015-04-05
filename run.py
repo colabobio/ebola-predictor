@@ -7,7 +7,6 @@ Exhaustive generation of models
 import os, threading
 import time, glob, time
 import itertools
-import operator
 
 total_sets = 10
 test_prec = 60
@@ -86,19 +85,10 @@ def run_model(fix_var, mdl_vars, mdl_count):
             
     for pred_name in predictors:
         print "PREDICTOR",pred_name,"---------------"
-#         mdl_name = "model-" +str(mdl_count) + "-" + pred_name
-#         model_vars[mdl_name] = vdict
         pred_opt = pred_options[pred_name]
         os.system("python train.py -N " + name + " " + pred_name + " "+ pred_opt)
         repfn = "./models/" + name + "/report-" + pred_name + ".out"
-        os.system("python eval.py -p " + pred_name + " -m report > " + repfn)
-#         with open(repfn, "r") as report:
-#             last = report.readlines()[-1]
-#             parts = last.split(",")
-#             print "------------------------>",float(parts[3]), float(parts[6])
-#             model_f1_scores[mdl_name] = float(parts[3])
-#             model_f1_dev[mdl_name] = float(parts[6])
-#     os.system("python pack.py model-" +str(mdl_count))
+        os.system("python eval.py -N " + name + " -p " + pred_name + " -m report > " + repfn)
 
 ##########################################################################################
 
@@ -119,10 +109,6 @@ out_var = all_vars[0]
 mdl_vars = all_vars[1:]
 if fix_var: mdl_vars.remove(fix_var)
 
-# model_f1_scores = {}
-# model_f1_dev = {}
-# model_vars = {}
-
 model_count = 0
 for size in model_sizes:
     fsize = size
@@ -132,12 +118,3 @@ for size in model_sizes:
         create_var_file(model_count, fix_var, mvars)
         run_model(fix_var, mvars, model_count)
         model_count += 1
-
-# sorted_preds = reversed(sorted(model_f1_scores.items(), key=operator.itemgetter(1)))
-# with open("store/ranking.txt", "w") as rfile:
-#     for pair in sorted_preds:
-#         pred_name = pair[0]
-#         pred_f1_score = pair[1]
-#         pred_f1_std = model_f1_dev[pred_name]
-#         mvars = model_vars[pred_name]
-#         rfile.write(pred_name + " " + ",".join(mvars) + " " + str(pred_f1_score) + " " + str(pred_f1_std) + "\n")
