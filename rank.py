@@ -1,3 +1,9 @@
+"""
+Exhaustive evaluation of models
+
+@copyright: The Broad Institute of MIT and Harvard 2015
+"""
+
 import os, glob
 import operator
 
@@ -33,9 +39,12 @@ for dir in model_dirs:
             last = report.readlines()[-1]
             parts = last.split(",")
             mdl_name = mdl_num + "-" + pred
-            model_f1_scores[mdl_name] = float(parts[3])
-            model_f1_dev[mdl_name] = float(parts[6])
-            model_vars[mdl_name] = mdl_vars
+            if 3 < len(parts):
+                model_f1_scores[mdl_name] = float(parts[3])
+                model_f1_dev[mdl_name] = float(parts[6])
+                model_vars[mdl_name] = mdl_vars
+            else:
+                print "  Cannot find scores, skipping!"
 
 sorted_preds = reversed(sorted(model_f1_scores.items(), key=operator.itemgetter(1)))
 with open("./models/ranking.txt", "w") as rfile:
