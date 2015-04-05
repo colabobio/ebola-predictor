@@ -1,17 +1,5 @@
 .DS_Store
 */.DS_Store
-data/*-params*
-data/training-data-*.csv
-data/testing-data-*.csv
-data/testing-data.csv
-data/training-data.csv
-data/*-index*.csv
-data/notes.txt
-temp/*
-models/*
-out
-store
-report.out
 *.pyc
 */*.pyc
 
