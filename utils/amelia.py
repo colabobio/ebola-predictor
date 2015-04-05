@@ -7,10 +7,9 @@ http://gking.harvard.edu/amelia
 @copyright: The Broad Institute of MIT and Harvard 2015
 """
 
-import sys, os, csv, argparse
+import os, argparse
 import rpy2.robjects as robjects
-
-var_file = "./data/variables.txt"
+from imputation import load_variables, load_bounds, aggregate_files
 
 """Creates a complete training set by imputing missing values using Amelia
 
@@ -46,43 +45,13 @@ def process(in_filename, out_filename, **kwparams):
     else:
         gen_plots = False
 
-    dir = os.path.split(in_filename)[0]
-    if os.path.exists(dir + "/variables.txt"):
-        fn = dir + "/variables.txt"
-    else:
-        fn = var_file
-    model_variables = []
-    var_types = {}
+    var_names, var_types = load_variables(in_filename)
+    bounds = load_bounds(in_filename, var_names, var_types)
     nom_rstr = ''
-    with open(fn, "rb") as vfile:
-        for line in vfile.readlines():
-            line = line.strip()
-            if not line: continue
-            [name, type] = line.split()[0:2]
-            model_variables.append(name)
-            var_types[name] = type == "category"
-            if var_types[name]:
-                if nom_rstr: nom_rstr = nom_rstr + ', '
-                nom_rstr = nom_rstr + '"' + name + '"'
-
-    # Extract bounds from data
-    bounds = [[1000, 0] for x in model_variables]
-    with open(in_filename, "rb") as tfile:
-        reader = csv.reader(tfile, delimiter=",")
-        reader.next()
-        for row in reader:
-            for i in range(0, len(row)):
-                if row[i] == "?": continue
-                val = float(row[i])
-                bounds[i][0] = min(val, bounds[i][0])
-                bounds[i][1] = max(val, bounds[i][1])
-
-    # Expand the bounds a bit...
-    tol = 0.0
-    for i in range(0, len(model_variables)):
-        if var_types[model_variables[i]]: continue
-        bounds[i][0] = (1 - tol) * bounds[i][0]
-        bounds[i][1] = (1 + tol) * bounds[i][1]
+    for name in var_names:
+        if var_types[name] == "category":
+            if nom_rstr: nom_rstr = nom_rstr + ', '
+            nom_rstr = nom_rstr + '"' + name + '"'
 
     # Construct bounds for the numerical variables
     # See section 4.6.3 in
@@ -93,9 +62,9 @@ def process(in_filename, out_filename, **kwparams):
     min_str = ""
     max_str = ""
     num_vars = 0
-    for i in range(0, len(model_variables)):
-        name = model_variables[i]
-        if not var_types[name]:
+    for i in range(0, len(var_names)):
+        name = var_names[i]
+        if var_types[name] != "category":
             num_vars = num_vars + 1
             if idx_str: 
                 idx_str = idx_str + ", "
@@ -117,21 +86,23 @@ def process(in_filename, out_filename, **kwparams):
     else:
          incheck_str = "FALSE"
 
+    tmp_prefix = "./temp/training-data-amelia-"
+    
     robjects.r('imdat <- amelia(trdat, m=' + str(num_imputed) + ', noms=nom_vars, bounds=num_bounds, max.resample = ' + str(resamples_opt) + ', incheck=' + incheck_str + ', emburn = c(5,' + str(max_iter) +'))')
-    robjects.r('write.amelia(obj=imdat, file.stem="./temp/training-data-", format="csv", row.names=FALSE)')
+    robjects.r('write.amelia(obj=imdat, file.stem="' + tmp_prefix + '", format="csv", row.names=FALSE)')
     
     if gen_plots:
         if not os.path.exists("./out"): os.makedirs("./out")
         robjects.r('pdf("./out/missingness.pdf", useDingbats=FALSE)')
         robjects.r('missmap(imdat)')
         robjects.r('dev.off()')
-        for i in range(0, len(model_variables)):
-            name = model_variables[i]
+        for i in range(0, len(var_names)):
+            name = var_names[i]
             # Compare observed density with imputed density
             robjects.r('pdf("./out/obs-vs-imp-' + name+ '.pdf", useDingbats=FALSE)')
             robjects.r('compare.density(imdat, var = "' + name + '")')
             robjects.r('dev.off()')
-            if not var_types[name]:
+            if var_types[name] != "category":
                 # Numerical variable, we can generate the quality of imputation plot
                 robjects.r('pdf("./out/quality-imp-' + name+ '.pdf", useDingbats=FALSE)')
                 robjects.r('overimpute(imdat, var = "' + name + '")')
@@ -139,37 +110,8 @@ def process(in_filename, out_filename, **kwparams):
         print "Saved Amelia plots to out folder"
 
     print "Success!"
-
-    print "Aggregating imputed datasets..."
-    aggregated_data = []
-    for i in range(1, num_imputed + 1):
-        filename = "./temp/training-data-" + str(i) + ".csv"
-        print "  Reading " + filename
-        with open(filename, "rb") as ifile:
-            reader = csv.reader(ifile, delimiter=",")
-            reader.next()
-            for row in reader:
-                if row[0] == "NA": 
-                    print "    Empty dataset, skipping!"
-                    break
-                add = True
-                for i in range(0, len(row)):
-                    name = model_variables[i]
-                    if not var_types[name]:
-                        val = float(row[i])
-                        if val < bounds[i][0] or bounds[i][1] < val:
-                            print "    Value " + row[i] + " for variable " + name + " is out of bounds [" + str(bounds[i][0]) + ", " + str(bounds[i][1]) + "], skipping"
-                            add = False
-                            break
-                if add: aggregated_data.append(row)
-
-    if aggregated_data:
-        with open(out_filename, "wb") as trfile:
-            writer = csv.writer(trfile, delimiter=",", quotechar='"', quoting=csv.QUOTE_MINIMAL)
-            writer.writerow(model_variables)
-            for row in aggregated_data:
-                writer.writerow(row)
-        print "Saved aggregated imputed datasets to", out_filename
+    imp_files = [tmp_prefix + str(i) + ".csv" for i in range(1, num_imputed + 1)]
+    aggregate_files(out_filename, imp_files, var_names, var_types, bounds)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

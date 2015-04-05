@@ -1,18 +1,17 @@
 """
-This script imputes the missing values using the MICE (Multivariate Imputation by
-Chained Equations) package in R:
+This script imputes the missing values using the Multiple Imputation method aregImpute from 
+Hmisc:
 
-http://www.stefvanbuuren.nl/mi/MICE.htm
-http://www.ats.ucla.edu/stat/r/faq/R_pmm_mi.html
+http://www.inside-r.org/packages/cran/Hmisc/docs/aregImpute
 
 @copyright: The Broad Institute of MIT and Harvard 2015
 """
 
-import argparse
+import sys, os, csv, argparse
 import rpy2.robjects as robjects
 from imputation import load_variables, load_bounds, aggregate_files
 
-"""Creates a complete training set by imputing missing values using MICE
+"""Creates a complete training set by imputing missing values using aregImpute
 
 :param in_filename: input file with all the data
 :param out_filename: output file with only complete rows
@@ -26,19 +25,33 @@ def process(in_filename, out_filename, **kwparams):
 
     var_names, var_types = load_variables(in_filename)
     bounds = load_bounds(in_filename, var_names, var_types)
+    model_str = ""
+    list_str = ""
+    for name in var_names:
+        if model_str: model_str += ' + '
+        else: model_str = '~ '
+        model_str += name
+        if list_str: list_str += ', '
+        list_str += '"' + name + '"'
+    frame_str = ",".join(["comp$" + x for x in list_str.split(",")])
+     
+    print model_str
+    print list_str
+    print frame_str
 
-    tmp_filename = "./temp/training-data-mice.csv"
+    tmp_prefix = "./temp/training-data-hmisc-"
 
-    print "Generating " + str(num_imputed) + " imputed datasets with MICE..."
-    robjects.r('library(mice)') 
+    print "Generating " + str(num_imputed) + " imputed datasets with Hmisc..."
+    robjects.r('library(Hmisc)') 
     robjects.r('trdat <- read.table("' + in_filename + '", sep=",", header=TRUE, na.strings="?")')
-    robjects.r('imdat <- mice(trdat, m=' + str(num_imputed) + ')')
-    robjects.r('codat <- complete(imdat, "long")')
-    robjects.r('drops <- c(".imp",".id")')
-    robjects.r('codat <- codat[,!(names(codat) %in% drops)]')
-    robjects.r('write.csv(codat, file="' + tmp_filename + '", row.names=FALSE)')
+    robjects.r('imdat <- aregImpute(' + model_str + ', data=trdat, n.impute=' + str(num_imputed) + ')')
 
-    imp_files = [tmp_filename]
+    imp_files = [tmp_prefix + str(i) + ".csv" for i in range(1, num_imputed + 1)]
+    for i in range(1, num_imputed + 1):
+        robjects.r('comp <- impute.transcan(imdat, imputation=' + str(i)+ ', data=trdat, list.out=TRUE, pr=FALSE, check=FALSE)')
+        robjects.r('df = data.frame(' + frame_str + ')')
+        robjects.r('colnames(df) <- c(' + list_str + ')')
+        robjects.r('write.csv(df, file="' + tmp_prefix + str(i) + '.csv", row.names=FALSE)')
     aggregate_files(out_filename, imp_files, var_names, var_types, bounds)
 
 if __name__ == "__main__":
