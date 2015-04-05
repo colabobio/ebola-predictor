@@ -221,7 +221,7 @@ def train(train_filename, param_filename, **kwparams):
     if "inv_reg" in kwparams:
         gamma = 1.0 / float(kwparams["inv_reg"])
     else:
-        gamma = 0.002
+        gamma = 0.005
 
     if "threshold" in kwparams:
         threshold = float(kwparams["threshold"])
@@ -318,7 +318,7 @@ if __name__ == "__main__":
                         help="Number of hidden layers")
     parser.add_argument("-f", "--hfactor", nargs=1, type=int, default=[1],
                         help="Hidden units factor")
-    parser.add_argument("-r", "--inv_reg", nargs=1, type=float, default=[500],
+    parser.add_argument("-r", "--inv_reg", nargs=1, type=float, default=[200],
                         help="Inverse of regularization coefficient, larger values represent lower penalty")
     parser.add_argument("-c", "--convergence", nargs=1, type=float, default=[1E-5],
                         help="Convergence threshold for the BFGS minimizer")
