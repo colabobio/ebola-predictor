@@ -1,8 +1,13 @@
 import os, glob
 import operator
 
+var_file = "./data/variables.txt"
 def load_vars(fn):
-    res = [] 
+    res = []
+    if os.path.exists(fn):
+        fn = dir + "/variables.txt"
+    else:
+        fn = var_file
     with open(fn, "rb") as vfile:
         for line in vfile.readlines():
             line = line.strip()
@@ -24,7 +29,7 @@ for dir in model_dirs:
     print "Reading model",mdl_num,"with variables", ",".join(mdl_vars)
     for rfn in report_files:
         with open(rfn, "r") as report:
-            pred = os.path.splitext(rfn.split("-", 1)[1])[0]
+            pred = os.path.splitext(rfn.split("-")[-1])[0]
             last = report.readlines()[-1]
             parts = last.split(",")
             mdl_name = mdl_num + "-" + pred
@@ -36,9 +41,11 @@ sorted_preds = reversed(sorted(model_f1_scores.items(), key=operator.itemgetter(
 with open("./models/ranking.txt", "w") as rfile:
     for pair in sorted_preds:
         full_name = pair[0]
-        mdl_count, pred_name = full_name.split("-")
+        idx = full_name.rfind('-')
+        mdl_name = full_name[0:idx]
+        pred_name = full_name[idx + 1:]
         pred_f1_score = pair[1]
         pred_f1_std = model_f1_dev[full_name]
         mvars = model_vars[full_name]
-        line = mdl_count + " " + pred_name + " " + ",".join(mvars) + " " + str(pred_f1_score) + " " + str(pred_f1_std)
+        line = mdl_name + " " + pred_name + " " + ",".join(mvars) + " " + str(pred_f1_score) + " " + str(pred_f1_std)
         rfile.write(line + "\n")
