@@ -26,7 +26,14 @@ model_f1_scores = {}
 model_f1_dev = {}
 model_vars = {}
 
-model_dirs = glob.glob("./models/*")
+parser = argparse.ArgumentParser()
+parser.add_argument('-B', '--base_dir', nargs=1, default=["./"],
+                    help="Base directory")
+args = parser.parse_args()
+
+mdl_dir = os.path.join(args.base_dir[0], "models")
+
+model_dirs = glob.glob(mdl_dir + "/*")
 for dir in model_dirs:
     if not os.path.isdir(dir): continue
     mdl_num = dir.split("/")[2]
@@ -47,7 +54,7 @@ for dir in model_dirs:
                 print "  Cannot find scores, skipping!"
 
 sorted_preds = reversed(sorted(model_f1_scores.items(), key=operator.itemgetter(1)))
-with open("./models/ranking.txt", "w") as rfile:
+with open(mdl_dir + "/ranking.txt", "w") as rfile:
     for pair in sorted_preds:
         full_name = pair[0]
         idx = full_name.rfind('-')

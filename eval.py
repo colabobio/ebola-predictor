@@ -223,9 +223,9 @@ def list_misses(dir, module):
     print "********************************************"
     print "Total miss-classifications for " + module.title() + ":",count
 
-def evaluate(name, predictor, method):
-    dir = "./models/" + name
-    
+def evaluate(base, name, predictor, method):
+    dir =  os.path.join(base, "models", name)
+
     module_path = os.path.abspath(predictor)
     module_filename = "eval"
     sys.path.insert(0, module_path)
@@ -257,6 +257,8 @@ def evaluate(name, predictor, method):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     # Evaluate the model with given method(s)
+    parser.add_argument('-B', '--base_dir', nargs=1, default=["./"],
+                        help="Base directory")
     parser.add_argument('-N', '--name', nargs=1, default=["test"],
                         help="Model name")
     parser.add_argument('-p', '--predictor', nargs=1, default=["nnet"], 
@@ -264,4 +266,4 @@ if __name__ == "__main__":
     parser.add_argument('-m', '--method', nargs=1, default=["report"], 
                         help="Evaluation method: caldis, calplot, report, roc, confusion, misses")
     args = parser.parse_args()
-    evaluate(args.name[0], args.predictor[0], args.method[0])
+    evaluate(args.base_dir[0], args.name[0], args.predictor[0], args.method[0])

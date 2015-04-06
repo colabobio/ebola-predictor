@@ -14,6 +14,8 @@ def delete(files):
             os.remove(file)
 
 parser = argparse.ArgumentParser()
+parser.add_argument('-B', '--base_dir', nargs=1, default=["./"],
+                    help="Base directory")
 parser.add_argument("-m", "--clean_models", action="store_true",
                     help="clean models folder")
 parser.add_argument("-j", "--clean_jobs", action="store_true",
@@ -26,15 +28,15 @@ parser.add_argument("-a", "--clean_all", action="store_true",
 args = parser.parse_args()
 if args.clean_models or args.clean_all:
     print "Cleaning models folder..."
-    delete(glob.glob("./models/*"))
+    delete(glob.glob(os.path.join(base, "models") + "/*"))
 if args.clean_jobs or args.clean_all:
     print "Cleaning jobs folder..."
-    delete(glob.glob("./jobs/*"))
+    delete(glob.glob(os.path.join(base, "jobs") + "/*"))
 if args.clean_out or args.clean_all:
     print "Cleaning out folder..."
-    delete(glob.glob("./out/*"))
+    delete(glob.glob(os.path.join(base, "out") + "/*"))
 
 print "Cleaning temp folder..."
-delete(glob.glob("./temp/*"))
+delete(glob.glob(os.path.join(base, "temp") + "/*"))
 
 print "Done."

@@ -8,8 +8,8 @@ evaluation.
 import sys, os, argparse, glob
 from importlib import import_module
 
-def train(mdl_name, predictor, **kwparams):
-    model_dir = "./models/" + mdl_name
+def train(base_dir, mdl_name, predictor, **kwparams):
+    model_dir =  os.path.join(base_dir, "models", mdl_name)
 
     module_path = os.path.abspath(predictor)
     module_filename = "train"
@@ -38,6 +38,8 @@ def train(mdl_name, predictor, **kwparams):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     # Evaluate the model with given method(s)
+    parser.add_argument('-B', '--base_dir', nargs=1, default=["./"],
+                        help="Base directory")
     parser.add_argument('-N', '--name', nargs=1, default=["test"],
                         help="Model name")
     parser.add_argument('pred', nargs=1, default=["nnet"],
@@ -48,4 +50,4 @@ if __name__ == "__main__":
     for var in args.vars:
         [k, v] = var.split("=")
         kwargs[k] = v
-    train(args.name[0], args.pred[0], **kwargs)
+    train(args.base_dir[0], args.name[0], args.pred[0], **kwargs)

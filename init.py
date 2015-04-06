@@ -5,7 +5,6 @@ Create training and test sets with optional imputation.
 """
 
 import os, sys, argparse, glob
-
 from utils.makesets import makesets
 from importlib import import_module
 
@@ -19,8 +18,10 @@ from importlib import import_module
 :param impute_method: name of script in utils folder containing the imputation algorithm
 :param kwparams: custom arguments that the imputation method can receive
 """
-def create_sets(model_name, iter_count, id_start, test_percentage, impute_method, **kwparams):
-    model_dir = "./models/" + model_name
+def create_sets(base_dir, model_name, iter_count, id_start, test_percentage, impute_method, **kwparams):
+    model_dir =  os.path.join(base_dir, "models", model_name)
+    if not os.path.exists(model_dir):
+        os.makedirs(model_dir)
 
     if id_start == 0:
         # remove old data
@@ -50,6 +51,8 @@ def create_sets(model_name, iter_count, id_start, test_percentage, impute_method
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
+    parser.add_argument('-B', '--base_dir', nargs=1, default=["./"],
+                        help="Base directory")
     parser.add_argument('-N', '--name', nargs=1, default=["test"],
                         help="Model name")
     parser.add_argument('-n', '--number', type=int, nargs=1, default=[10],
@@ -64,6 +67,7 @@ if __name__ == "__main__":
                         help="Custom arguments for imputation algorithm")
     args = parser.parse_args()
 
+    base_dir = args.base_dir[0]
     model_name = args.name[0]
     iter_count = args.number[0]
     id_start = args.start[0]
@@ -73,4 +77,4 @@ if __name__ == "__main__":
     for var in args.vars:
         [k, v] = var.split("=")
         kwargs[k] = v
-    create_sets(model_name, iter_count, id_start, test_percentage, impute_method, **kwargs)
+    create_sets(base_dir, model_name, iter_count, id_start, test_percentage, impute_method, **kwargs)
