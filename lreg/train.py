@@ -4,6 +4,7 @@ Trains a Logistic Regression Classifier with binary output.
 @copyright: The Broad Institute of MIT and Harvard 2015
 """
 
+import argparse
 import sys
 import pandas as pd
 import numpy as np

@@ -91,12 +91,12 @@ def train(train_filename, param_filename, **kwparams):
     else:
         n_jobs = 1
 
-    if "random_state" in kwparams:
+    if "random_state" in kwparams and kwparams["random_state"]:
         random_state = int(kwparams["random_state"])
     else:
         random_state = None
 
-    if "class_weight" in kwparams:
+    if "class_weight" in kwparams and kwparams["class_weight"]:
         class_weight = kwparams["class_weight"]
     else:
         class_weight = None

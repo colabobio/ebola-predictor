@@ -67,7 +67,7 @@ def train(train_filename, param_filename, **kwparams):
     else:
         cache_size = 200
 
-    if "class_weight" in kwparams:
+    if "class_weight" in kwparams and kwparams["class_weight"]:
         class_weight = kwparams["class_weight"]
     else:
         class_weight = None
@@ -77,7 +77,7 @@ def train(train_filename, param_filename, **kwparams):
     else:
         max_iter = -1
 
-    if "random_state" in kwparams:
+    if "random_state" in kwparams and kwparams["random_state"]:
         random_state = int(kwparams["random_state"])
     else:
         random_state = None
@@ -122,7 +122,7 @@ if __name__ == "__main__":
                         help="Dual or primal formulation")
     parser.add_argument("-l", "--tol", nargs=1, type=float, default=[0.0001],
                         help="Tolerance for stopping criterion")
-    parser.add_argument("-h", "--cache_size", nargs=1, type=float, default=[200],
+    parser.add_argument("-z", "--cache_size", nargs=1, type=float, default=[200],
                         help="Specify the size of the kernel cache (in MB)")
     parser.add_argument("-w", "--class_weight", nargs=1, default=[None],
                         help="Set the parameter C of class i to class_weight[i]*C for SVC")
