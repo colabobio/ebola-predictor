@@ -8,11 +8,11 @@ import os, argparse, itertools
 
 master_file = "./data/variables-master.txt"
 
-def save_clump(count, vars):
+def save_clump(count, ids, vars):
     print "Create file for job", count
     with open("./jobs/job-" + str(count), "w") as jfile:
-        for k in vars:
-            jfile.write(str(k) + " " + ",".join(vars[k]) + "\n")
+        for k in range(0, len(vars)):
+            jfile.write(str(ids[k]) + " " + ",".join(vars[k]) + "\n")
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-s", "--model_sizes", nargs=1, default=["2,3,4"],
@@ -52,25 +52,24 @@ if fix_var: mdl_vars.remove(fix_var)
 
 model_count = 0
 clump_count = 0
-clump_idx = 0
-clump_vars = {}
+clump_idxs = []
+clump_vars = []
 for size in model_sizes:
     fsize = size
     if fix_var: fsize -= 1
     var_comb = itertools.combinations(mdl_vars, fsize)
     for mvars in var_comb:
-        if clump_idx < clump_size:
-            lvars = []
-            if fix_var: lvars.append(fix_var)
-            lvars.extend(mvars)
-            clump_vars[model_count] = lvars
-            clump_idx += 1
-        else:
-            save_clump(clump_count, clump_vars)
+        if len(clump_vars) == clump_size:
+            save_clump(clump_count, clump_idxs, clump_vars)
             clump_count += 1
-            clump_idx = 0
-            clump_vars = {}
+            clump_idxs = []
+            clump_vars = []
+        lvars = []
+        if fix_var: lvars.append(fix_var)
+        lvars.extend(mvars)
+        clump_idxs.append(model_count)
+        clump_vars.append(lvars)
         model_count += 1
 
 if clump_vars:
-    save_clump(clump_count, clump_vars)
+    save_clump(clump_count, clump_idxs, clump_vars)
