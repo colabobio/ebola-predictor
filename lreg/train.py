@@ -181,11 +181,10 @@ def train(train_filename, param_filename, **kwparams):
         print "Error: cost function increased..."
         print "Try adjusting the learning or the regularization coefficients"
 
-    plt.plot(np.arange(values.shape[0]), values)
-    plt.xlabel("Step number")
-    plt.ylabel("Cost function")
-
     if show:
+        plt.plot(np.arange(values.shape[0]), values)
+        plt.xlabel("Step number")
+        plt.ylabel("Cost function")
         plt.show()
 
     print ""
