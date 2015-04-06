@@ -17,9 +17,6 @@ if not os.path.exists(zip_filename):
     print "The file",zip_filename,"does not exist!"
     exit(1)
 
-all_files = glob.glob("./data/*")
-for file in all_files: os.remove(file)
-
 zf = zipfile.ZipFile(zip_filename, "r")
 print "Extracting " + zip_filename + " into data folder..."
 try:
