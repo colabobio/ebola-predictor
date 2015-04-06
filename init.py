@@ -8,8 +8,6 @@ import os, sys, argparse, glob
 
 from utils.makesets import makesets
 from importlib import import_module
-#from utils.listdel import listdel
-# from utils.impute import impute
 
 """Creates training/test sets using the provided parameters
 
