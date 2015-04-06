@@ -7,8 +7,6 @@ Exhaustive generation of models
 import os, argparse, itertools
 
 master_file = "./data/variables-master.txt"
-model_sizes = [2, 3, 4, 5, 6, 7, 8, 9, 10]
-clump_size = 6
 
 def save_clump(count, vars):
     print "Create file for job", count

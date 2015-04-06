@@ -1,5 +1,5 @@
 """
-Exhaustive evaluation of models
+Rank all available models
 
 @copyright: The Broad Institute of MIT and Harvard 2015
 """
