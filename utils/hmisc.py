@@ -35,16 +35,12 @@ def process(in_filename, out_filename, **kwparams):
         list_str += '"' + name + '"'
     frame_str = ",".join(["comp$" + x for x in list_str.split(",")])
      
-    print model_str
-    print list_str
-    print frame_str
-
     tmp_prefix = "./temp/training-data-hmisc-"
 
     print "Generating " + str(num_imputed) + " imputed datasets with Hmisc..."
     robjects.r('library(Hmisc)') 
     robjects.r('trdat <- read.table("' + in_filename + '", sep=",", header=TRUE, na.strings="?")')
-    robjects.r('imdat <- aregImpute(' + model_str + ', data=trdat, n.impute=' + str(num_imputed) + ')')
+    robjects.r('imdat <- aregImpute(' + model_str + ', nk=c(0,3:5), tlinear=FALSE, data=trdat, n.impute=' + str(num_imputed) + ')')
 
     imp_files = [tmp_prefix + str(i) + ".csv" for i in range(1, num_imputed + 1)]
     for i in range(1, num_imputed + 1):
