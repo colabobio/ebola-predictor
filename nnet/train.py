@@ -295,11 +295,10 @@ def train(train_filename, param_filename, **kwparams):
     theta = fmin_bfgs(cost, theta0, fprime=gradient, args=params, gtol=threshold, callback=add_value)
     print "Done!"
 
-    plt.plot(np.arange(values.shape[0]), values)
-    plt.xlabel("Step number")
-    plt.ylabel("Cost function")
-
     if show:
+        plt.plot(np.arange(values.shape[0]), values)
+        plt.xlabel("Step number")
+        plt.ylabel("Cost function") 
         plt.show()
 
     print ""
