@@ -26,6 +26,208 @@ to "complete" an incomplete training set by using a variety of methods. Some of 
 already built into the pipeline, but additional methods can be implemented also by following
 a number of conventions.
 
+
+
+###Step by step examaples
+
+**1) SINGLE TRAINING/TESTING RUN**
+
+create training/testing sets, impute missing values, train predictor,
+evaluate predictor:
+
+```
+python utils/makesets.py
+```
+
+The percentage of complete records used in testing set can be specified with the -p argument:
+
+```
+python utils/makesets.py -p 70
+```
+
+Then, we need to impute the missing values. The options are: 
+
+* list-wise deletion: removes a record if it contains any number of missing values. If there
+are no missing values, it effectively acts as a copy operation.
+
+* mean imputation: it calculates the mean value in each variable separately, and replaces 
+the missing values with the means
+
+* amelia: hybrid EM with bootstrap
+
+* Hmisc: chained-equation using predicted mean matching or regression imputation
+
+* MICE: chained-equation (and potential NINR models)
+
+list-wise and mean imputation are not recommended, however list-wise should be used when
+there are no missing values since it operates as a copy:
+
+```
+python utils/listdel.py
+```
+
+Amelia, Hmisc and MICE are run in a similar way:
+
+```
+python utils/amelia.py
+python utils/mice.py
+python utils/hmisc.py
+```
+
+Amelia, hmisc, and MICE have optional arguments that are different between them, but all 
+allow to specify the number of imputed data frames that are combined to generate a
+single training set:
+
+```
+python utils/amelia.py --num_imputed 10
+python utils/mice.py --num_imputed 10
+python utils/hmisc.py --num_imputed 10
+```
+
+This number is 5 by default.
+
+After imputing missing values, the model training phase is executed by running the train 
+script available in each predictor:
+
+```
+python nnet/train.py
+python lreg/train.py
+python scikit_lreg/train.py
+python scikit_dtree/train.py
+python scikit_randf/train.py
+python scikit_svm/train.py
+```
+Each predictor has unique options, calling the train script with the -h argument will show
+all the options.
+
+```
+python nnet/train.py -h
+python nnet/train.py -r 100
+```
+
+Finally, evaluation is conducted with the eval script available for each predictor. The 
+evaluation metric needs to be specified with the -m argument, which accepts the following
+options: caldis, calplot, report, roc, confusion, misses:
+
+```
+python nnet/eval.py -m report
+```
+
+**2) BATCH MODE**
+
+It is often the case we need to get a sense of the overall performance of the predictor 
+when generating many different copies of training/testing sets. This can be achieved by
+the provided batch mode. The first step in the batch mode consists in generating a 
+predetermined number of training/testing sets, and completing the training sets with the
+imputation algorithm of choice. For instance, to generate 10 training/testing sets with 
+amelia imputation, one would run:
+
+```
+python init.py -n 10 -s 0 -m amelia
+```
+
+The percentage of complete records to include in the testing set, as well as imputation 
+arguments can be specified as well:
+
+```
+python init.py -n 10 -s 0 -t 70 -m amelia num_imputed=10
+```
+
+The training of the desired predictor on each of the generated training sets can be performed 
+with:
+
+```
+python train.py nnet
+```
+
+One can pass the arguments to the predictor as follows:
+
+```
+python train.py nnet inv_reg=100
+```
+
+The evaluation over all testing sets and summary statistics can be obtained with the eval script:
+
+```
+python eval.py -p nnet -m report
+```
+
+**2.1) BATCH MODE WITH CUSTOM MODEL NAME and LOCATION**
+
+The batch mode scripts allow to set the name of the model being trained/tested, as well
+as the location where the generated files will be stored. By model, here it is understood
+the collection of predictive variables set in the data/variables.txt file. These parameters
+are specified with the -N and -B arguments in the init, train, and eval scripts:
+
+```
+python init.py -B /Users/andres/Temp/test -N simple -n 10 -s 0 -m amelia
+python train.py -B /Users/andres/Temp/test -N simple nnet
+python eval.py -B /Users/andres/Temp/test -N simple -p nnet -m report
+```
+
+**3) GENERATING/RUNNING JOBS**
+
+Exhaustive model generation can take a long time on a single machine, so a job generation/
+launching system is provided to run these tasks on HPC clusters.
+
+As a preparation step, clean all previous job files:
+
+```
+python clean.py -j
+```
+
+The first step consists in adding all variables in data/variables-master.txt. If one
+variable is to be kept constant, the star character can be added at the end of the line for
+that variable.
+
+Then, run the gen_jobs.py script with the sizes of models to use:
+
+```
+python gen_jobs.py -s 2-5 -c 5
+```
+
+The range of model sizes is is given in the argument -s, while -c indicates how many
+models to "clump" together in each job.
+
+```
+python run_jobs.py -m lsf
+```
+
+In order to see how the job submission commands would look like, but without actually submitting 
+them, we can use the debug mode:
+
+```
+python run_jobs.py -m debug
+```
+
+And to run them locally
+
+```
+python run_jobs.py -m local
+```
+
+Each job will operate on the corresponding variables generated with gen_jobs, and will
+use the configuration set in the job.cfg file
+
+To get a ranking of all the models and predictors for each model, the rank_models script
+will go through each folder and parse the report files and sort the predictions based on 
+their F1-scores:
+
+```
+python rank_models.py
+```
+
+As earlier, a custom location can be used to store the models and output files. This needs to 
+be set in the job.cfg file so each job will save its data to the corresponding model folder,
+as well as an argument to run_jobs and rank_models:
+
+```
+python run_jobs.py -B /Users/andres/Temp/test/ -m debug
+python rank_models.py -B /Users/andres/Temp/test/
+```
+
+
+
 Let's go over a simple usage case in order to exemplify how all these stages work together.
 
 **1) Model preparation.** This preliminary stage involves setting up the source data file, 
