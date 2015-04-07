@@ -286,7 +286,6 @@ def train(train_filename, param_filename, **kwparams):
             X[:, j] = 1.0 / M
 
     theta0 = 1 - 2 * np.random.rand(R)
-    print theta0
     params = (X, y, N, L, S, K, gamma)
 
     # http://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.fmin_bfgs.html

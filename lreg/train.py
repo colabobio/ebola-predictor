@@ -95,7 +95,6 @@ def optim(params, threshold):
 
     print ""
     print "Running BFGS minimization..."
-#     theta0 = np.random.rand(N)
     theta0 = 1 - 2 * np.random.rand(N)
  
     thetaOpt = fmin_l_bfgs_b(cost, theta0, fprime=gradient, args=(X, y, gamma), pgtol=threshold, callback=add_value)[0]
