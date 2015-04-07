@@ -37,7 +37,7 @@ mdl_dir = os.path.join(base_dir, "models")
 model_dirs = glob.glob(mdl_dir + "/*")
 for dir in model_dirs:
     if not os.path.isdir(dir): continue
-    mdl_num = dir.split("/")[2]
+    mdl_num = dir.split("/")[-1]
     mdl_vars = load_vars(dir + "/variables.txt")
     report_files = glob.glob(dir + "/report-*.out")
     print "Reading model",mdl_num,"with variables", ",".join(mdl_vars)
