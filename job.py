@@ -44,6 +44,10 @@ def run_model(mdl_id, mdl_vars):
             if not thread.isAlive(): break
         n = get_last(mdl_id)
         if n < total_sets - 1:
+            # Remove core dump files, we know that (most likely) is just amelia crashing...
+            core_files = glob.glob("./core.*")
+            for file in core_files:
+                os.remove(file)
             if nrest < max_restarts:
                 start = n + 1
                 count = total_sets - start
