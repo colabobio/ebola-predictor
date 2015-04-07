@@ -9,6 +9,8 @@ import os, sys, glob, argparse
 parser = argparse.ArgumentParser()
 parser.add_argument('-B', '--base_dir', nargs=1, default=["./"],
                     help="Base directory")
+parser.add_argument('-P', '--proj_name', nargs=1, default=["Sabeti-ML-pred"],
+                    help="LSF project name")
 parser.add_argument("-m", "--mode", nargs=1, default=["debug"],
                     help="running mode: debug, local, lsf")
 parser.add_argument("-q", "--queue", nargs=1, default=["hour"],
@@ -23,6 +25,7 @@ base = args.base_dir[0]
 mode = args.mode[0].lower()
 queue = args.queue[0].lower()
 cfgfile = args.config[0]
+prjname = args.proj_name[0]
 jobs_dir = args.jobs_dir[0]
 
 out_dir = os.path.join(base, "out")
@@ -37,7 +40,7 @@ for file in job_files:
         print "Running job",file,"with configuration",cfgfile,"and output to",out_file,"..."
         os.system(cmd_str)
     else:
-        cmd_str = "bsub -o " + out_file + " -q " + queue + " ./job.py -j " + file + " -c " + cfgfile
+        cmd_str = "bsub -o " + out_file + " -q " + queue + " -P " + prjname + " ./job.py -j " + file + " -c " + cfgfile
         if mode == "debug":
             print cmd_str
         else:
