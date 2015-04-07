@@ -33,7 +33,7 @@ for file in job_files:
         cmd_str = "./job.py -j " + file + " -c " + cfgfile + " > " + out_file
         os.system(cmd_str)
     else:
-        cmd_str = "bsub -o " + out_file + " -q " + queue + " ./job.py -j " + file " -c " + cfgfile
+        cmd_str = "bsub -o " + out_file + " -q " + queue + " ./job.py -j " + file + " -c " + cfgfile
         if mode == "debug":
             print cmd_str
         else:
