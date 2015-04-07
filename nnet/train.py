@@ -280,13 +280,13 @@ def train(train_filename, param_filename, **kwparams):
         values = df.values[:, j]
         minv = values.min()
         maxv = values.max()
-#         X[:, j] = (values - minv) / (maxv - minv)
         if maxv > minv:
             X[:, j] = np.clip((values - minv) / (maxv - minv), 0, 1)
         else:
             X[:, j] = 1.0 / M
 
-    theta0 = np.random.rand(R)
+    theta0 = 1 - 2 * np.random.rand(R)
+    print theta0
     params = (X, y, N, L, S, K, gamma)
 
     # http://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.fmin_bfgs.html
