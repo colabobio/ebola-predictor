@@ -8,7 +8,7 @@ http://www.ats.ucla.edu/stat/r/faq/R_pmm_mi.html
 @copyright: The Broad Institute of MIT and Harvard 2015
 """
 
-import argparse
+import os, argparse
 import rpy2.robjects as robjects
 from imputation import load_variables, load_bounds, aggregate_files
 
@@ -27,7 +27,7 @@ def process(in_filename, out_filename, **kwparams):
     var_names, var_types = load_variables(in_filename)
     bounds = load_bounds(in_filename, var_names, var_types)
 
-    dir, = os.path.split(in_filename)
+    dir,_ = os.path.split(in_filename)
     tmp_filename = os.path.join(dir, "temp-data-mice.csv")
 
     print "Generating " + str(num_imputed) + " imputed datasets with MICE..."

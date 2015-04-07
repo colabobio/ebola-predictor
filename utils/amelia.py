@@ -86,7 +86,7 @@ def process(in_filename, out_filename, **kwparams):
     else:
          incheck_str = "FALSE"
 
-    dir, = os.path.split(in_filename)
+    dir,_ = os.path.split(in_filename)
     tmp_prefix = os.path.join(dir, "temp-data-amelia-")
 
     robjects.r('imdat <- amelia(trdat, m=' + str(num_imputed) + ', noms=nom_vars, bounds=num_bounds, max.resample = ' + str(resamples_opt) + ', incheck=' + incheck_str + ', emburn = c(5,' + str(max_iter) +'))')

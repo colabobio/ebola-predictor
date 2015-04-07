@@ -35,7 +35,7 @@ def process(in_filename, out_filename, **kwparams):
         list_str += '"' + name + '"'
     frame_str = ",".join(["comp$" + x for x in list_str.split(",")])
 
-    dir, = os.path.split(in_filename)
+    dir,_ = os.path.split(in_filename)
     tmp_prefix = os.path.join(dir, "temp-data-hmisc-")
 
     print "Generating " + str(num_imputed) + " imputed datasets with Hmisc..."
