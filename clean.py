@@ -24,6 +24,8 @@ parser.add_argument("-o", "--clean_out", action="store_true",
                         help="clean out folder")
 parser.add_argument("-a", "--clean_all", action="store_true",
                     help="clean all folders")
+args = parser.parse_args()
+base = args.base_dir[0]
 
 args = parser.parse_args()
 if args.clean_models or args.clean_all:

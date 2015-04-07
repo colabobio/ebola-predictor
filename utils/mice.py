@@ -27,7 +27,8 @@ def process(in_filename, out_filename, **kwparams):
     var_names, var_types = load_variables(in_filename)
     bounds = load_bounds(in_filename, var_names, var_types)
 
-    tmp_filename = "./temp/training-data-mice.csv"
+    dir, = os.path.split(in_filename)
+    tmp_filename = os.path.join(dir, "temp-data-mice.csv")
 
     print "Generating " + str(num_imputed) + " imputed datasets with MICE..."
     robjects.r('library(mice)') 

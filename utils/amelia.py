@@ -86,8 +86,9 @@ def process(in_filename, out_filename, **kwparams):
     else:
          incheck_str = "FALSE"
 
-    tmp_prefix = "./temp/training-data-amelia-"
-    
+    dir, = os.path.split(in_filename)
+    tmp_prefix = os.path.join(dir, "temp-data-amelia-")
+
     robjects.r('imdat <- amelia(trdat, m=' + str(num_imputed) + ', noms=nom_vars, bounds=num_bounds, max.resample = ' + str(resamples_opt) + ', incheck=' + incheck_str + ', emburn = c(5,' + str(max_iter) +'))')
     robjects.r('write.amelia(obj=imdat, file.stem="' + tmp_prefix + '", format="csv", row.names=FALSE)')
     
