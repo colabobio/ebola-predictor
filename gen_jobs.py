@@ -4,13 +4,13 @@ Exhaustive generation of models
 @copyright: The Broad Institute of MIT and Harvard 2015
 """
 
-import os, argparse, itertools
+import os, glob, argparse, shutil, itertools
 
 master_file = "./data/variables-master.txt"
 
-def save_clump(count, ids, vars):
+def save_clump(dir, count, ids, vars):
     print "Create file for job", count
-    with open("./jobs/job-" + str(count), "w") as jfile:
+    with open(dir + "/job-" + str(count), "w") as jfile:
         for k in range(0, len(vars)):
             jfile.write(str(ids[k]) + " " + ",".join(vars[k]) + "\n")
 
@@ -19,7 +19,23 @@ parser.add_argument("-s", "--model_sizes", nargs=1, default=["2,3,4"],
                     help="list of model sizes")
 parser.add_argument("-c", "--clump_size", type=int, nargs=1, default=[5],
                     help="size of models inside a single job")
+parser.add_argument("-d", "--jobs_dir", nargs=1, default=["./jobs"],
+                    help="Directory where to save job files")
+
 args = parser.parse_args()
+
+dir = args.jobs_dir[0]
+if not os.path.exists(dir): os.makedirs(dir)
+else:
+    files = glob.glob(dir + "/*")
+    if files:
+        print "Jobs folder not empy, deleting all its contents..."
+        for file in files:
+            if os.path.isdir(file):
+                shutil.rmtree(file)
+            else:
+                os.remove(file)
+        print "Done."
 
 sizes = args.model_sizes[0]
 parts = sizes.split(',')
@@ -60,7 +76,7 @@ for size in model_sizes:
     var_comb = itertools.combinations(mdl_vars, fsize)
     for mvars in var_comb:
         if len(clump_vars) == clump_size:
-            save_clump(clump_count, clump_idxs, clump_vars)
+            save_clump(dir, clump_count, clump_idxs, clump_vars)
             clump_count += 1
             clump_idxs = []
             clump_vars = []
@@ -72,4 +88,4 @@ for size in model_sizes:
         model_count += 1
 
 if clump_vars:
-    save_clump(clump_count, clump_idxs, clump_vars)
+    save_clump(dir, clump_count, clump_idxs, clump_vars)
