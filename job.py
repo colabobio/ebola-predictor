@@ -15,7 +15,7 @@ def get_last(name):
 
 def worker(name, count, first, imeth):
     print "Start"
-    os.system("python init.py -N " + name + " -n " + str(count) + " -s " + str(first) + " -t " + str(test_prec) + " -m " + imeth + " " + impute_options[imeth])
+    os.system("python init.py -B " + base_folder + " -N " + name + " -n " + str(count) + " -s " + str(first) + " -t " + str(test_prec) + " -m " + imeth + " " + impute_options[imeth])
     return
 
 def create_var_file(mdl_id, mdl_vars):
@@ -64,9 +64,9 @@ def run_model(mdl_id, mdl_vars):
     for pred_name in predictors:
         print "PREDICTOR",pred_name,"---------------"
         pred_opt = pred_options[pred_name]
-        os.system("python train.py -N " + mdl_id + " " + pred_name + " " + pred_opt)
+        os.system("python train.py -B " + base_folder + " -N " + mdl_id + " " + pred_name + " " + pred_opt)
         repfn = "./models/" + mdl_id + "/report-" + pred_name + ".out"
-        os.system("python eval.py -N " + mdl_id + " -p " + pred_name + " -m report > " + repfn)
+        os.system("python eval.py -B " + base_folder + " -N " + mdl_id + " -p " + pred_name + " -m report > " + repfn)
 
 ##########################################################################################
 
@@ -79,6 +79,7 @@ job_filename = sys.argv[1]
 total_sets = 100
 test_prec = 60
 max_restarts = 5
+base_folder="./"
 predictors = ["lreg", "scikit_lreg"]
 pred_options = {"lreg":"", "scikit_lreg":""}
 impute_method = "hmisc"
@@ -93,6 +94,7 @@ with open("job.cfg", "r") as cfg:
         if key == "total_sets": total_sets = int(value)
         elif key == "test_prec": test_prec = int(value)
         elif key == "max_restarts": max_restarts = int(value)
+        elif key == "base_folder": base_folder = value
         elif key == "predictors": predictors = value.split(",")
         elif "pred_options" in key:
             pred = key.split(".")[1]
