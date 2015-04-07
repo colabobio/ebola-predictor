@@ -8,17 +8,21 @@ import os, argparse, glob
 import zipfile, zlib
 
 parser = argparse.ArgumentParser()
-parser.add_argument("name", nargs=1, default=["temp"],
-                    help="Name of model to pack")
+parser.add_argument('-B', '--base_dir', nargs=1, default=["./"],
+                    help="Base directory")
+parser.add_argument('-N', '--name', nargs=1, default=["test"],
+                    help="Model name")
 args = parser.parse_args()
-dir = args.name[0]
+base = args.base_dir[0]
+name = args.name[0]
 
 data_files = glob.glob("./data/*")
-model_files = glob.glob("./models/" + dir + "/*")
+model_dir =  os.path.join(base, "models", name)
+model_files = glob.glob(model_dir + "/*")
 
 if not os.path.exists("./store"): os.makedirs("./store")
 
-zip_filename = os.path.join("./store", dir + ".zip")
+zip_filename = os.path.join("./store", name + ".zip")
 
 if os.path.exists(zip_filename):
     print "The file",zip_filename,"already exists, choose another name!"

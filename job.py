@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import sys, os, threading
+import sys, os, threading, argparse
 import time, glob, time
 import itertools
 
@@ -70,11 +70,15 @@ def run_model(mdl_id, mdl_vars):
 
 ##########################################################################################
 
-if len(sys.argv) < 2:
-    print "Need job file, quitting!"
-    exit(0)
+parser = argparse.ArgumentParser()
+parser.add_argument('-j', '--job_file', nargs=1, default=["./jobs/job-0"],
+                    help="Job file")
+parser.add_argument('-c', '--cfg_file', nargs=1, default=["./job.cfg"],
+                    help="Config file")
+args = parser.parse_args()
 
-job_filename = sys.argv[1]
+job_filename = args.job_file[0]
+cfg_filename = args.cfg_file[0]
 
 total_sets = 100
 test_prec = 60
@@ -85,7 +89,7 @@ pred_options = {"lreg":"", "scikit_lreg":""}
 impute_method = "hmisc"
 impute_fallback = "mice"
 impute_options = {"hmisc":"", "mice":""}
-with open("job.cfg", "r") as cfg:
+with open(cfg_filename, "r") as cfg:
     lines = cfg.readlines()
     for line in lines:
         line = line.strip()

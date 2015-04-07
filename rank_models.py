@@ -4,7 +4,7 @@ Rank all available models
 @copyright: The Broad Institute of MIT and Harvard 2015
 """
 
-import os, glob
+import os, glob, argparse
 import operator
 
 var_file = "./data/variables.txt"
@@ -30,8 +30,9 @@ parser = argparse.ArgumentParser()
 parser.add_argument('-B', '--base_dir', nargs=1, default=["./"],
                     help="Base directory")
 args = parser.parse_args()
+base_dir = args.base_dir[0]
 
-mdl_dir = os.path.join(args.base_dir[0], "models")
+mdl_dir = os.path.join(base_dir, "models")
 
 model_dirs = glob.glob(mdl_dir + "/*")
 for dir in model_dirs:

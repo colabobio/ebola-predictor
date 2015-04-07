@@ -25,9 +25,8 @@ parser.add_argument("-o", "--clean_out", action="store_true",
 parser.add_argument("-a", "--clean_all", action="store_true",
                     help="clean all folders")
 args = parser.parse_args()
-base = args.base_dir[0]
 
-args = parser.parse_args()
+base = args.base_dir[0]
 if args.clean_models or args.clean_all:
     print "Cleaning models folder..."
     delete(glob.glob(os.path.join(base, "models") + "/*"))

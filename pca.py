@@ -11,11 +11,22 @@ import sys, os, glob
 sys.path.append(os.path.abspath('./utils'))
 from pca_transform import do_pca
 
-test_files = glob.glob("./data/testing-data-*.csv")
+parser = argparse.ArgumentParser()
+parser.add_argument('-B', '--base_dir', nargs=1, default=["./"],
+                    help="Base directory")
+parser.add_argument('-N', '--name', nargs=1, default=["test"],
+                    help="Model name")
+args = parser.parse_args()
+
+base_dir = args.base_dir[0]
+mdl_name = args.name[0]
+mdl_dir =  os.path.join(base_dir, "models", mdl_name)
+
+test_files = glob.glob(mdl_dir + "/testing-data-*.csv")
 for testfile in test_files:
-    start_idx = testfile.find("./data/testing-data-") + len("./data/testing-data-")
+    start_idx = testfile.find(mdl_dir + "/testing-data-") + len(mdl_dir + "/testing-data-")
     stop_idx = testfile.find('.csv')
     id = testfile[start_idx:stop_idx]
-    trainfile = "./data/training-data-completed-" + str(id) + ".csv"
+    trainfile = mdl_dir + "/training-data-completed-" + str(id) + ".csv"
     if os.path.exists(testfile) and os.path.exists(trainfile):
         do_pca(testfile, trainfile, 6)
