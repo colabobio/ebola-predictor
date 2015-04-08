@@ -7,7 +7,9 @@ import itertools
 master_file = "./data/variables-master.txt"
 
 def get_last(name):
-    train_files = glob.glob(base_folder + "/models/" + name + "/training-data-completed*.csv")
+    mdl_folder = base_folder + "/models/" + name
+    if not os.path.exists(mdl_folder): return -1
+    train_files = glob.glob(mdl_folder + "/training-data-completed*.csv")
     idx = [int(fn[fn.rfind("-") + 1: fn.rfind(".")]) for fn in train_files]
     idx.sort()
     if idx: return idx[-1]
@@ -32,45 +34,55 @@ def run_model(mdl_id, mdl_vars):
     print "running model", mdl_id, mdl_vars
     create_var_file(mdl_id, mdl_vars)
     
-    imeth = impute_method
-    count = total_sets
-    start = 0
-    nrest = 0
-    while True:
-        thread = threading.Thread(target=worker, args=(mdl_id, count, start, imeth))
-        thread.start()
+    n = get_last(mdl_id)
+    if n + 1 == total_sets:
+        print "Training/testing files already generated, skipping init stage..."
+    else:
+        imeth = impute_method
+        count = total_sets
+        start = 0
+        nrest = 0
         while True:
-            time.sleep(0.1)
-            if not thread.isAlive(): break
-        n = get_last(mdl_id)
-        if n < total_sets - 1:
-            # Remove core dump files, we know that (most likely) is just amelia crashing...
-            core_files = glob.glob("./core.*")
-            for file in core_files:
-                os.remove(file)
-            if nrest < max_restarts:
-                start = n + 1
-                count = total_sets - start
-                nrest += 1
-            else:
-                if impute_fallback and (not imeth == impute_fallback):
-                    imeth = impute_fallback
-                    count = total_sets
-                    start = 0
-                    nrest = 0
-                    print "Primary imputation, will try fallback imputation method",imeth
+            thread = threading.Thread(target=worker, args=(mdl_id, count, start, imeth))
+            thread.start()
+            while True:
+                time.sleep(0.1)
+                if not thread.isAlive(): break
+            n = get_last(mdl_id)
+            if n < total_sets - 1:
+                # Remove core dump files, we know that (most likely) is just amelia crashing...
+                core_files = glob.glob("./core.*")
+                for file in core_files:
+                    os.remove(file)
+                if nrest < max_restarts:
+                    start = n + 1
+                    count = total_sets - start
+                    nrest += 1
                 else:
-                    print "Model cannot be succesfully imputed, skipping!"
-                    return
-        else:
-            print "Done! Number of restarts:", nrest
-            break
+                    if impute_fallback and (not imeth == impute_fallback):
+                        imeth = impute_fallback
+                        count = total_sets
+                        start = 0
+                        nrest = 0
+                        print "Primary imputation, will try fallback imputation method",imeth
+                    else:
+                        print "Model cannot be succesfully imputed, skipping!"
+                        return
+            else:
+                print "Done! Number of restarts:", nrest
+                break
             
     for pred_name in predictors:
         print "PREDICTOR",pred_name,"---------------"
         pred_opt = pred_options[pred_name]
-        os.system("python train.py -B " + base_folder + " -N " + mdl_id + " " + pred_name + " " + pred_opt)
         repfn = base_folder + "/models/" + mdl_id + "/report-" + pred_name + ".out"
+        if os.path.exists(repfn):
+            with open(repfn, "r") as report:
+                lines = report.readlines()
+                if lines:
+                    print "Report for",pred_name,"found, skipping..."
+                    continue
+        os.system("python train.py -B " + base_folder + " -N " + mdl_id + " " + pred_name + " " + pred_opt)
         os.system("python eval.py -B " + base_folder + " -N " + mdl_id + " -p " + pred_name + " -m report > " + repfn)
 
 ##########################################################################################

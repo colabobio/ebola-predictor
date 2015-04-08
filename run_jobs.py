@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 """
 Runs all the jobs in the jobs folder
 
@@ -11,10 +13,14 @@ parser.add_argument('-B', '--base_dir', nargs=1, default=["./"],
                     help="Base directory")
 parser.add_argument('-P', '--proj_name', nargs=1, default=["Sabeti-ML-pred"],
                     help="LSF project name")
-parser.add_argument("-m", "--mode", nargs=1, default=["debug"],
+parser.add_argument('mode', nargs=1, default=["debug"],
                     help="running mode: debug, local, lsf")
 parser.add_argument("-q", "--queue", nargs=1, default=["hour"],
                     help="type of queue in LSF mode: hour or week")
+parser.add_argument("-t", "--time", nargs=1, default=["1:00"],
+                    help="maximum amount of time required by the job")
+parser.add_argument("-m", "--memory", nargs=1, default=["1"],
+                    help="maximum amount of memory required by the job")
 parser.add_argument("-c", "--config", nargs=1, default=["./job.cfg"],
                     help="job config file")
 parser.add_argument("-d", "--jobs_dir", nargs=1, default=["./jobs"],
@@ -24,6 +30,8 @@ args = parser.parse_args()
 base = args.base_dir[0]
 mode = args.mode[0].lower()
 queue = args.queue[0].lower()
+maxtime = args.time[0]
+maxmem = args.memory[0]
 cfgfile = args.config[0]
 prjname = args.proj_name[0]
 jobs_dir = args.jobs_dir[0]
@@ -40,7 +48,8 @@ for file in job_files:
         print "Running job",file,"with configuration",cfgfile,"and output to",out_file,"..."
         os.system(cmd_str)
     else:
-        cmd_str = "bsub -o " + out_file + " -q " + queue + " -P " + prjname + " ./job.py -j " + file + " -c " + cfgfile
+        bsub_opt = " -q " + queue + " -P " + prjname + " -W " + maxtime + " -R 'rusage[mem=" + maxmem + "]'"
+        cmd_str = "bsub -o " + out_file + bsub_opt + " ./job.py -j " + file + " -c " + cfgfile
         if mode == "debug":
             print cmd_str
         else:

@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 """
 Exhaustive generation of models
 

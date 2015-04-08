@@ -183,27 +183,27 @@ that variable.
 Then, run the gen_jobs.py script with the sizes of models to use:
 
 ```
-python gen_jobs.py -s 2-5 -c 5
+gen_jobs.py -s 2-5 -c 5
 ```
 
 The range of model sizes is is given in the argument -s, while -c indicates how many
 models to "clump" together in each job.
 
 ```
-python run_jobs.py -m lsf
+run_jobs.py lsf
 ```
 
 In order to see how the job submission commands would look like, but without actually submitting 
 them, we can use the debug mode:
 
 ```
-python run_jobs.py -m debug
+run_jobs.py debug
 ```
 
 And to run them locally
 
 ```
-python run_jobs.py -m local
+run_jobs.py local
 ```
 
 Each job will operate on the corresponding variables generated with gen_jobs, and will
@@ -214,7 +214,7 @@ will go through each folder and parse the report files and sort the predictions 
 their F1-scores:
 
 ```
-python rank_models.py
+rank_models.py
 ```
 
 As earlier, a custom location can be used to store the models and output files. This needs to 
@@ -222,8 +222,8 @@ be set in the job.cfg file so each job will save its data to the corresponding m
 as well as an argument to run_jobs and rank_models:
 
 ```
-python run_jobs.py -B /Users/andres/Temp/test/ -m debug
-python rank_models.py -B /Users/andres/Temp/test/
+run_jobs.py -B /Users/andres/Temp/test/ debug
+rank_models.py -B /Users/andres/Temp/test/
 ```
 
 
