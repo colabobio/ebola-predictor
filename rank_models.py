@@ -28,12 +28,9 @@ def reading_model(train_files, report_files, mdl_num):
         with open(rfn, "r") as report:
             pred = os.path.splitext(rfn.split("-")[-1])[0]
             lines = report.readlines()
-            if not lines:
-                continue
-            for pred in predictors:
-                if pred in rfn:
-                    count += 1
-                    break
+            if not lines: continue
+            if pred in predictors:
+                count += 1
             last = lines[-1]
             parts = last.split(",")
             mdl_name = mdl_num + "-" + pred
