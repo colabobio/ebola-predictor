@@ -1,0 +1,11 @@
+OUT category
+TEMP float
+AST_1 float
+Cr_1 float
+AlkPhos_1 float
+TCo2_1 float
+BUN_1 float
+DIARR category
+WEAK category
+VOMIT category
+EDEMA category

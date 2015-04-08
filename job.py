@@ -4,8 +4,6 @@ import sys, os, threading, argparse
 import time, glob, time
 import itertools
 
-master_file = "./data/variables-master.txt"
-
 def get_last(name):
     mdl_folder = base_folder + "/models/" + name
     if not os.path.exists(mdl_folder): return -1
@@ -128,6 +126,7 @@ with open(cfg_filename, "r") as cfg:
 
 all_vars = []
 var_dict = {}
+master_file = "./data/variables-master.txt"
 with open(master_file, "rb") as mfile:
     for line in mfile.readlines():
         line = line.strip()

@@ -8,8 +8,6 @@ Exhaustive generation of models
 
 import os, glob, argparse, shutil, itertools
 
-master_file = "./data/variables-master.txt"
-
 def save_clump(dir, count, ids, vars):
     print "Create file for job", count
     with open(dir + "/job-" + str(count), "w") as jfile:
@@ -54,6 +52,7 @@ clump_size = args.clump_size[0]
 all_vars = []
 var_dict = {}
 fix_var = None
+master_file = "./data/variables-master.txt"
 with open(master_file, "rb") as mfile:
     for line in mfile.readlines():
         line = line.strip()
