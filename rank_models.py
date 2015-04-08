@@ -23,10 +23,19 @@ def load_vars(fn):
     return res[1:]
 
 def reading_model(train_files, report_files, mdl_num):
+    count = 0
     for rfn in report_files:
         with open(rfn, "r") as report:
             pred = os.path.splitext(rfn.split("-")[-1])[0]
-            last = report.readlines()[-1]
+            lines = report.readlines()
+            if not lines:
+                print "  Cannot find scores in",rfn,", skipping!"
+                continue
+            for pred in predictors:
+                if pred in rfn:
+                    count += 1
+                    break
+            last = lines[-1]
             parts = last.split(",")
             mdl_name = mdl_num + "-" + pred
             if 3 < len(parts):
@@ -34,7 +43,8 @@ def reading_model(train_files, report_files, mdl_num):
                 model_f1_dev[mdl_name] = float(parts[6])
                 model_vars[mdl_name] = mdl_vars
             else:
-                print "  Cannot find scores, skipping!"
+                print "  Cannot find scores in",rfn,", skipping!"
+    return count
 
 model_f1_scores = {}
 model_f1_dev = {}
@@ -61,18 +71,12 @@ for dir_name, subdir_list, file_list in os.walk(base_dir):
         if train_files:
             mdl_count += 1
             report_files = glob.glob(dir_name + "/report-*.out")
-            count = 0
-            for pred in predictors:
-                for pfn in report_files:
-                    if pred in pfn: 
-                        count += 1
-                        break
-            if count < len(predictors):
-                incomplete_models.append(dir_name)
             mdl_vars = load_vars(dir_name + "/variables.txt")
             mdl_num = dir_name
             print "Reading model",mdl_num,"with variables", ",".join(mdl_vars)
-            reading_model(train_files, report_files, mdl_num)
+            count = reading_model(train_files, report_files, mdl_num)
+            if count < len(predictors):
+                incomplete_models.append(dir_name)
 
 print "Number of models:",mdl_count
 print "Number of incomplete models:",len(incomplete_models)
