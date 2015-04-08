@@ -83,6 +83,8 @@ print "Number of incomplete models:",len(incomplete_models)
 
 sorted_preds = reversed(sorted(model_f1_scores.items(), key=operator.itemgetter(1)))
 with open(base_dir + "/ranking.txt", "w") as rfile:
+    pos = 1
+    tot = len(model_f1_scores)
     for pair in sorted_preds:
         full_name = pair[0]
         idx = full_name.rfind('-')
@@ -91,8 +93,9 @@ with open(base_dir + "/ranking.txt", "w") as rfile:
         pred_f1_score = pair[1]
         pred_f1_std = model_f1_dev[full_name]
         mvars = model_vars[full_name]
-        line = mdl_name + " " + pred_name + " " + ",".join(mvars) + " " + str(pred_f1_score) + " " + str(pred_f1_std)
+        line = str(pos) + "/" + str(tot) + " " + mdl_name + " " + pred_name + " " + ",".join(mvars) + " " + str(pred_f1_score) + " " + str(pred_f1_std)
         rfile.write(line + "\n")
+        pos += 1
 print "Saved ranking to",base_dir + "/ranking.txt"
 
 if incomplete_models:
