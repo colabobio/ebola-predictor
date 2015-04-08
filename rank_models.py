@@ -29,7 +29,6 @@ def reading_model(train_files, report_files, mdl_num):
             pred = os.path.splitext(rfn.split("-")[-1])[0]
             lines = report.readlines()
             if not lines:
-                print "  Cannot find scores in",rfn,", skipping!"
                 continue
             for pred in predictors:
                 if pred in rfn:
@@ -39,6 +38,7 @@ def reading_model(train_files, report_files, mdl_num):
             parts = last.split(",")
             mdl_name = mdl_num + "-" + pred
             if 3 < len(parts):
+                print "  Getting scores for",pred,"..."
                 model_f1_scores[mdl_name] = float(parts[3])
                 model_f1_dev[mdl_name] = float(parts[6])
                 model_vars[mdl_name] = mdl_vars
