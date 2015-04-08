@@ -99,6 +99,7 @@ total_sets = 100
 test_prec = 60
 max_restarts = 5
 base_folder="./"
+var_file = "./data/variables-master.txt"
 predictors = ["lreg", "scikit_lreg"]
 pred_options = {"lreg":"", "scikit_lreg":""}
 impute_method = "hmisc"
@@ -114,6 +115,7 @@ with open(cfg_filename, "r") as cfg:
         elif key == "test_prec": test_prec = int(value)
         elif key == "max_restarts": max_restarts = int(value)
         elif key == "base_folder": base_folder = value
+        elif key == "var_file": var_file = value
         elif key == "predictors": predictors = value.split(",")
         elif "pred_options" in key:
             pred = key.split(".")[1]
@@ -126,8 +128,7 @@ with open(cfg_filename, "r") as cfg:
 
 all_vars = []
 var_dict = {}
-master_file = "./data/variables-master.txt"
-with open(master_file, "rb") as mfile:
+with open(var_file, "rb") as mfile:
     for line in mfile.readlines():
         line = line.strip()
         if not line: continue

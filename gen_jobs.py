@@ -15,6 +15,8 @@ def save_clump(dir, count, ids, vars):
             jfile.write(str(ids[k]) + " " + ",".join(vars[k]) + "\n")
 
 parser = argparse.ArgumentParser()
+parser.add_argument("-V", "--var_file", nargs=1, default=["./data/variables-master.txt"],
+                    help="File with list of variables")
 parser.add_argument("-s", "--model_sizes", nargs=1, default=["2,3,4"],
                     help="list of model sizes")
 parser.add_argument("-c", "--clump_size", type=int, nargs=1, default=[5],
@@ -52,8 +54,8 @@ clump_size = args.clump_size[0]
 all_vars = []
 var_dict = {}
 fix_var = None
-master_file = "./data/variables-master.txt"
-with open(master_file, "rb") as mfile:
+var_file = args.var_file[0]
+with open(var_file, "rb") as mfile:
     for line in mfile.readlines():
         line = line.strip()
         if not line: continue
