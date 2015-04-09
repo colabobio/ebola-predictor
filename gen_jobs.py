@@ -40,16 +40,24 @@ else:
         print "Done."
 
 sizes = args.model_sizes[0]
+def_clump_size = args.clump_size[0]
+clump_sizes = []
 parts = sizes.split(',')
 model_sizes = []
 for s in parts:
+    if ":" in s:
+        s, sc = s.split(":")
+        c = int(sc)
+    else:
+        c = def_clump_size
     if '-' in s:
         t = s.split('-')
-        model_sizes.extend(range(int(t[0]), int(t[1]) + 1))
+        sizes = range(int(t[0]), int(t[1]) + 1)
+        model_sizes.extend(sizes)
+        clump_sizes.extend([c] * len(sizes))
     else:
         model_sizes.append(int(s))
-
-clump_size = args.clump_size[0]
+        clump_sizes.append(c)
 
 all_vars = []
 var_dict = {}
@@ -73,12 +81,13 @@ model_count = 0
 clump_count = 0
 clump_idxs = []
 clump_vars = []
-for size in model_sizes:
+for i in range(0, len(model_sizes)):
+    size = model_sizes[i]
     fsize = size
     if fix_var: fsize -= 1
     var_comb = itertools.combinations(mdl_vars, fsize)
     for mvars in var_comb:
-        if len(clump_vars) == clump_size:
+        if len(clump_vars) == clump_sizes[i]:
             save_clump(dir, clump_count, clump_idxs, clump_vars)
             clump_count += 1
             clump_idxs = []
@@ -89,6 +98,8 @@ for size in model_sizes:
         clump_idxs.append(model_count)
         clump_vars.append(lvars)
         model_count += 1
-
-if clump_vars:
-    save_clump(dir, clump_count, clump_idxs, clump_vars)
+    if clump_vars:
+        save_clump(dir, clump_count, clump_idxs, clump_vars)
+        clump_count += 1
+        clump_idxs = []
+        clump_vars = []
