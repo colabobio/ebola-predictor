@@ -48,13 +48,13 @@ model_vars = {}
 incomplete_models = []
 
 parser = argparse.ArgumentParser()
-parser.add_argument('base_dir', nargs=1, default=["./models"],
+parser.add_argument('-m', '--models_dir', nargs=1, default=["./models"],
                     help="Directory to look for models")
 parser.add_argument('-p', '--pred_list', nargs=1, default=[""],
                     help="Predictors to search results for")
 
 args = parser.parse_args()
-base_dir = args.base_dir[0]
+base_dir = args.models_dir[0]
 
 predictors = []
 if args.pred_list[0]:
