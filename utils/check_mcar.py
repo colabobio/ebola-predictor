@@ -3,6 +3,8 @@ Tests for Missing Completely At Random (MCAR) using LittleMCAR function in Baylo
 
 http://cran.r-project.org/web/packages/BaylorEdPsych/
 
+http://cran.r-project.org/web/packages/MissMech/
+
 based on the multivariate test described in
 
 Little, R (1988). A test of missing completely at random for multivariate data with missing
@@ -16,11 +18,10 @@ import sys, csv, os
 import rpy2.robjects as robjects
 
 src_file = "./data/sources.txt"
-var_file = "./data/variables-master.txt"
 range_file = "./data/ranges.txt"
 ignore_file = "./data/ignore.txt"
 
-def run_test(pvalue_threshold):
+def run_test(var_file, mcar_test, pvalue_threshold):
     input_file = ""
     with open(src_file, "rb") as sfile:
         for line in sfile.readlines():
@@ -91,41 +92,55 @@ def run_test(pvalue_threshold):
                 r += 1
 
     test_filename = "./mcar_test.csv"
-
-    dvar = model_variables[0]
-    robjects.r('library(BaylorEdPsych)')
     with open(test_filename, "w") as trfile:
         writer = csv.writer(trfile, delimiter=",", quotechar='"', quoting=csv.QUOTE_MINIMAL)
         writer.writerow(model_variables)
         for row in all_data:
             writer.writerow(row)
     robjects.r('dat <- read.table("' + test_filename + '", sep=",", header=TRUE, na.strings="?")')
-    robjects.r('res <- LittleMCAR(dat)')
-    print ""
-    res = robjects.r['res']
-    chisq = res[0][0]
-    pvalue = res[2][0]
-    print "Value of chi-squared statistic:", chisq
-    print "P-value:", pvalue
-    if pvalue > pvalue_threshold:
-        print ""
-        print "Missingness patterns *****************************************************"
-        print ""
-        i = 0 
-        for patrn in res[5]:
-            print "Pattern",i,"----------------------------------------------------------"
-            i += 1
-            print patrn
-            print "IDs"
-            for rn in patrn.rownames:
-                print idx_info[int(rn) - 1][1]
-            print ""
 
+    if mcar_test == "little":
+        robjects.r('library(BaylorEdPsych)')
+        robjects.r('res <- LittleMCAR(dat)')
+        print ""
+        res = robjects.r['res']
+        print res
+    else:
+        robjects.r('library(MissMech)')
+        robjects.r('res <- TestMCARNormality(dat, alpha = ' + str(pvalue_threshold) + ')')
+        res = robjects.r['res']
+        print res
+
+#     chisq = res[0][0]
+#     pvalue = res[2][0]
+#     print "Value of Little'schi-squared statistic:", chisq
+#     print "P-value of Little's chi-squared test  :", pvalue
+#     if pvalue_threshold < pvalue:
+#         print "Therefore, MCAR hypothesis cannot be rejected at " + str(pvalue_threshold) + " significance level" 
+#     else:
+#         print ""
+#         print "Missingness patterns *****************************************************"
+#         print ""
+#         i = 0 
+#         for patrn in res[5]:
+#             print "Pattern",i,"----------------------------------------------------------"
+#             i += 1
+#             print patrn
+#             print "IDs"
+#             for rn in patrn.rownames:
+#                 print idx_info[int(rn) - 1][1]
+#             print ""
+    
     os.remove(test_filename)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
+    parser.add_argument("-v", "--var_file", nargs=1, default=["./data/variables-master.txt"],
+                        help="File containing list of variables to consider in the test")
     parser.add_argument("-p", "--pvalue", type=float, nargs=1, default=[0.05],
                         help="P-value for the chi-squared statistic")
+    parser.add_argument("-t", "--test", nargs=1, default=["little"],
+                        help="Test type: little for Little's MCAR chi-square test, hawkins for Hawkins test of normality and homoscedasticity")
     args = parser.parse_args()
-    run_test(args.pvalue[0])
+    
+    run_test(args.var_file[0], args.test[0], args.pvalue[0])
