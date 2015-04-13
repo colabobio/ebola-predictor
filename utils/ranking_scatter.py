@@ -1,5 +1,5 @@
 """
-Creates scatter plot from reports
+Creates scatter plot from ranking
 
 @copyright: The Broad Institute of MIT and Harvard 2015
 """
