@@ -17,6 +17,8 @@ def save_clump(dir, count, ids, vars):
 parser = argparse.ArgumentParser()
 parser.add_argument("-V", "--var_file", nargs=1, default=["./data/variables-master.txt"],
                     help="File with list of variables")
+parser.add_argument("-i", "--incomplete", nargs=1, default=[""],
+                    help="list of incomplete models")
 parser.add_argument("-s", "--model_sizes", nargs=1, default=["2,3,4"],
                     help="list of model sizes")
 parser.add_argument("-c", "--clump_size", type=int, nargs=1, default=[5],
@@ -31,13 +33,33 @@ if not os.path.exists(dir): os.makedirs(dir)
 else:
     files = glob.glob(dir + "/*")
     if files:
-        print "Jobs folder not empy, deleting all its contents..."
+        print "Jobs folder not empty, deleting all its contents..."
         for file in files:
             if os.path.isdir(file):
                 shutil.rmtree(file)
             else:
                 os.remove(file)
         print "Done."
+
+inc_file = args.incomplete[0]
+if inc_file:
+    # Generate jobs from list of incomplete models
+    inc_models = []
+    with open(inc_file, "rb") as ifile:
+        for line in ifile.readlines():
+            inc_models.append(line.strip())
+    count = 0
+    for mdl in inc_models:
+        _, name = os.path.split(mdl)
+        vars = []
+        with open(os.path.join(mdl, "variables.txt"), "rb") as vfile:
+            lines = vfile.readlines()[1:]
+            for line in lines:
+                line = line.strip()
+                if line: vars.append(line.split()[0])
+        save_clump(dir, count, [name], [vars])
+        count += 1
+    exit(0)
 
 sizes = args.model_sizes[0]
 def_clump_size = args.clump_size[0]

@@ -37,8 +37,8 @@ def run_model(mdl_id, mdl_vars):
         print "Training/testing files already generated, skipping init stage..."
     else:
         imeth = impute_method
-        count = total_sets
-        start = 0
+        start = n + 1
+        count = total_sets - start
         nrest = 0
         while True:
             thread = threading.Thread(target=worker, args=(mdl_id, count, start, imeth))
