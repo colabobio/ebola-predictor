@@ -61,10 +61,12 @@ if args.pred_list[0]:
     predictors = args.pred_list[0].split(",")
 
 mdl_count = 0
+empty_count = 0
 for dir_name, subdir_list, file_list in os.walk(base_dir):
     if file_list:
         train_files = glob.glob(dir_name + "/training-data-completed-*.csv")
-        if train_files:
+        var_file = os.path.exists(dir_name + "/variables.txt")
+        if train_files or var_file:
             mdl_count += 1
             report_files = glob.glob(dir_name + "/report-*.out")
             mdl_vars = load_vars(dir_name + "/variables.txt")
