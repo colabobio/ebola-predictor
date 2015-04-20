@@ -17,21 +17,25 @@ import seaborn as sns
 # predictor = args.pred[0]
 # mode = args.scatter_mode[0]
 
+rank_file = "./out/ranking-nopcr.txt"
+pdf_file = "./out/ranking-nopcr.pdf"
+predictors = ["lreg", "nnet", "scikit_dtree", "scikit_svm"]
+pred_names = {"lreg": "Logistic Regression", "nnet": "Neural Network", "scikit_dtree": "Decision Tree", "scikit_svm": "Support Vector Machine"}
 # predictors = ["lreg", "nnet", "scikit_lreg", "scikit_dtree", "scikit_randf", "scikit_svm"]
-predictors = ["nnet"]
-colors = {"lreg":[166,206,227], 
-          "nnet":[31,120,180],
+# predictors = ["nnet"]
+colors = {"lreg":[171,217,233], 
+          "nnet":[44,123,182],
           "scikit_lreg":[178,223,138],
-          "scikit_dtree":[51,160,44],
+          "scikit_dtree":[253,174,97],
           "scikit_randf":[251,154,153],
-          "scikit_svm":[227,26,28]}
+          "scikit_svm":[215,25,28]}
 opacity = 160
 
 plt.clf()
 fig = plt.figure()
 
-plt.xlim([0.5,1.1])
-plt.ylim([0.5,1.1])
+plt.xlim([0.5,1.05])
+plt.ylim([-0.05,0.5])
 plt.axes().set_aspect('equal')
 
 
@@ -43,7 +47,7 @@ vars90 = Set([])
 vars99 = Set([])
 inter90 = None
 vcounts = {}
-with open("out/ranking.txt", "r") as rfile:
+with open(rank_file, "r") as rfile:
     lines = rfile.readlines()
     for line in lines:
         line = line.strip()
@@ -71,12 +75,12 @@ with open("out/ranking.txt", "r") as rfile:
         
         r1 = random.random()
         r2 = random.random()        
-        if f1_mean == 1:
-            f1_mean += 0.01*(1-2*r1)
-            f1_std += 0.01*(1-2*r2)
+#         if f1_mean == 1:
+#             f1_mean += 0.01*(1-2*r1)
+#             f1_std += 0.01*(1-2*r2)
                     
         x.append(f1_mean)
-        y.append(1 - f1_std)
+        y.append(f1_std)
         vlist = vars.split(",")
         l = len(vlist)
         z = 30 * l /10.0
@@ -104,7 +108,7 @@ for k in xdict:
     c = [e/255.0 for e in colors[k]]
     c.append(opacity/255.0) 
     plots.append(plt.scatter(x, y, s=s, color=c, marker='o'))
-    labels.append(k);
+    labels.append(pred_names[k]);
 
 
 print "Variables in predictors with more than 99% accuracy:", vars99
@@ -117,11 +121,11 @@ for v in sorted_counts: print v
 plt.legend(tuple(plots),
            tuple(labels),
            loc='best',
-           ncol=3,
+           ncol=2,
            prop={'size':9})
 
-plt.xlabel('Mean F1 score')
-plt.ylabel('1 - F1 score error')
+plt.xlabel('F1-score mean')
+plt.ylabel('F1-score error')
 
 # plt.show()
-fig.savefig("./out/ranking.pdf")
+fig.savefig(pdf_file)
