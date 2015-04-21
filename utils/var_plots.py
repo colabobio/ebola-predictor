@@ -7,6 +7,7 @@ Rank all available models
 import argparse
 import os, csv
 import pandas as pd
+import matplotlib as mpl
 import matplotlib.pyplot as plt
 import seaborn as sns
 
@@ -146,17 +147,25 @@ ranges = (df["DIAG"] == 1) & (10 <= df["AGE"]) & (df["AGE"] <= 50) & ((df["OUT"]
 # sns.set(style="whitegrid")
 
 for var in numvar:
-    df[ranges].boxplot(var, by=depvar)
+    #df[ranges].boxplot(var, by=depvar)
+    g = sns.factorplot("OUT", var, data=df[ranges], kind="box", ci=0, palette="coolwarm")
+    g.despine(offset=10, trim=True)
+    g.set_xticklabels(['No', 'Yes'])
     plt.savefig("./out/" + var + ".pdf")
     plt.clf()
 
 for var in catvar:
-    sns.factorplot("OUT", var, data=df[ranges], ci=0);
+	with mpl.rc_context({"lines.linewidth": 0.5}):
+# 		g = sns.barplot(df[ranges][var], df[ranges]["OUT"], palette="coolwarm")
+		g = sns.FacetGrid(df[ranges], aspect=1)
+		g.map(sns.barplot, "OUT", var, palette="coolwarm");
+		g.set_xticklabels(['No', 'Yes'])
+		g.set(ylim=(0.0, 1.0))
 #     df[ranges].hist(var, by=depvar)
 #     df[ranges].plot(kind='area', var, by=depvar)
-
-    plt.savefig("./out/" + var + ".pdf")
-    plt.clf()
+# 
+    	plt.savefig("./out/" + var + ".pdf")
+    	plt.clf()
 
 
 # df[ranges & (df["OUT"] == 0)]["ALT_1"].plot(kind='box', color=color, sym='r+')
