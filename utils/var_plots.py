@@ -11,86 +11,31 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-'''
-src_file = "./data/sources.txt"
-range_file = "./data/ranges.txt"
-ignore_file = "./data/ignore.txt"
-
-def load_data(var_file):
-    input_file = ""
-    with open(src_file, "rb") as sfile:
-        for line in sfile.readlines():
-            input_file = os.path.abspath(line.strip())
-
-    model_variables = []
-    with open(var_file, "rb") as vfile:
-        for line in vfile.readlines():
-            line = line.strip()
-            if not line: continue
-            model_variables.append(line.split()[0])
-
-    dvar = model_variables[0]
-    ivar = model_variables[1:]
-
-    range_variables = [] 
-    with open(range_file, "rb") as rfile:
-        for line in rfile.readlines():
-            line = line.strip()
-            if not line: continue
-            parts = line.strip().split()
-            if 2 < len(parts):
-                range_variables.append({"name":parts[0], "type":parts[1], "range":parts[2].split(",")})
-
-    ignore_records = []
-    with open(ignore_file, "rb") as rfile:
-        for line in rfile.readlines():
-            line = line.strip()
-            if not line: continue
-            ignore_records.append(line)
-
-    idx_info = []
-    all_data = []
-    with open(input_file, "rb") as ifile:
-        reader = csv.reader(ifile)
-        titles = reader.next()
-        model_idx = [titles.index(var) for var in model_variables]
-        r0 = 0
-        r = 0
-        for row in reader:
-            if row[0] in ignore_records: continue
-
-            r0 += 1 # Starts at 1, because of titles
-            all_missing = True
-            some_missing = False
-            missing_dvar = row[model_idx[0]] == "\\N"
-            for i in range(1, len(model_variables)):
-                var_idx = model_idx[i]
-                if row[var_idx] == "\\N":
-                    some_missing = True
-                else:
-                    all_missing = False
-
-            inside_range = True
-            for var in range_variables:
-                idx = titles.index(var["name"])
-                val = row[idx]
-                if val == "\\N": continue
-                vtype = var["type"]
-                vrang = var["range"]
-                test = True
-                if vtype == "category":
-                    test = val in vrang
-                else:
-                    test = float(vrang[0]) <= float(val) and float(val) < float(vrang[1])
-                inside_range = inside_range and test
-
-            if not all_missing and not missing_dvar and inside_range:
-                idx_info.append([r0, row[0], row[model_idx[0]]])
-                all_data.append([row[idx].replace("\\N", "?") for idx in model_idx])
-                r += 1
-                
-    print all_data
-'''
+var_labels = { "OUT": "Outcome",
+               "PCR": "PCR",
+               "WEAK": "Weakness",
+               "VOMIT": "Vomit",
+               "AST_1": "AST",
+               "Ca_1": "Ca",
+               "AlkPhos_1": "ALK",
+               "EDEMA": "Edema",
+               "CONF": "Confussion",
+               "Cl_1": "Cl",
+               "TEMP": "Temperature",
+               "RRATE": "Respiratory rate",
+               "PBACK": "Back pain",
+               "DIZZI": "Dizziness",
+               "ALT_1": "ALT",
+               "Cr_1": "CRE",
+               "TCo2_1": "tCO2",
+               "PRETROS": "Retrosternal pain",
+               "DIARR": "Diarrhea",
+               "HRATE": "Hearth rate",
+               "Alb_1": "Alb",
+               "BUN_1": "BUN",
+               "TP_1": "TP",
+               "PDIAST": "Diastolic pressure",
+               "PABD": "Abdominal pain" }
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-v", "--var_file", nargs=1, default=["./data/variables-master.txt"],
@@ -150,7 +95,9 @@ for var in numvar:
     #df[ranges].boxplot(var, by=depvar)
     g = sns.factorplot("OUT", var, data=df[ranges], kind="box", ci=0, palette="coolwarm")
     g.despine(offset=10, trim=True)
-    g.set_xticklabels(['No', 'Yes'])
+    g.set_xticklabels(['Discharged', 'Died'])
+    plt.xlabel('Outcome')    
+    plt.ylabel(var_labels[var])
     plt.savefig("./out/" + var + ".pdf")
     plt.clf()
 
@@ -159,21 +106,12 @@ for var in catvar:
 # 		g = sns.barplot(df[ranges][var], df[ranges]["OUT"], palette="coolwarm")
 		g = sns.FacetGrid(df[ranges], aspect=1)
 		g.map(sns.barplot, "OUT", var, palette="coolwarm");
-		g.set_xticklabels(['No', 'Yes'])
+		g.set_xticklabels(['Discharged', 'Died'])
 		g.set(ylim=(0.0, 1.0))
+        plt.xlabel('Outcome')    
+        plt.ylabel(var_labels[var])		
 #     df[ranges].hist(var, by=depvar)
 #     df[ranges].plot(kind='area', var, by=depvar)
 # 
     	plt.savefig("./out/" + var + ".pdf")
     	plt.clf()
-
-
-# df[ranges & (df["OUT"] == 0)]["ALT_1"].plot(kind='box', color=color, sym='r+')
-# df[ranges & (df["OUT"] == 1)]["ALT_1"].plot(kind='box', color=color, sym='r+')
-
-# 
-
-# df[criterion]["ALT_1"].plot(kind='box', color=color, sym='r+')
-
-
-# sns.factorplot("ALT_1", df, kind="bar");
