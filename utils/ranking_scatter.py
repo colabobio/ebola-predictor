@@ -19,12 +19,14 @@ args = parser.parse_args()
 rank_file = args.ranking_file[0]
 pdf_file = args.pdf_file[0]
 
-'''
+excluded_predictors = ["scikit_lreg", "scikit_randf"]
+
+
 index_mode = "PRED"
+# index_names = ["lreg", "nnet", "scikit_lreg", "scikit_dtree", "scikit_randf", "scikit_svm"]
+# index_names = ["lreg"]
 index_names = ["lreg", "nnet", "scikit_dtree", "scikit_svm"]
 index_labels = {"lreg": "Logistic Regression", "nnet": "Neural Network", "scikit_dtree": "Decision Tree", "scikit_svm": "Support Vector Machine"}
-# predictors = ["lreg", "nnet", "scikit_lreg", "scikit_dtree", "scikit_randf", "scikit_svm"]
-# predictors = ["scikit_svm"]
 glyph_colors = {"lreg":[171,217,233],
                 "nnet":[44,123,182],
                 "scikit_lreg":[178,223,138],
@@ -33,8 +35,10 @@ glyph_colors = {"lreg":[171,217,233],
                 "scikit_svm":[215,25,28]}
 opacity = 160
 label_columns = 2
-'''
+fixed_size = False
 
+'''
+# Algorithm
 index_mode = "MODEL"
 index_names = ["amelia", "mice", "hmisc"]
 index_labels = {"amelia": "Amelia II", "mice": "MICE", "hmisc": "Hmisc"}
@@ -45,8 +49,10 @@ opacity = 160
 label_columns = 3
 fixed_size = True
 glyph_size = 30
+'''
 
 '''
+# Samples
 index_mode = "MODEL"
 index_names = ["df1", "df5", "df10"]
 index_labels = {"df1": "1 imputation", "df5": "5 imputations", "df10": "10 imputations"}
@@ -59,7 +65,9 @@ label_columns = 3
 fixed_size = True
 glyph_size = 30
 '''
+
 '''
+# Percentage
 index_mode = "MODEL"
 index_names = ["t80", "t65", "t50"]
 index_labels = {"t80": "20% complete", "t65": "35% complete", "t50": "50% complete"}
@@ -94,15 +102,16 @@ with open(rank_file, "r") as rfile:
         line = line.strip()
         parts = line.split(" ")
 
+        pred = parts[2]
         if index_mode == "PRED":
-            idx = parts[2]
+            idx = pred
         else:
             idx = ""
             mdl_str = parts[1]
             for idx in index_names:
                 if idx in mdl_str:
                     break
-        if not idx in index_names: continue
+        if not idx in index_names or pred in excluded_predictors: continue
 
         if idx in xdict:
             x = xdict[idx]
@@ -159,9 +168,9 @@ for k in index_names:
     y = ydict[k]
     s = sdict[k]
     c = [e/255.0 for e in glyph_colors[k]]
-    c.append(opacity/255.0) 
+    c.append(opacity/255.0)
     plots.append(plt.scatter(x, y, s=s, color=c, marker='o'))
-    labels.append(index_labels[k]);
+    labels.append(index_labels[k])
 
 print "Variables in predictors with more than 99% accuracy:", vars99
 print "Variables in predictors with more than 90% accuracy:", vars90
