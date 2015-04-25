@@ -8,7 +8,7 @@ import seaborn as sns
 parser = argparse.ArgumentParser()
 parser.add_argument('-B', '--base_dir', nargs=1, default=["./"],
                     help="Directory to look for models")
-parser.add_argument('-o', '--output_pdf', nargs=1, default=["./out/roc.pdf"],
+parser.add_argument('-o', '--output_pdf', nargs=1, default=["./out/aggregated-roc.pdf"],
                     help="pdf file to save ROC curve to")
 
 args = parser.parse_args()
@@ -55,6 +55,7 @@ for dir_name, subdir_list, file_list in os.walk(os.path.join(base_dir, "models")
                         y, p = [float(x) for x in line.split(",")]
                         ydata.append(y)
                         pdata.append(p)
+            if count == 4: break
 
 print "Generating ROC plot..."
 plots = []
