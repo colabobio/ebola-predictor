@@ -11,16 +11,48 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 parser = argparse.ArgumentParser()
-parser.add_argument("-rank", "--ranking_file", nargs=1, default=["ranking.txt"],
+parser.add_argument("-rank", "--ranking_file", nargs=1, default=["./out/ranking.txt"],
                     help="Ranking file")
-parser.add_argument("-pdf", "--pdf_file", nargs=1, default=["ranking.pdf"],
+parser.add_argument("-pdf", "--pdf_file", nargs=1, default=["./out/ranking.pdf"],
                     help="Ranking file")
+parser.add_argument("-pred", "--pred_file", nargs=1, default=["./out/predictors.tsv"],
+                    help="Predictors file")
+parser.add_argument("-count", "--count_file", nargs=1, default=["./out/varcounts.csv"],
+                    help="Predictors file")
+
 args = parser.parse_args()
 rank_file = args.ranking_file[0]
 pdf_file = args.pdf_file[0]
+pred_file = args.pred_file[0]
+count_file = args.count_file[0]
 
 excluded_predictors = ["scikit_lreg", "scikit_randf"]
 
+var_labels = { "OUT": "Outcome",
+               "PCR": "PCR",
+               "WEAK": "Weakness",
+               "VOMIT": "Vomit",
+               "AST_1": "AST",
+               "Ca_1": "Ca",
+               "AlkPhos_1": "ALK",
+               "EDEMA": "Edema",
+               "CONF": "Confussion",
+               "Cl_1": "Cl",
+               "TEMP": "Temperature",
+               "RRATE": "Respiratory rate",
+               "PBACK": "Back pain",
+               "DIZZI": "Dizziness",
+               "ALT_1": "ALT",
+               "Cr_1": "CRE",
+               "TCo2_1": "tCO2",
+               "PRETROS": "Retrosternal pain",
+               "DIARR": "Diarrhea",
+               "HRATE": "Heart rate",
+               "Alb_1": "Alb",
+               "BUN_1": "BUN",
+               "TP_1": "TP",
+               "PDIAST": "Diastolic pressure",
+               "PABD": "Abdominal pain" }
 
 index_mode = "PRED"
 # index_names = ["lreg", "nnet", "scikit_lreg", "scikit_dtree", "scikit_randf", "scikit_svm"]
@@ -88,12 +120,12 @@ plt.xlim([0.5,1.05])
 plt.ylim([-0.05,0.5])
 plt.axes().set_aspect('equal')
 
+top_models = []
 counts = {}
 xdict = {}
 ydict = {}
 sdict = {}
 vars90 = Set([])
-vars99 = Set([])
 inter90 = None
 vcounts = {}
 with open(rank_file, "r") as rfile:
@@ -129,13 +161,11 @@ with open(rank_file, "r") as rfile:
         vars = parts[3]
         f1_mean = float(parts[4])
         f1_std = float(parts[5])
-        if 0.9 < f1_mean: counts[idx] = counts[idx] + 1
 
-        r1 = random.random()
-        r2 = random.random()
-
-        x.append(f1_mean)
-        y.append(f1_std)
+        if 0.9 <= f1_mean: counts[idx] = counts[idx] + 1
+        if 0.05 <= f1_std:
+            x.append(f1_mean)
+            y.append(f1_std)
 
         vlist = vars.split(",")
 
@@ -147,23 +177,28 @@ with open(rank_file, "r") as rfile:
            z = 30 * l /10.0
            s.append(z)
 
-        if 0.9 <= f1_mean: 
-            for v in vlist: 
+        if 0.9 <= f1_mean and 0.05 <= f1_std:
+            top_line = index_labels[idx] + '\t' + ', '.join([var_labels[v] for v in vlist]) + '\t' + ("%.2f" % f1_mean) + '\t' + ("%.2f" % f1_std)
+            top_models.append(top_line)
+            for v in vlist:
                 vars90.add(v)
                 if not v in vcounts: vcounts[v] = 0
                 vcounts[v] = vcounts[v] + 1
             if not inter90: inter90 = Set(vlist)
-            else: 
-                print Set(vlist)
+            else:
                 inter90 = inter90.intersection(Set(vlist))
-        if 0.99 <= f1_mean: 
-            for v in vlist: vars99.add(v)
 
+print "Number of models with mean F1-score above 90%:"
+for k in index_names:
+    if not k in xdict: continue
+    print index_labels[k] + ": " + str(counts[k])
+
+print ""
+print "Saving scatter plot to " + pdf_file + "..."
 plots = []
 labels = []
 for k in index_names:
     if not k in xdict: continue
-    print k, counts[k]
     x = xdict[k]
     y = ydict[k]
     s = sdict[k]
@@ -171,13 +206,6 @@ for k in index_names:
     c.append(opacity/255.0)
     plots.append(plt.scatter(x, y, s=s, color=c, marker='o'))
     labels.append(index_labels[k])
-
-print "Variables in predictors with more than 99% accuracy:", vars99
-print "Variables in predictors with more than 90% accuracy:", vars90
-print "Variables in all predictors with more than 90% accuracy:", inter90
-print "Counts for variables in predictors with more than 90% accuracy:"
-sorted_counts = reversed(sorted(vcounts.items(), key=operator.itemgetter(1)))
-for v in sorted_counts: print v
 
 plt.legend(tuple(plots),
            tuple(labels),
@@ -187,6 +215,23 @@ plt.legend(tuple(plots),
 
 plt.xlabel('F1-score mean')
 plt.ylabel('F1-score error')
-
 # plt.show()
 fig.savefig(pdf_file)
+print "Done."
+
+print ""
+print "Saving list of predictors to " + pred_file + "..."
+with open(pred_file, "w") as pfile:
+    pfile.write("Predictor\tVariables\tF1 mean\tF1 error\n")
+    for line in top_models:
+        pfile.write(line + "\n")
+print "Done."
+
+print ""
+print "Saving variable counts to " + count_file + "..."
+sorted_counts = reversed(sorted(vcounts.items(), key=operator.itemgetter(1)))
+with open(count_file, "w") as pfile:
+    pfile.write("Variable,Count\n")
+    for v in sorted_counts: 
+        pfile.write(var_labels[v[0]] + "," + str(v[1]) + "\n")
+print "Done."
