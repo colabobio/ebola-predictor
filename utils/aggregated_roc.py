@@ -55,7 +55,6 @@ for dir_name, subdir_list, file_list in os.walk(os.path.join(base_dir, "models")
                         y, p = [float(x) for x in line.split(",")]
                         ydata.append(y)
                         pdata.append(p)
-            if count == 4: break
 
 print "Generating ROC plot..."
 plots = []
