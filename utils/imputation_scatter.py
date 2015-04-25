@@ -1,5 +1,6 @@
 """
-Creates scatter plot from ranking file
+Creates the F1 mean/error scatter plots for all combinations of imputation parameters
+(percentage of complete records used for training, number of imputed frames)
 
 @copyright: The Broad Institute of MIT and Harvard 2015
 """

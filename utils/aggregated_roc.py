@@ -1,3 +1,9 @@
+"""
+Creates ROC curve aggregating all models available inside the base directory
+
+@copyright: The Broad Institute of MIT and Harvard 2015
+"""
+
 import os, sys, random, glob, argparse
 import numpy as np
 import pandas as pd
