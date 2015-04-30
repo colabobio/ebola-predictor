@@ -3,7 +3,7 @@
 import os
 
 curr_dir = os.getcwd()
-app_dir = os.path.join(curr_dir, 'app/evdcare')
+app_dir = os.path.join(curr_dir, 'evdcare')
 icon_file = os.path.join(app_dir, 'icon.png')
 pfora_dir = os.path.abspath('../python-for-android/dist/default')
 os.chdir(pfora_dir)
