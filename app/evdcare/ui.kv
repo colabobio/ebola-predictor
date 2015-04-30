@@ -1,0 +1,46 @@
+<InputScreen>:
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            text: 'Enter patient symptoms'
+            size_hint: 1, 0.25
+        GridLayout:
+            id: input_values
+            orientation: 'vertical'
+            rows: 3
+            cols: 2
+            padding: 20 
+            spacing: 100
+            Label:
+                text: 'Virus load:'
+            TextInput:
+                id: qpcr
+            Label:
+                text: 'Temperature:'
+            TextInput:
+                id: temp
+            Label:
+                text: 'AST:'
+            TextInput:
+                id: ast
+        Button:
+            id: get_risk
+            text: 'Calculate Risk'
+            size_hint: 1, 0.25
+            on_press: app.calc_risk(qpcr.text, temp.text, ast.text)
+
+<ResultScreen>:
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            canvas.before:
+                Color:
+                    rgba: root.curr_risk_color
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+            text: root.curr_risk_label
+
+        Button:
+            text: 'New Patient'
+            on_press: root.manager.current = 'input'

@@ -1,0 +1,3 @@
+title=Ebola Predictor
+author=Sabeti Team
+orientation=sensor
