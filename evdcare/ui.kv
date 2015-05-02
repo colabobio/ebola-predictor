@@ -2,19 +2,39 @@
     BoxLayout:
         orientation: 'vertical'
         Label:
-            text: 'Enter patient symptoms'
+            canvas.before:
+                Color:
+                    rgba: [0.96, 0.97, 0.97, 1.0]
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+            text: 'Patient Profile'
+            color: [0, 0, 0, 1]
             size_hint: 1, 0.25
+
         GridLayout:
             id: input_values
             orientation: 'vertical'
             rows: 3
             cols: 2
-            padding: 20 
+            padding: 50 
             spacing: 100
+
+            canvas.before:
+                Color:
+                    rgba: [0.5, 0.5, 0.5, 1.0]
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+
             Label:
                 text: 'Virus load:'
             TextInput:
                 id: qpcr
+                text: "10.0"
+                multiline: False
+                input_type: 'number'
+                input_filter: 'float'
             Label:
                 text: 'Temperature:'
             TextInput:
@@ -23,6 +43,11 @@
                 text: 'AST:'
             TextInput:
                 id: ast
+#            Label:
+#                text: 'Weakness:'
+#            CheckBox:
+
+
         Button:
             id: get_risk
             text: 'Calculate Risk'

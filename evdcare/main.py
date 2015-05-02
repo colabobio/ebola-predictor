@@ -1,16 +1,19 @@
 import kivy
-kivy.require('1.0.9')
+kivy.require('1.9.0')
 
 from kivy.app import App
 from kivy.lang import Builder
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.properties import ListProperty, StringProperty
 
+from kivy.uix.textinput import TextInput
+
+import re
 from utils import gen_predictor
 import numpy as np
 
 # Load the kv file specifying the UI, otherwise needs to be named
-# patienttest.kv (see note in App class below) and will be loaded
+# EbolaPredictor.kv (see note in App class below) and will be loaded
 # automatically.
 Builder.load_file('ui.kv')
 
