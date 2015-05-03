@@ -35,14 +35,25 @@
                 multiline: False
                 input_type: 'number'
                 input_filter: 'float'
+                on_text: app.set_var_value("PCR", args[1])
             Label:
                 text: 'Temperature:'
             TextInput:
                 id: temp
+                text: "37.0"
+                multiline: False
+                input_type: 'number'
+                input_filter: 'float'
+                on_text: app.set_var_value("TEMP", args[1])
             Label:
                 text: 'AST:'
             TextInput:
                 id: ast
+                text: "100.0"
+                multiline: False
+                input_type: 'number'
+                input_filter: 'float'
+                on_text: app.set_var_value("AST_1", args[1])
 #            Label:
 #                text: 'Weakness:'
 #            CheckBox:
@@ -68,4 +79,4 @@
 
         Button:
             text: 'New Patient'
-            on_press: root.manager.current = 'input'
+            on_press: app.restart()

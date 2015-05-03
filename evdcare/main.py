@@ -6,9 +6,7 @@ from kivy.lang import Builder
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.properties import ListProperty, StringProperty
 
-from kivy.uix.textinput import TextInput
-
-import re
+import csv, re
 from utils import gen_predictor
 import numpy as np
 
@@ -16,6 +14,16 @@ import numpy as np
 # EbolaPredictor.kv (see note in App class below) and will be loaded
 # automatically.
 Builder.load_file('ui.kv')
+
+# Load variables
+with open("variables.csv", "r") as vfile:
+    reader = csv.reader(vfile)
+    for row in reader:
+        print row
+
+values = {}
+
+print "************************"
 
 # Declare both screens
 class InputScreen(Screen):
@@ -38,6 +46,14 @@ predictor = gen_predictor('params/nnet-params-0')
 class EbolaPredictorApp(App):
     def build(self):
         return sm
+
+    def set_var_value(self, name, value):
+        values[name] = value    
+        print name, value
+
+    def restart():
+        values = {}
+        sm.current = 'input'
 
     def calc_risk(self, qpcr_str, temp_str, ast_str):
         qpcr = None
