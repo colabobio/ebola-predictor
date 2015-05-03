@@ -31,7 +31,7 @@
                 text: 'Virus load:'
             TextInput:
                 id: qpcr
-                text: "10.0"
+                text: ""
                 multiline: False
                 input_type: 'number'
                 input_filter: 'float'
@@ -40,7 +40,7 @@
                 text: 'Temperature:'
             TextInput:
                 id: temp
-                text: "37.0"
+                text: ""
                 multiline: False
                 input_type: 'number'
                 input_filter: 'float'
@@ -49,7 +49,7 @@
                 text: 'AST:'
             TextInput:
                 id: ast
-                text: "100.0"
+                text: ""
                 multiline: False
                 input_type: 'number'
                 input_filter: 'float'
@@ -63,7 +63,7 @@
             id: get_risk
             text: 'Calculate Risk'
             size_hint: 1, 0.25
-            on_press: app.calc_risk(qpcr.text, temp.text, ast.text)
+            on_press: app.calc_risk()
 
 <ResultScreen>:
     BoxLayout:

@@ -16,10 +16,22 @@ import numpy as np
 Builder.load_file('ui.kv')
 
 # Load variables
+variables = []
+var_label = {}
+var_unit = {}
+var_kind = {}
 with open("variables.csv", "r") as vfile:
     reader = csv.reader(vfile)
+    reader.next()
     for row in reader:
-        print row
+        name = row[0]
+        label = row[1]
+        unit = row[2]
+        kind = row[3] 
+        variables.append(name)
+        var_label[name] = label
+        var_unit[name] = unit
+        var_kind[name] = kind
 
 values = {}
 
@@ -51,47 +63,41 @@ class EbolaPredictorApp(App):
         values[name] = value    
         print name, value
 
-    def restart():
+    def restart(self):
         values = {}
         sm.current = 'input'
 
-    def calc_risk(self, qpcr_str, temp_str, ast_str):
-        qpcr = None
-        temp = None
-        ast = None
+    def calc_risk(self):
+        model_vars = ["PCR", "TEMP", "AST_1"]
+        model_min = [0, 36, 0]
+        model_max = [10, 40, 2000]
+        N = len(model_vars)         
 
-        try:
-            qpcr = float(qpcr_str)
-        except ValueError:
-            pass
-        except TypeError:
-            pass
+        v = [None] * (N + 1)
+        v[0] = 1
+        for i in range(N):
+            var = model_vars[i]
+            if var in values:
+                try:
+                    v[i + 1] = float(values[var])
+                except ValueError:
+                    pass
+                except TypeError:
+                    pass
 
-        try:
-            temp = float(temp_str)
-        except ValueError:
-            pass
-        except TypeError:
-            pass
+        print values
+        print v
 
-        try:
-            ast = float(ast_str)
-        except ValueError:
-            pass
-        except TypeError:
-            pass
-
-        if qpcr == None or temp == None or ast == None:
+        if None in v:
             res_scr.curr_risk_color = [0.5, 0.5, 0.5, 1]
             res_scr.curr_risk_label = 'INSUFFICIENT DATA'            
             sm.current = 'result'
             return 
 
-        x1 = qpcr / 10
-        x2 = (temp - 32) / (40 - 32)
-        x3 = (ast - 0) / 2000
+        for i in range(N): 
+            v[i + 1] = (v[i + 1] - model_min[i]) / (model_max[i] - model_min[i])
 
-        X = np.array([[1, x1, x2, x3]])
+        X = np.array([v])
         probs = predictor(X)
 
         pred = probs[0]
