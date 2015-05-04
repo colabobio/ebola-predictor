@@ -70,6 +70,14 @@ class EbolaPredictorApp(App):
     def build(self):
         return sm
 
+    def on_pause(self):
+        # Here you can save data if needed
+        return True
+
+    def on_resume(self):
+        # Here you can check if any data needs replacing (usually nothing)
+        pass
+
     def set_var_value(self, name, value):
         values[name] = value    
         print name, value
@@ -121,10 +129,10 @@ class EbolaPredictorApp(App):
 
         pred = probs[0]
         if pred < 0.5:
-            res_scr.curr_risk_color = [0, 1, 0, 1]
+            res_scr.curr_risk_color = [121.0/255, 192.0/255, 119.0/255, 1]
             res_scr.curr_risk_label = 'LOW RISK'
         else:
-            res_scr.curr_risk_color = [1, 0, 0, 1]
+            res_scr.curr_risk_color = [153.0/255, 93.0/255, 77.0/255, 1]
             res_scr.curr_risk_label = 'HIGH RISK' 
         
         sm.transition = SlideTransition(direction='left')

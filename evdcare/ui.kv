@@ -197,6 +197,17 @@
         Label:
             canvas.before:
                 Color:
+                    rgba: [0.96, 0.97, 0.97, 1.0]
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+            text: 'Patient Prognosis'
+            color: [0, 0, 0, 1]
+            size_hint: 1, 0.25
+
+        Label:
+            canvas.before:
+                Color:
                     rgba: root.curr_risk_color
                 Rectangle:
                     pos: self.pos
@@ -204,5 +215,7 @@
             text: root.curr_risk_label
 
         Button:
+            orientation: 'horizontal'
+            size_hint: 1, 0.25
             text: 'New Patient'
             on_press: app.restart()
