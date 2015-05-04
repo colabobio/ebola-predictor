@@ -12,13 +12,14 @@
             color: [0, 0, 0, 1]
             size_hint: 1, 0.25
 
+
         GridLayout:
             id: input_values
-            orientation: 'vertical'
-            rows: 3
+#            orientation: 'vertical'
+#            rows: 4
             cols: 2
             padding: 50 
-            spacing: 100
+            spacing: 10
 
             canvas.before:
                 Color:
@@ -27,37 +28,41 @@
                     pos: self.pos
                     size: self.size
 
+
             Label:
-                text: 'Virus load:'
+                text: 'Weakness:'
+            ToggleButton:
+                id: Weakness
+                text: "No" if self.state == "normal" else "Yes" 
+                on_release: app.set_var_value("WEAK", 1 if self.text == "Yes" else 0)
+
+            Label:
+                text: "Virus load"
             TextInput:
-                id: qpcr
+                id: PCR
                 text: ""
                 multiline: False
                 input_type: 'number'
                 input_filter: 'float'
                 on_text: app.set_var_value("PCR", args[1])
             Label:
-                text: 'Temperature:'
+                text: "Temperature"
             TextInput:
-                id: temp
+                id: TEMP
                 text: ""
                 multiline: False
                 input_type: 'number'
                 input_filter: 'float'
                 on_text: app.set_var_value("TEMP", args[1])
             Label:
-                text: 'AST:'
+                text: "AST"
             TextInput:
-                id: ast
+                id: AST
                 text: ""
                 multiline: False
                 input_type: 'number'
                 input_filter: 'float'
                 on_text: app.set_var_value("AST_1", args[1])
-#            Label:
-#                text: 'Weakness:'
-#            CheckBox:
-
 
         Button:
             id: get_risk
