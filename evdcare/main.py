@@ -36,14 +36,23 @@ with open("variables.csv", "r") as vfile:
         var_kind[name] = kind
 values = {}
 
+class InputScreen(Screen):
+    def clear_widgets(self):
+        for widget in self.walk():
+            if type(widget) == kivy.uix.textinput.TextInput:
+                widget.text = ""
+            elif type(widget) == kivy.uix.togglebutton.ToggleButton:
+                widget.state = "normal"
+#             print("{} -> {}".format(widget, widget.id))
+
 # Declare both screens
-class InputScreen1(Screen):
+class InputScreen1(InputScreen):
     pass
 
-class InputScreen2(Screen):
+class InputScreen2(InputScreen):
     pass
 
-class InputScreen3(Screen):
+class InputScreen3(InputScreen):
     pass
 
 class ResultScreen(Screen):
@@ -84,6 +93,11 @@ class EbolaPredictorApp(App):
 
     def restart(self):
         values = {}
+        print "***********************"
+        in_scr[0].clear_widgets()
+        in_scr[1].clear_widgets()
+        in_scr[2].clear_widgets()
+        print "***********************"
         sm.current = 'input 1'
 
     def go_screen(self, scr):
