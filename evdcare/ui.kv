@@ -26,13 +26,7 @@
                     size: self.size
 
             Label:
-                text: 'Weakness:'
-            ToggleButton:
-                text: "No" if self.state == "normal" else "Yes" 
-                on_release: app.set_var_value("WEAK", 1 if self.text == "Yes" else 0)
-
-            Label:
-                text: "Virus load"
+                text: "Virus load [log units]"
             TextInput:
                 text: ""
                 multiline: False
@@ -40,7 +34,7 @@
                 input_filter: 'float'
                 on_text: app.set_var_value("PCR", args[1])
             Label:
-                text: "Temperature"
+                text: "Temperature [°C]"
             TextInput:
                 text: ""
                 multiline: False
@@ -48,13 +42,21 @@
                 input_filter: 'float'
                 on_text: app.set_var_value("TEMP", args[1])
             Label:
-                text: "AST"
+                text: "AST [U/L]"
             TextInput:
                 text: ""
                 multiline: False
                 input_type: 'number'
                 input_filter: 'float'
                 on_text: app.set_var_value("AST_1", args[1])
+            Label:
+                text: "ALK [U/L]"
+            TextInput:
+                text: ""
+                multiline: False
+                input_type: 'number'
+                input_filter: 'float'
+                on_text: app.set_var_value("AlkPhos_1", args[1])
 
         Button:
             text: 'Next'
@@ -90,37 +92,38 @@
                     pos: self.pos
                     size: self.size
 
-
             Label:
-                text: 'Weakness:'
-            ToggleButton:
-                text: "No" if self.state == "normal" else "Yes" 
-                on_release: app.set_var_value("WEAK", 1 if self.text == "Yes" else 0)
-
-            Label:
-                text: "Virus load"
+                text: "CRE [umol/L]"
             TextInput:
                 text: ""
                 multiline: False
                 input_type: 'number'
                 input_filter: 'float'
-                on_text: app.set_var_value("PCR", args[1])
+                on_text: app.set_var_value("Cr_1", args[1])
             Label:
-                text: "Temperature"
+                text: "tCO2 [mmol/L]"
             TextInput:
                 text: ""
                 multiline: False
                 input_type: 'number'
                 input_filter: 'float'
-                on_text: app.set_var_value("TEMP", args[1])
+                on_text: app.set_var_value("TCo2_1", args[1])
             Label:
-                text: "AST"
+                text: "BUN [mmol urea/L]"
             TextInput:
                 text: ""
                 multiline: False
                 input_type: 'number'
                 input_filter: 'float'
-                on_text: app.set_var_value("AST_1", args[1])
+                on_text: app.set_var_value("BUN_1", args[1])
+            Label:
+                text: "Heart rate"
+            TextInput:
+                text: ""
+                multiline: False
+                input_type: 'number'
+                input_filter: 'float'
+                on_text: app.set_var_value("HRATE", args[1])
 
         BoxLayout:
             orientation: 'horizontal'
@@ -160,37 +163,22 @@
                     pos: self.pos
                     size: self.size
 
-
             Label:
-                text: 'Weakness:'
+                text: "Diarrhea"
+            ToggleButton:
+                text: "No" if self.state == "normal" else "Yes" 
+                on_release: app.set_var_value("DIARR", 1 if self.text == "Yes" else 0)
+            Label:
+                text: "Weakness"
             ToggleButton:
                 text: "No" if self.state == "normal" else "Yes" 
                 on_release: app.set_var_value("WEAK", 1 if self.text == "Yes" else 0)
 
             Label:
-                text: "Virus load"
-            TextInput:
-                text: ""
-                multiline: False
-                input_type: 'number'
-                input_filter: 'float'
-                on_text: app.set_var_value("PCR", args[1])
-            Label:
-                text: "Temperature"
-            TextInput:
-                text: ""
-                multiline: False
-                input_type: 'number'
-                input_filter: 'float'
-                on_text: app.set_var_value("TEMP", args[1])
-            Label:
-                text: "AST"
-            TextInput:
-                text: ""
-                multiline: False
-                input_type: 'number'
-                input_filter: 'float'
-                on_text: app.set_var_value("AST_1", args[1])
+                text: "Vomit"
+            ToggleButton:
+                text: "No" if self.state == "normal" else "Yes" 
+                on_release: app.set_var_value("VOMIT", 1 if self.text == "Yes" else 0)
 
         BoxLayout:
             orientation: 'horizontal'
@@ -201,9 +189,6 @@
             Button:
                 text: 'Calculate Risk'
                 on_press: app.calc_risk()
-
-
-
 
 
 <ResultScreen>:
