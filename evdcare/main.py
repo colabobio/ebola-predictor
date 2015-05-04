@@ -5,8 +5,9 @@ from kivy.app import App
 from kivy.lang import Builder
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.properties import ListProperty, StringProperty
+from kivy.uix.screenmanager import SlideTransition
 
-import csv, re
+import re
 from utils import gen_predictor
 import numpy as np
 
@@ -21,9 +22,10 @@ var_label = {}
 var_unit = {}
 var_kind = {}
 with open("variables.csv", "r") as vfile:
-    reader = csv.reader(vfile)
-    reader.next()
-    for row in reader:
+    lines = vfile.readlines()
+    for line in lines[1:]:
+        line = line.strip()
+        row = line.split(",")
         name = row[0]
         label = row[1]
         unit = row[2]
@@ -32,13 +34,16 @@ with open("variables.csv", "r") as vfile:
         var_label[name] = label
         var_unit[name] = unit
         var_kind[name] = kind
-
 values = {}
 
-print "************************"
-
 # Declare both screens
-class InputScreen(Screen):
+class InputScreen1(Screen):
+    pass
+
+class InputScreen2(Screen):
+    pass
+
+class InputScreen3(Screen):
     pass
 
 class ResultScreen(Screen):
@@ -47,11 +52,17 @@ class ResultScreen(Screen):
     pass
 
 # Create the screen manager
-in_scr = InputScreen(name='input')
+in_scr = [None] * 3
+in_scr[0] = InputScreen1(name='input 1')
+in_scr[1] = InputScreen2(name='input 2')
+in_scr[2] = InputScreen3(name='input 3')
 res_scr = ResultScreen(name='result')
 sm = ScreenManager()
-sm.add_widget(in_scr)
+for iscr in in_scr: sm.add_widget(iscr)
 sm.add_widget(res_scr)
+#curr_scr = 1
+#print curr_scr
+#print "************************"
 
 predictor = gen_predictor('params/nnet-params-0')
 
@@ -65,7 +76,15 @@ class EbolaPredictorApp(App):
 
     def restart(self):
         values = {}
-        sm.current = 'input'
+        sm.current = 'input 1'
+
+    def go_screen(self, scr):
+        curr_scr = int(sm.current.split()[1])
+        if curr_scr < scr:
+            sm.transition = SlideTransition(direction='left')
+        else:
+            sm.transition = SlideTransition(direction='right')
+        sm.current = 'input ' + str(scr)
 
     def calc_risk(self):
         model_vars = ["PCR", "TEMP", "AST_1"]
@@ -107,6 +126,8 @@ class EbolaPredictorApp(App):
         else:
             res_scr.curr_risk_color = [1, 0, 0, 1]
             res_scr.curr_risk_label = 'HIGH RISK' 
+        
+        sm.transition = SlideTransition(direction='left')
         sm.current = 'result'
  
 if __name__ == '__main__':

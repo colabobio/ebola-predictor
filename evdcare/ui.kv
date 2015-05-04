@@ -1,4 +1,68 @@
-<InputScreen>:
+<InputScreen1>:
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            canvas.before:
+                Color:
+                    rgba: [0.96, 0.97, 0.97, 1.0]
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+            text: 'Patient Profile'
+            color: [0, 0, 0, 1]
+            size_hint: 1, 0.25
+
+        GridLayout:
+            rows: 4
+            cols: 2
+            padding: 50 
+            spacing: 20
+
+            canvas.before:
+                Color:
+                    rgba: [0.5, 0.5, 0.5, 1.0]
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+
+            Label:
+                text: 'Weakness:'
+            ToggleButton:
+                text: "No" if self.state == "normal" else "Yes" 
+                on_release: app.set_var_value("WEAK", 1 if self.text == "Yes" else 0)
+
+            Label:
+                text: "Virus load"
+            TextInput:
+                text: ""
+                multiline: False
+                input_type: 'number'
+                input_filter: 'float'
+                on_text: app.set_var_value("PCR", args[1])
+            Label:
+                text: "Temperature"
+            TextInput:
+                text: ""
+                multiline: False
+                input_type: 'number'
+                input_filter: 'float'
+                on_text: app.set_var_value("TEMP", args[1])
+            Label:
+                text: "AST"
+            TextInput:
+                text: ""
+                multiline: False
+                input_type: 'number'
+                input_filter: 'float'
+                on_text: app.set_var_value("AST_1", args[1])
+
+        Button:
+            text: 'Next'
+            size_hint: 1, 0.25
+            on_press: app.go_screen(2)
+
+
+<InputScreen2>:
     BoxLayout:
         orientation: 'vertical'
         Label:
@@ -14,12 +78,10 @@
 
 
         GridLayout:
-            id: input_values
-#            orientation: 'vertical'
-#            rows: 4
+            rows: 4
             cols: 2
             padding: 50 
-            spacing: 10
+            spacing: 20
 
             canvas.before:
                 Color:
@@ -32,14 +94,12 @@
             Label:
                 text: 'Weakness:'
             ToggleButton:
-                id: Weakness
                 text: "No" if self.state == "normal" else "Yes" 
                 on_release: app.set_var_value("WEAK", 1 if self.text == "Yes" else 0)
 
             Label:
                 text: "Virus load"
             TextInput:
-                id: PCR
                 text: ""
                 multiline: False
                 input_type: 'number'
@@ -48,7 +108,6 @@
             Label:
                 text: "Temperature"
             TextInput:
-                id: TEMP
                 text: ""
                 multiline: False
                 input_type: 'number'
@@ -57,18 +116,95 @@
             Label:
                 text: "AST"
             TextInput:
-                id: AST
                 text: ""
                 multiline: False
                 input_type: 'number'
                 input_filter: 'float'
                 on_text: app.set_var_value("AST_1", args[1])
 
-        Button:
-            id: get_risk
-            text: 'Calculate Risk'
+        BoxLayout:
+            orientation: 'horizontal'
             size_hint: 1, 0.25
-            on_press: app.calc_risk()
+            Button:
+                text: 'Previous'
+                on_press: app.go_screen(1)
+            Button:
+                text: 'Next'
+                on_press: app.go_screen(3)
+
+
+<InputScreen3>:
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            canvas.before:
+                Color:
+                    rgba: [0.96, 0.97, 0.97, 1.0]
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+            text: 'Patient Profile'
+            color: [0, 0, 0, 1]
+            size_hint: 1, 0.25
+
+
+        GridLayout:
+            cols: 2
+            padding: 50 
+            spacing: 20
+
+            canvas.before:
+                Color:
+                    rgba: [0.5, 0.5, 0.5, 1.0]
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+
+
+            Label:
+                text: 'Weakness:'
+            ToggleButton:
+                text: "No" if self.state == "normal" else "Yes" 
+                on_release: app.set_var_value("WEAK", 1 if self.text == "Yes" else 0)
+
+            Label:
+                text: "Virus load"
+            TextInput:
+                text: ""
+                multiline: False
+                input_type: 'number'
+                input_filter: 'float'
+                on_text: app.set_var_value("PCR", args[1])
+            Label:
+                text: "Temperature"
+            TextInput:
+                text: ""
+                multiline: False
+                input_type: 'number'
+                input_filter: 'float'
+                on_text: app.set_var_value("TEMP", args[1])
+            Label:
+                text: "AST"
+            TextInput:
+                text: ""
+                multiline: False
+                input_type: 'number'
+                input_filter: 'float'
+                on_text: app.set_var_value("AST_1", args[1])
+
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint: 1, 0.25
+            Button:
+                text: 'Previous'
+                on_press: app.go_screen(2)
+            Button:
+                text: 'Calculate Risk'
+                on_press: app.calc_risk()
+
+
+
+
 
 <ResultScreen>:
     BoxLayout:
