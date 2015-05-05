@@ -4,7 +4,7 @@ kivy.require('1.9.0')
 from kivy.app import App
 from kivy.lang import Builder
 from kivy.uix.screenmanager import ScreenManager, Screen
-from kivy.properties import ListProperty, StringProperty
+from kivy.properties import ListProperty, StringProperty, NumericProperty
 from kivy.uix.screenmanager import SlideTransition
 
 import re
@@ -58,6 +58,7 @@ class InputScreen3(InputScreen):
 class ResultScreen(Screen):
     curr_risk_color = ListProperty([0, 0, 0, 1])
     curr_risk_label = StringProperty('NONE')
+    curr_risk_level = NumericProperty(0)
     pass
 
 # Create the screen manager
@@ -69,9 +70,6 @@ res_scr = ResultScreen(name='result')
 sm = ScreenManager()
 for iscr in in_scr: sm.add_widget(iscr)
 sm.add_widget(res_scr)
-#curr_scr = 1
-#print curr_scr
-#print "************************"
 
 predictor = gen_predictor('params/nnet-params-0')
 
@@ -132,6 +130,7 @@ class EbolaPredictorApp(App):
         if None in v:
             res_scr.curr_risk_color = [0.5, 0.5, 0.5, 1]
             res_scr.curr_risk_label = 'INSUFFICIENT DATA'            
+            res_scr.curr_risk_level = 0
             sm.current = 'result'
             return 
 
@@ -142,13 +141,15 @@ class EbolaPredictorApp(App):
         probs = predictor(X)
 
         pred = probs[0]
+        print "------------->",pred,type(pred)
+        res_scr.curr_risk_level = float(pred)
         if pred < 0.5:
             res_scr.curr_risk_color = [121.0/255, 192.0/255, 119.0/255, 1]
             res_scr.curr_risk_label = 'LOW RISK'
         else:
+            level = float((pred - 0.5) / 0.5)
             res_scr.curr_risk_color = [153.0/255, 93.0/255, 77.0/255, 1]
             res_scr.curr_risk_label = 'HIGH RISK' 
-        
         sm.transition = SlideTransition(direction='left')
         sm.current = 'result'
  

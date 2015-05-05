@@ -205,14 +205,27 @@
             color: [0, 0, 0, 1]
             size_hint: 1, 0.25
 
-        Label:
+        BoxLayout:
+            orientation: 'horizontal'
             canvas.before:
                 Color:
-                    rgba: root.curr_risk_color
+                    rgba: [0.5, 0.5, 0.5, 1.0]
                 Rectangle:
                     pos: self.pos
                     size: self.size
-            text: root.curr_risk_label
+            Widget:
+                canvas.before:
+                    Color:
+                        rgba: root.curr_risk_color
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size[0], self.size[1] * root.curr_risk_level
+            BoxLayout:
+                orientation: 'vertical'
+                Label:
+                    text: str(root.curr_risk_label)
+                Label:
+                    text: "Risk level: " + "%.2f" % (root.curr_risk_level * 100) + "%"
 
         Button:
             orientation: 'horizontal'
