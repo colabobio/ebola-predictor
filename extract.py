@@ -41,6 +41,9 @@ for fn in ranking_files:
                          os.mkdir(dir)
                      shutil.copy(var_file, os.path.join(dir, "variables.txt"))
                      
+                     with open(os.path.join(dir, "ranking.txt"), "w") as rfile:
+                         rfile.write(str(f1_mean) + " " + str(f1_std) + "\n")
+
                      shutil.copy(par_file, os.path.join(dir, "nnet-params"))
                      df = pd.read_csv(train_file, delimiter=",", na_values="?")
                      M = df.shape[0]
