@@ -11,11 +11,14 @@ from sklearn.metrics import roc_curve, auc
 import seaborn as sns
 
 parser = argparse.ArgumentParser()
-parser.add_argument("-rank", "--ranking_file", nargs=1, default=["ranking.txt"],
+parser.add_argument("-B", "--base_dir", nargs=1, default=["./"],
+                    help="Base folder")
+parser.add_argument("-rank", "--ranking_file", nargs=1, default=["./out/ranking.txt"],
                     help="Ranking file")
-parser.add_argument("-pdf", "--pdf_file", nargs=1, default=["ranking.pdf"],
+parser.add_argument("-pdf", "--pdf_file", nargs=1, default=["./out/roc-over90.pdf"],
                     help="Ranking file")
 args = parser.parse_args()
+base_dir = args.base_dir[0]
 rank_file = args.ranking_file[0]
 pdf_file = args.pdf_file[0]
 
@@ -32,7 +35,7 @@ glyph_colors = {"lreg":[171,217,233],
                 "scikit_dtree":[253,174,97],
                 "scikit_randf":[251,154,153],
                 "scikit_svm":[215,25,28]}
-opacity = 255
+opacity = 160
 label_columns = 2
 fixed_size = False
 
@@ -91,7 +94,7 @@ with open(rank_file, "r") as rfile:
         parts = line.split(" ")
 
         pred = parts[2]
-        mdl_str = parts[1]        
+        mdl_str = parts[1]
         if index_mode == "PRED":
             idx = pred
         else:
@@ -104,13 +107,13 @@ with open(rank_file, "r") as rfile:
         f1_mean = float(parts[4])
         f1_std = float(parts[5])
 
-        if 0.9 <= f1_mean: 
+        if 0.9 <= f1_mean and 0.05 <= f1_std:
             id = os.path.split(mdl_str)[1]
             print id
-            os.system("python eval.py -N " + id + " -p " + pred + " -m roc > ./out/roc.tmp")
+            os.system("python eval.py -B " + base_dir + " -N " + id + " -p " + pred + " -m roc > ./out/roc.tmp")
             df = pd.read_csv("./out/roc.csv", delimiter=",")
             y = df["Y"]
-            p = df["P"]            
+            p = df["P"]
 
             c = [e/255.0 for e in glyph_colors[pred]]
             c.append(opacity/255.0)
@@ -129,16 +132,3 @@ plt.legend(loc='lower right', ncol=2)
 
 # plt.show()
 fig.savefig(pdf_file)
-
-
-# plt.legend(tuple(plots),
-#            tuple(labels),
-#            loc='best',
-#            ncol=label_columns,
-#            prop={'size':9})
-# 
-# plt.xlabel('F1-score mean')
-# plt.ylabel('F1-score error')
-# 
-# # plt.show()
-# fig.savefig(pdf_file)

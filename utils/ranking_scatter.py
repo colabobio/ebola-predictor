@@ -59,6 +59,7 @@ index_mode = "PRED"
 # index_names = ["lreg"]
 index_names = ["lreg", "nnet", "scikit_dtree", "scikit_svm"]
 index_labels = {"lreg": "Logistic Regression", "nnet": "Neural Network", "scikit_dtree": "Decision Tree", "scikit_svm": "Support Vector Machine"}
+index_acron = {"lreg": "LR", "nnet": "ANN", "scikit_dtree": "DT", "scikit_svm": "SVM"}
 glyph_colors = {"lreg":[171,217,233],
                 "nnet":[44,123,182],
                 "scikit_lreg":[178,223,138],
@@ -74,6 +75,7 @@ fixed_size = False
 index_mode = "MODEL"
 index_names = ["amelia", "mice", "hmisc"]
 index_labels = {"amelia": "Amelia II", "mice": "MICE", "hmisc": "Hmisc"}
+index_acron = index_labels
 glyph_colors = {"amelia":[252,141,98],
                 "mice":[102,194,165],
                 "hmisc":[141,160,203]}
@@ -88,6 +90,7 @@ glyph_size = 30
 index_mode = "MODEL"
 index_names = ["df1", "df5", "df10"]
 index_labels = {"df1": "1 imputation", "df5": "5 imputations", "df10": "10 imputations"}
+index_acron = {"df1": "#1", "df5": "#5", "df10": "#10"}
 glyph_colors = {"df1":[253,192,134],
                 "df5":[190,174,212],
                 "df10":[127,201,127]}
@@ -103,6 +106,7 @@ glyph_size = 30
 index_mode = "MODEL"
 index_names = ["t80", "t65", "t50"]
 index_labels = {"t80": "20% complete", "t65": "35% complete", "t50": "50% complete"}
+index_acron = {"t80": "20%", "t65": "35%", "t50": "50%"}
 glyph_colors = {"t80":[166,206,227],
                 "t65":[31,120,180],
                 "t50":[178,223,138]}
@@ -162,8 +166,8 @@ with open(rank_file, "r") as rfile:
         f1_mean = float(parts[4])
         f1_std = float(parts[5])
 
-        if 0.9 <= f1_mean: counts[idx] = counts[idx] + 1
         if 0.05 <= f1_std:
+            if 0.9 <= f1_mean: counts[idx] = counts[idx] + 1
             x.append(f1_mean)
             y.append(f1_std)
 
@@ -178,7 +182,7 @@ with open(rank_file, "r") as rfile:
            s.append(z)
 
         if 0.9 <= f1_mean and 0.05 <= f1_std:
-            top_line = index_labels[idx] + '\t' + ', '.join([var_labels[v] for v in vlist]) + '\t' + ("%.2f" % f1_mean) + '\t' + ("%.2f" % f1_std)
+            top_line = index_acron[idx] + '\t' + ', '.join([var_labels[v] for v in vlist]) + '\t' + ("%.2f" % f1_mean) + '\t' + ("%.2f" % f1_std)
             top_models.append(top_line)
             for v in vlist:
                 vars90.add(v)
