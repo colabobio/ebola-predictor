@@ -7,9 +7,12 @@ from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.properties import ListProperty, StringProperty, NumericProperty
 from kivy.uix.screenmanager import SlideTransition
 
+import os
 import re
-from utils import gen_predictor
+import glob
+import operator
 import numpy as np
+from utils import gen_predictor
 
 # Load the kv file specifying the UI, otherwise needs to be named
 # EbolaPredictor.kv (see note in App class below) and will be loaded
@@ -71,7 +74,29 @@ sm = ScreenManager()
 for iscr in in_scr: sm.add_widget(iscr)
 sm.add_widget(res_scr)
 
-predictor = gen_predictor('params/nnet-params-0')
+ranking = {}
+dirs = glob.glob("models/*")
+for d in dirs:
+    with open(os.path.join(d, "ranking.txt")) as rfile:
+        line = rfile.readlines()[0].strip()
+        f1score = float(line.split()[0])
+        ranking[d] = f1score 
+
+sorted_ranking = reversed(sorted(ranking.items(), key=operator.itemgetter(1)))
+models_info = []
+for pair in sorted_ranking:
+#    print , pair[1]
+    d = pair[0]
+    v = []
+    with open(os.path.join(d, "variables.txt")) as vfile:
+        lines = vfile.readlines()
+        for line in lines[1:]:
+            line = line.strip()
+            parts = line.split()
+            v.append(parts[0])
+    info = [d, v] 
+    print info
+    models_info.append(info)
 
 class EbolaPredictorApp(App):
     def build(self):
@@ -107,10 +132,47 @@ class EbolaPredictorApp(App):
         sm.current = 'input ' + str(scr)
 
     def calc_risk(self):
-        model_vars = ["PCR", "TEMP", "AST_1"]
-        model_min = [0, 36, 0]
-        model_max = [10, 40, 2000]
-        N = len(model_vars)         
+        # Find highest ranking model that contained in the provided variables
+        model_dir = None
+        model_vars = None
+        vv = set([])
+        for k in values:
+            if values[k]: vv.add(k)
+        print vv 
+        for info in models_info: 
+            v = set(info[1])
+            res = v.issubset(vv)
+            #print res, info[1]
+            if res:
+                model_dir = info[0]
+                model_vars = info[1]    
+        
+        if not model_dir or not models_info:
+            res_scr.curr_risk_color = [0.5, 0.5, 0.5, 1]
+            res_scr.curr_risk_label = 'INSUFFICIENT DATA'            
+            res_scr.curr_risk_level = 0
+            sm.current = 'result'
+            return
+
+        print "FOUND MODEL !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"     
+        print model_dir
+        print model_vars
+            
+        predictor = gen_predictor(os.path.join(model_dir, 'nnet-params'))
+        N = len(model_vars)
+        
+        model_min = []
+        model_max = []
+        with open(os.path.join(model_dir, 'bounds.txt')) as bfile:
+            lines = bfile.readlines()
+            for line in lines:
+                line = line.strip()
+                parts = line.split()
+                model_min.append(float(parts[1]))  
+                model_max.append(float(parts[2]))
+
+        print model_min
+        print model_max 
 
         v = [None] * (N + 1)
         v[0] = 1
@@ -124,22 +186,24 @@ class EbolaPredictorApp(App):
                 except TypeError:
                     pass
 
-        print values
-        print v
-
         if None in v:
             res_scr.curr_risk_color = [0.5, 0.5, 0.5, 1]
             res_scr.curr_risk_label = 'INSUFFICIENT DATA'            
             res_scr.curr_risk_level = 0
             sm.current = 'result'
-            return 
+            return
 
-        for i in range(N): 
-            v[i + 1] = (v[i + 1] - model_min[i]) / (model_max[i] - model_min[i])
+        for i in range(N):
+            f = (v[i + 1] - model_min[i]) / (model_max[i] - model_min[i]) 
+            if f < 0: v[i + 1] = 0
+            elif 1 < f: v[i + 1] = 1
+            else: v[i + 1] = f
+
+        print values
+        print v
 
         X = np.array([v])
         probs = predictor(X)
-
         pred = probs[0]
         print "------------->",pred,type(pred)
         res_scr.curr_risk_level = float(pred)
