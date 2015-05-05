@@ -1,0 +1,12 @@
+Name,Label,Unit,Kind 
+PCR,Virus load,Log units,float
+TEMP,Temperature,[°C],float
+AST_1,AST,[U/L],float
+AlkPhos_1,ALK,[U/L],float
+Cr_1,CRE,[umol/L],float
+TCo2_1,tCO2,[mmol/L],float
+BUN_1,BUN,[mmol urea/L],float
+HRATE,Heart rate,,float
+DIARR,Diarrhea,,category
+WEAK,Weakness,,category
+VOMIT,Vomit,,category
