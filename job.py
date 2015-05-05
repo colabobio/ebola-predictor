@@ -1,3 +1,9 @@
+"""
+Executes a single job.
+
+@copyright: The Broad Institute of MIT and Harvard 2015
+"""
+
 #!/usr/bin/env python
 
 import sys, os, threading, argparse
