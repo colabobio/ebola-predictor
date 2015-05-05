@@ -1,0 +1,5 @@
+OUT category
+PCR float
+AlkPhos_1 float
+HRATE float
+DIARR category

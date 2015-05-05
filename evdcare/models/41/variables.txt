@@ -1,0 +1,6 @@
+OUT category
+PCR float
+TEMP float
+Cr_1 float
+DIARR category
+WEAK category

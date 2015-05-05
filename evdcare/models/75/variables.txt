@@ -1,0 +1,5 @@
+OUT category
+TEMP float
+AlkPhos_1 float
+TCo2_1 float
+DIARR category

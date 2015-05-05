@@ -1,0 +1,5 @@
+OUT category
+PCR float
+TEMP float
+AST_1 float
+Cr_1 float

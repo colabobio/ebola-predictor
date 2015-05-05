@@ -1,0 +1,4 @@
+OUT category
+TEMP float
+AST_1 float
+DIARR category

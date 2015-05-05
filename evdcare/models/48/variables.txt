@@ -1,0 +1,4 @@
+OUT category
+PCR float
+AST_1 float
+DIARR category

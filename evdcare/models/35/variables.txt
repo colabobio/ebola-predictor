@@ -1,0 +1,6 @@
+OUT category
+PCR float
+TEMP float
+AlkPhos_1 float
+HRATE float
+VOMIT category

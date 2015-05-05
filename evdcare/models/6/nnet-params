@@ -1,0 +1,29 @@
+Number of independent variables : 4
+Number of hidden layers         : 1
+Number of units per hidden layer: 4
+Number of output classes        : 1
+layer 0, node 0, input 0: -0.355543439705
+layer 0, node 0, input 1: 0.84121281713
+layer 0, node 0, input 2: 0.840569823608
+layer 0, node 0, input 3: -0.545952298126
+layer 0, node 0, input 4: 0.64831666706
+layer 0, node 1, input 0: 0.732393699101
+layer 0, node 1, input 1: -1.33051130859
+layer 0, node 1, input 2: -1.45082488266
+layer 0, node 1, input 3: 0.880179345358
+layer 0, node 1, input 4: -1.0821538597
+layer 0, node 2, input 0: -0.355461325221
+layer 0, node 2, input 1: 0.840694827394
+layer 0, node 2, input 2: 0.840575074383
+layer 0, node 2, input 3: -0.546030171408
+layer 0, node 2, input 4: 0.649547166976
+layer 0, node 3, input 0: -0.355275352018
+layer 0, node 3, input 1: 0.84129546521
+layer 0, node 3, input 2: 0.841085397863
+layer 0, node 3, input 3: -0.545992054354
+layer 0, node 3, input 4: 0.649403794222
+layer 1, node 0, input 0: -0.43351996719
+layer 1, node 0, input 1: 1.46434045434
+layer 1, node 0, input 2: -2.86934135794
+layer 1, node 0, input 3: 1.46507716769
+layer 1, node 0, input 4: 1.46598357372
