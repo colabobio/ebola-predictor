@@ -168,18 +168,21 @@
             BoxLayout:
                 orientation: 'horizontal'
                 CheckBox:
+                    name: "diarrhea_na"
                     group: "diarrhea"
                     active: True
                     on_release: app.set_var_value("DIARR", "")
                 Label:
                     text: "NA"
                 CheckBox:
+                    name: "diarrhea_yes"
                     group: "diarrhea"
                     active: False
                     on_release: app.set_var_value("DIARR", "1")
                 Label:
                     text: "Yes"
                 CheckBox:
+                    name: "diarrhea_no"
                     group: "diarrhea"
                     active: False
                     on_release: app.set_var_value("DIARR", "0")
@@ -191,18 +194,21 @@
             BoxLayout:
                 orientation: 'horizontal'
                 CheckBox:
+                    name: "weakness_na"
                     group: "weakness"
                     active: True
                     on_release: app.set_var_value("WEAK", "")
                 Label:
                     text: "NA"
                 CheckBox:
+                    name: "weakness_yes"
                     group: "weakness"
                     active: False
                     on_release: app.set_var_value("WEAK", "1")
                 Label:
                     text: "Yes"
                 CheckBox:
+                    name: "weakness_no"
                     group: "weakness"
                     active: False
                     on_release: app.set_var_value("WEAK", "0")
@@ -214,18 +220,21 @@
             BoxLayout:
                 orientation: 'horizontal'
                 CheckBox:
+                    name: "vomit_na"
                     group: "vomit"
                     active: True
                     on_release: app.set_var_value("VOMIT", "")
                 Label:
                     text: "NA"
                 CheckBox:
+                    name: "vomit_yes"
                     group: "vomit"
                     active: False
                     on_release: app.set_var_value("VOMIT", "1")
                 Label:
                     text: "Yes"
                 CheckBox:
+                    name: "vomit_no"
                     group: "vomit"
                     active: False
                     on_release: app.set_var_value("VOMIT", "0")

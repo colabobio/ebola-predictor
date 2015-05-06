@@ -5,6 +5,7 @@ from kivy.app import App
 from kivy.lang import Builder
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.properties import ListProperty, StringProperty, NumericProperty
+from kivy.uix.checkbox import CheckBox
 from kivy.uix.screenmanager import SlideTransition
 
 import os
@@ -44,8 +45,11 @@ class InputScreen(Screen):
         for widget in self.walk():
             if type(widget) == kivy.uix.textinput.TextInput:
                 widget.text = ""
-            elif type(widget) == kivy.uix.togglebutton.ToggleButton:
-                widget.state = "normal"
+            elif type(widget) == kivy.uix.checkbox.CheckBox:
+                if "_na" in widget.name:
+                    widget.active = True
+                else:
+                    widget.active = False
 #             print("{} -> {}".format(widget, widget.id))
 
 # Declare both screens
