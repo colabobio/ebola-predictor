@@ -165,20 +165,72 @@
 
             Label:
                 text: "Diarrhea"
-            ToggleButton:
-                text: "No" if self.state == "normal" else "Yes" 
-                on_release: app.set_var_value("DIARR", 1 if self.text == "Yes" else 0)
+            BoxLayout:
+                orientation: 'horizontal'
+                CheckBox:
+                    group: "diarrhea"
+                    active: True
+                    on_release: app.set_var_value("DIARR", "")
+                Label:
+                    text: "NA"
+                CheckBox:
+                    group: "diarrhea"
+                    active: False
+                    on_release: app.set_var_value("DIARR", "1")
+                Label:
+                    text: "Yes"
+                CheckBox:
+                    group: "diarrhea"
+                    active: False
+                    on_release: app.set_var_value("DIARR", "0")
+                Label:
+                    text: "No"
+
             Label:
                 text: "Weakness"
-            ToggleButton:
-                text: "No" if self.state == "normal" else "Yes" 
-                on_release: app.set_var_value("WEAK", 1 if self.text == "Yes" else 0)
+            BoxLayout:
+                orientation: 'horizontal'
+                CheckBox:
+                    group: "weakness"
+                    active: True
+                    on_release: app.set_var_value("WEAK", "")
+                Label:
+                    text: "NA"
+                CheckBox:
+                    group: "weakness"
+                    active: False
+                    on_release: app.set_var_value("WEAK", "1")
+                Label:
+                    text: "Yes"
+                CheckBox:
+                    group: "weakness"
+                    active: False
+                    on_release: app.set_var_value("WEAK", "0")
+                Label:
+                    text: "No"
 
             Label:
                 text: "Vomit"
-            ToggleButton:
-                text: "No" if self.state == "normal" else "Yes" 
-                on_release: app.set_var_value("VOMIT", 1 if self.text == "Yes" else 0)
+            BoxLayout:
+                orientation: 'horizontal'
+                CheckBox:
+                    group: "vomit"
+                    active: True
+                    on_release: app.set_var_value("VOMIT", "")
+                Label:
+                    text: "NA"
+                CheckBox:
+                    group: "vomit"
+                    active: False
+                    on_release: app.set_var_value("VOMIT", "1")
+                Label:
+                    text: "Yes"
+                CheckBox:
+                    group: "vomit"
+                    active: False
+                    on_release: app.set_var_value("VOMIT", "0")
+                Label:
+                    text: "No"
 
         BoxLayout:
             orientation: 'horizontal'
