@@ -163,10 +163,11 @@ class EbolaPredictorApp(App):
         for info in models_info: 
             v = set(info[1])
             res = v.issubset(vv)
-            #print res, info[1]
+            print res, info[1]
             if res:
                 model_dir = info[0]
-                model_vars = info[1]    
+                model_vars = info[1]
+                break    
         
         if not model_dir or not models_info:
             res_scr.curr_risk_color = [0.5, 0.5, 0.5, 1]
