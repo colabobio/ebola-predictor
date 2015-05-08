@@ -6,7 +6,10 @@ from kivy.lang import Builder
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.properties import ListProperty, StringProperty, NumericProperty
 from kivy.uix.checkbox import CheckBox
-from kivy.uix.screenmanager import SlideTransition
+from kivy.uix.screenmanager import SlideTransition, RiseInTransition, FallOutTransition
+
+from kivy.uix.image import Image
+from kivy.uix.behaviors import ButtonBehavior
 
 import os
 import re
@@ -14,6 +17,17 @@ import glob
 import operator
 import numpy as np
 from utils import gen_predictor
+
+#Fonts
+from kivy.core.text import LabelBase
+KIVY_FONTS = [
+    {
+        "name": "LatoRegular",
+        "fn_regular": "./fonts/LatoRegular.ttf",
+    }
+]
+for font in KIVY_FONTS:
+    LabelBase.register(**font)
 
 # Load the kv file specifying the UI, otherwise needs to be named
 # EbolaPredictor.kv (see note in App class below) and will be loaded
@@ -50,7 +64,6 @@ class InputScreen(Screen):
                     widget.active = True
                 else:
                     widget.active = False
-#             print("{} -> {}".format(widget, widget.id))
 
 # Declare both screens
 class InputScreen1(InputScreen):
@@ -66,6 +79,9 @@ class ResultScreen(Screen):
     curr_risk_color = ListProperty([0, 0, 0, 1])
     curr_risk_label = StringProperty('NONE')
     curr_risk_level = NumericProperty(0)
+    pass
+
+class ImageButton(ButtonBehavior, Image):
     pass
 
 # Create the screen manager
@@ -125,8 +141,9 @@ class EbolaPredictorApp(App):
         in_scr[1].clear_widgets()
         in_scr[2].clear_widgets()
         print "***********************"
+        sm.transition = FallOutTransition()
         sm.current = 'input 1'
-
+  
     def go_screen(self, scr):
         curr_scr = int(sm.current.split()[1])
         if curr_scr < scr:
@@ -155,6 +172,7 @@ class EbolaPredictorApp(App):
             res_scr.curr_risk_color = [0.5, 0.5, 0.5, 1]
             res_scr.curr_risk_label = 'INSUFFICIENT DATA'            
             res_scr.curr_risk_level = 0
+            sm.transition = RiseInTransition()
             sm.current = 'result'
             return
 
@@ -218,7 +236,8 @@ class EbolaPredictorApp(App):
             level = float((pred - 0.5) / 0.5)
             res_scr.curr_risk_color = [153.0/255, 93.0/255, 77.0/255, 1]
             res_scr.curr_risk_label = 'HIGH RISK' 
-        sm.transition = SlideTransition(direction='left')
+        sm.transition = RiseInTransition() 
+        #sm.transition = SlideTransition(direction='left')
         sm.current = 'result'
  
 if __name__ == '__main__':

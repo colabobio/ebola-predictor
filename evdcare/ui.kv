@@ -1,7 +1,15 @@
 <InputScreen1>:
     BoxLayout:
         orientation: 'vertical'
+        canvas.before:
+            Color:
+                rgba: [0.436, 0.44, 0.444, 1.0]
+            Rectangle:
+                pos: self.pos
+                size: self.size
+        
         Label:
+            font_name: 'LatoRegular'
             canvas.before:
                 Color:
                     rgba: [0.96, 0.97, 0.97, 1.0]
@@ -9,21 +17,18 @@
                     pos: self.pos
                     size: self.size
             text: 'Patient Profile'
-            color: [0, 0, 0, 1]
-            size_hint: 1, 0.25
+            color: [0.329, 0.329, 0.329, 0.4]
+            size_hint: 1, 0.15
+            font_size: 28
 
         GridLayout:
+            size_hint: 1, 0.77
             rows: 4
             cols: 2
-            padding: 50 
-            spacing: 20
-
-            canvas.before:
-                Color:
-                    rgba: [0.5, 0.5, 0.5, 1.0]
-                Rectangle:
-                    pos: self.pos
-                    size: self.size
+            padding: 50, 70
+            spacing: 15, 30
+            row_default_height: "30dp"
+            row_force_default: True
 
             Label:
                 text: "Virus load [log units]"
@@ -58,16 +63,28 @@
                 input_filter: 'float'
                 on_text: app.set_var_value("AlkPhos_1", args[1])
 
-        Button:
-            text: 'Next'
-            size_hint: 1, 0.25
-            on_press: app.go_screen(2)
+        AnchorLayout:
+            size_hint: 1, 0.08
+            anchor_x: 'right'
+            anchor_y: 'top'            
+            ImageButton:
+                source: "./buttons/next.png"
+                size_hint: 0.5, 0.8
+                on_press: app.go_screen(2)
 
 
 <InputScreen2>:
     BoxLayout:
         orientation: 'vertical'
+        canvas.before:
+            Color:
+                rgba: [0.436, 0.44, 0.444, 1.0]
+            Rectangle:
+                pos: self.pos
+                size: self.size
+        
         Label:
+            font_name: 'LatoRegular'
             canvas.before:
                 Color:
                     rgba: [0.96, 0.97, 0.97, 1.0]
@@ -75,22 +92,18 @@
                     pos: self.pos
                     size: self.size
             text: 'Patient Profile'
-            color: [0, 0, 0, 1]
-            size_hint: 1, 0.25
-
+            color: [0.329, 0.329, 0.329, 0.4]
+            size_hint: 1, 0.15
+            font_size: 28
 
         GridLayout:
+            size_hint: 1, 0.77
             rows: 4
             cols: 2
-            padding: 50 
-            spacing: 20
-
-            canvas.before:
-                Color:
-                    rgba: [0.5, 0.5, 0.5, 1.0]
-                Rectangle:
-                    pos: self.pos
-                    size: self.size
+            padding: 50, 70
+            spacing: 15, 30
+            row_default_height: "30dp"
+            row_force_default: True
 
             Label:
                 text: "CRE [umol/L]"
@@ -127,19 +140,35 @@
 
         BoxLayout:
             orientation: 'horizontal'
-            size_hint: 1, 0.25
-            Button:
-                text: 'Previous'
-                on_press: app.go_screen(1)
-            Button:
-                text: 'Next'
-                on_press: app.go_screen(3)
+            size_hint: 1, 0.08
+            AnchorLayout:
+                anchor_x: 'left'
+                anchor_y: 'top'            
+                ImageButton:
+                    source: "./buttons/prev.png"
+                    size_hint: 1, 0.8
+                    on_press: app.go_screen(1)
 
+            AnchorLayout:
+                anchor_x: 'right'
+                anchor_y: 'top'            
+                ImageButton:
+                    source: "./buttons/next.png"
+                    size_hint: 1, 0.8
+                    on_press: app.go_screen(3)
 
 <InputScreen3>:
     BoxLayout:
         orientation: 'vertical'
+        canvas.before:
+            Color:
+                rgba: [0.436, 0.44, 0.444, 1.0]
+            Rectangle:
+                pos: self.pos
+                size: self.size
+        
         Label:
+            font_name: 'LatoRegular'
             canvas.before:
                 Color:
                     rgba: [0.96, 0.97, 0.97, 1.0]
@@ -147,133 +176,141 @@
                     pos: self.pos
                     size: self.size
             text: 'Patient Profile'
-            color: [0, 0, 0, 1]
-            size_hint: 1, 0.25
-
+            color: [0.329, 0.329, 0.329, 0.4]
+            size_hint: 1, 0.15
+            font_size: 28
 
         GridLayout:
+            size_hint: 1, 0.45
+            rows: 3
             cols: 2
-            padding: 50 
-            spacing: 20
-
-            canvas.before:
-                Color:
-                    rgba: [0.5, 0.5, 0.5, 1.0]
-                Rectangle:
-                    pos: self.pos
-                    size: self.size
+            padding: 50, 70
+            spacing: 15, 30
+            row_default_height: "30dp"
+            row_force_default: True
 
             Label:
                 text: "Diarrhea"
             BoxLayout:
                 orientation: 'horizontal'
+                Label:
+                    text: "NA"
                 CheckBox:
                     name: "diarrhea_na"
                     group: "diarrhea"
                     active: True
                     on_release: app.set_var_value("DIARR", "")
                 Label:
-                    text: "NA"
+                    text: "Yes"                
                 CheckBox:
                     name: "diarrhea_yes"
                     group: "diarrhea"
                     active: False
                     on_release: app.set_var_value("DIARR", "1")
                 Label:
-                    text: "Yes"
+                    text: "No"
                 CheckBox:
                     name: "diarrhea_no"
                     group: "diarrhea"
                     active: False
                     on_release: app.set_var_value("DIARR", "0")
-                Label:
-                    text: "No"
 
             Label:
                 text: "Weakness"
             BoxLayout:
                 orientation: 'horizontal'
+                Label:
+                    text: "NA"
                 CheckBox:
                     name: "weakness_na"
                     group: "weakness"
                     active: True
                     on_release: app.set_var_value("WEAK", "")
                 Label:
-                    text: "NA"
+                    text: "Yes"
                 CheckBox:
                     name: "weakness_yes"
                     group: "weakness"
                     active: False
                     on_release: app.set_var_value("WEAK", "1")
                 Label:
-                    text: "Yes"
+                    text: "No"
                 CheckBox:
                     name: "weakness_no"
                     group: "weakness"
                     active: False
                     on_release: app.set_var_value("WEAK", "0")
-                Label:
-                    text: "No"
 
             Label:
                 text: "Vomit"
             BoxLayout:
                 orientation: 'horizontal'
+                Label:
+                    text: "NA"
                 CheckBox:
                     name: "vomit_na"
                     group: "vomit"
                     active: True
                     on_release: app.set_var_value("VOMIT", "")
                 Label:
-                    text: "NA"
+                    text: "Yes"
                 CheckBox:
-                    name: "vomit_yes"
+                    name: "vomit_yes"	
                     group: "vomit"
                     active: False
                     on_release: app.set_var_value("VOMIT", "1")
                 Label:
-                    text: "Yes"
+                    text: "No"
                 CheckBox:
                     name: "vomit_no"
                     group: "vomit"
                     active: False
                     on_release: app.set_var_value("VOMIT", "0")
-                Label:
-                    text: "No"
 
-        BoxLayout:
-            orientation: 'horizontal'
-            size_hint: 1, 0.25
-            Button:
-                text: 'Previous'
-                on_press: app.go_screen(2)
-            Button:
-                text: 'Calculate Risk'
+        AnchorLayout:
+            size_hint: 1, 0.3
+            anchor_x: 'center'
+            anchor_y: 'center'
+            ImageButton:
+                source: "./buttons/estimate.png"
+                size_hint: 1, 0.3
                 on_press: app.calc_risk()
 
+        AnchorLayout:
+            size_hint: 1, 0.08
+            anchor_x: 'left'
+            anchor_y: 'top'
+            ImageButton:
+                source: "./buttons/prev.png"
+                size_hint: 0.5, 0.8
+                on_press: app.go_screen(2)
 
 <ResultScreen>:
     BoxLayout:
         orientation: 'vertical'
+        canvas.before:
+            Color:
+                rgba: [0.436, 0.44, 0.444, 1.0]
+            Rectangle:
+                pos: self.pos
+                size: self.size
+        
         Label:
+            font_name: 'LatoRegular'
             canvas.before:
                 Color:
                     rgba: [0.96, 0.97, 0.97, 1.0]
                 Rectangle:
                     pos: self.pos
                     size: self.size
-            text: 'Patient Prognosis'
-            color: [0, 0, 0, 1]
-            size_hint: 1, 0.25
+            text: 'Patient Profile'
+            color: [0.329, 0.329, 0.329, 0.4]
+            size_hint: 1, 0.15
+            font_size: 28
 
         BoxLayout:
             orientation: 'horizontal'
-            canvas.before:
-                Color:
-                    rgba: [0.5, 0.5, 0.5, 1.0]
-                Rectangle:
-                    pos: self.pos
-                    size: self.size
+            size_hint: 1, 0.55
             Widget:
                 canvas.before:
                     Color:
@@ -288,8 +325,12 @@
                 Label:
                     text: "Risk level: " + "%.2f" % (root.curr_risk_level * 100) + "%"
 
-        Button:
-            orientation: 'horizontal'
-            size_hint: 1, 0.25
-            text: 'New Patient'
-            on_press: app.restart()
+        AnchorLayout:
+            size_hint: 1, 0.3
+            anchor_x: 'center'
+            anchor_y: 'center'
+            ImageButton:
+                source: "./buttons/enter.png"
+                size_hint: 1, 0.3
+                on_press: app.restart()
+
