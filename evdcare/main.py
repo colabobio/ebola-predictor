@@ -207,8 +207,14 @@ class EbolaCAREApp(App):
         sm.current = 'input ' + str(scr)
 
     def calc_risk(self):
-        if "AGE" in values:
-            age = float(values["AGE"])
+        if "AGE" in values and values["AGE"]:
+            age = 30
+            try:                  
+                age = float(values["AGE"])
+            except ValueError:
+                pass
+            except TypeError:
+                pass
             if age < 10 or 50 < age: 
                 res_scr.curr_risk_color = [153.0/255, 93.0/255, 77.0/255, 1]
                 res_scr.curr_risk_label = 'HIGH RISK'            
