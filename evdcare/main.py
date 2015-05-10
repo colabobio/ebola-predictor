@@ -8,6 +8,9 @@ from kivy.properties import ListProperty, StringProperty, NumericProperty
 from kivy.uix.checkbox import CheckBox
 from kivy.uix.screenmanager import SlideTransition, RiseInTransition, FallOutTransition
 
+from kivy.storage.jsonstore import JsonStore
+from os.path import join
+
 from kivy.uix.image import Image
 from kivy.uix.behaviors import ButtonBehavior
 
@@ -18,6 +21,7 @@ import operator
 import numpy as np
 from utils import gen_predictor
 
+####################################################################################
 #Fonts
 from kivy.core.text import LabelBase
 KIVY_FONTS = [
@@ -29,16 +33,23 @@ KIVY_FONTS = [
 for font in KIVY_FONTS:
     LabelBase.register(**font)
 
+####################################################################################
 # Load the kv file specifying the UI, otherwise needs to be named
 # EbolaPredictor.kv (see note in App class below) and will be loaded
 # automatically.
 Builder.load_file('ui.kv')
 
+####################################################################################
 # Load variables
+values = {}
+units = {}
+
 variables = []
 var_label = {}
-var_unit = {}
 var_kind = {}
+var_def_unit = {}
+var_alt_unit = {}
+var_unit_conv = {}
 with open("variables.csv", "r") as vfile:
     lines = vfile.readlines()
     for line in lines[1:]:
@@ -46,33 +57,50 @@ with open("variables.csv", "r") as vfile:
         row = line.split(",")
         name = row[0]
         label = row[1]
-        unit = row[2]
-        kind = row[3] 
+        kind = row[2] 
+        def_unit = row[3]
+        alt_unit = row[4]
+        unit_conv = row[5]
+ 
         variables.append(name)
         var_label[name] = label
-        var_unit[name] = unit
         var_kind[name] = kind
-values = {}
+        var_def_unit[name] = def_unit
+        var_alt_unit[name] = alt_unit
+        var_unit_conv[name] = unit_conv
+        print name, label, kind, def_unit, alt_unit, unit_conv
+ 
+####################################################################################
+# Create a Json store to save units
+ 
+#data_dir = getattr(self, 'user_data_dir') #get a writable path to save the file
+#store = JsonStore(join(data_dir, 'user.json'))
 
+#store.put('score', best=50)
+#if store.exists('score'):
+#    best =  store.get('score')['best']
+
+####################################################################################
+# Create the screen manager
+
+# Base class for all input screens
 class InputScreen(Screen):
     def clear_widgets(self):
         for widget in self.walk():
             if type(widget) == kivy.uix.textinput.TextInput:
                 widget.text = ""
-            elif type(widget) == kivy.uix.checkbox.CheckBox:
-                if "_na" in widget.name:
-                    widget.active = True
-                else:
-                    widget.active = False
+            elif type(widget) == kivy.uix.spinner.Spinner:
+                if not "_unit" in widget.name:
+                    widget.text = "Unknown"
 
-# Declare both screens
-class InputScreen1(InputScreen):
+# Declare all screens
+class InputScreenChart(InputScreen):
     pass
 
-class InputScreen2(InputScreen):
+class InputScreenLab(InputScreen):
     pass
 
-class InputScreen3(InputScreen):
+class InputScreenPCR(InputScreen):
     pass
 
 class ResultScreen(Screen):
@@ -84,15 +112,17 @@ class ResultScreen(Screen):
 class ImageButton(ButtonBehavior, Image):
     pass
 
-# Create the screen manager
 in_scr = [None] * 3
-in_scr[0] = InputScreen1(name='input 1')
-in_scr[1] = InputScreen2(name='input 2')
-in_scr[2] = InputScreen3(name='input 3')
+in_scr[0] = InputScreenChart(name='input 1')
+in_scr[1] = InputScreenLab(name='input 2')
+in_scr[2] = InputScreenPCR(name='input 3')
 res_scr = ResultScreen(name='result')
 sm = ScreenManager()
 for iscr in in_scr: sm.add_widget(iscr)
 sm.add_widget(res_scr)
+
+####################################################################################
+# Read the predictive models
 
 ranking = {}
 dirs = glob.glob("models/*")
@@ -105,7 +135,6 @@ for d in dirs:
 sorted_ranking = reversed(sorted(ranking.items(), key=operator.itemgetter(1)))
 models_info = []
 for pair in sorted_ranking:
-#    print , pair[1]
     d = pair[0]
     v = []
     with open(os.path.join(d, "variables.txt")) as vfile:
@@ -117,6 +146,9 @@ for pair in sorted_ranking:
     info = [d, v] 
     print info
     models_info.append(info)
+
+####################################################################################
+# Main app
 
 class EbolaPredictorApp(App):
     def build(self):
@@ -131,8 +163,14 @@ class EbolaPredictorApp(App):
         pass
 
     def set_var_value(self, name, value):
+        categories = {"Unknown":"", "Yes":"1", "No":"0"}
+        if value in categories:
+            value = categories[value]
         values[name] = value    
         print name, value
+
+    def set_var_unit(self, name, unit):
+        pass
 
     def restart(self):
         values = {}
