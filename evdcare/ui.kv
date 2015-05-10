@@ -306,9 +306,11 @@
             row_force_default: True
 
             Label:
+                size_hint: 0.3, 1
                 font_name: 'LatoRegular'
-                text: "Virus load"
+                text: "Virus load"         
             TextInput:
+                size_hint: 0.4, 1
                 text: ""
                 multiline: False
                 input_type: 'number'
@@ -318,7 +320,7 @@
                 text_size: self.size[0] - 10, self.size[1] 
                 halign: 'left'
                 valign: 'middle'
-                size_hint: 0.5, 1 
+                size_hint: 0.3, 1 
                 font_name: 'LatoRegular'
                 text: "log units"
 

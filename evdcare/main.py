@@ -248,8 +248,13 @@ class EbolaPredictorApp(App):
         for i in range(N):
             var = model_vars[i]
             if var in values:
-                try:
+                try:                  
                     v[i + 1] = float(values[var])
+                    if not units[var] == var_def_unit[var]:
+                        # Need to convert units
+                        c, f = var_unit_conv[var]
+                        print "convert",var,v[i + 1],"->",f*(v[i + 1] + c)
+                        v[i + 1] = f * (v[i + 1] + c)
                 except ValueError:
                     pass
                 except TypeError:
