@@ -1,3 +1,79 @@
+<InputScreenDemo>:
+    BoxLayout:
+        orientation: 'vertical'
+        canvas.before:
+            Color:
+                rgba: [0.436, 0.44, 0.444, 1.0]
+            Rectangle:
+                pos: self.pos
+                size: self.size
+        
+        Label:
+            font_name: 'LatoRegular'
+            canvas.before:
+                Color:
+                    rgba: [0.96, 0.97, 0.97, 1.0]
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+            text: 'Patient Profile'
+            color: [0.436, 0.44, 0.444, 1.0]
+            size_hint: 1, 0.15
+            font_size: 28
+
+        Label:
+            font_name: 'LatoRegular'
+            text: 'Demographics'
+            color: [0.96, 0.97, 0.97, 1.0]
+            size_hint: 1, 0.1
+            font_size: 24
+
+        GridLayout:
+            size_hint: 1, 0.67
+            rows: 2
+            cols: 3
+            padding: 50, 15
+            spacing: 15, 30
+            row_default_height: "30dp"
+            row_force_default: True
+
+            Label:
+                font_name: 'LatoRegular'
+                text: "Age"
+            TextInput:
+                text: ""
+                multiline: False
+                input_type: 'number'
+                input_filter: 'float'
+                on_text: app.set_var_value("AGE", args[1])
+            Label:
+                text_size: self.size[0] - 10, self.size[1] 
+                halign: 'left'
+                valign: 'middle'
+                size_hint: 0.5, 1 
+                font_name: 'LatoRegular'
+                text: "years"
+            Label:
+                font_name: 'LatoRegular'
+                text: "Gender"
+            Spinner:
+                name: "GENDER.val"
+                text: "Unknown"
+                values: ["Unknown", "Female", "Male"]
+                on_text: app.set_var_value("GENDER", self.text)
+            Label:
+                size_hint: 0.5, 1
+                text: ""
+
+        AnchorLayout:
+            size_hint: 1, 0.08
+            anchor_x: 'right'
+            anchor_y: 'top'            
+            ImageButton:
+                source: "./buttons/next.png"
+                size_hint: 0.5, 0.8
+                on_press: app.go_screen(2)
+
 <InputScreenChart>:
     BoxLayout:
         orientation: 'vertical'
@@ -107,14 +183,24 @@
                 size_hint: 0.5, 1
                 text: ""
 
-        AnchorLayout:
+        BoxLayout:
+            orientation: 'horizontal'
             size_hint: 1, 0.08
-            anchor_x: 'right'
-            anchor_y: 'top'            
-            ImageButton:
-                source: "./buttons/next.png"
-                size_hint: 0.5, 0.8
-                on_press: app.go_screen(2)
+            AnchorLayout:
+                anchor_x: 'left'
+                anchor_y: 'top'            
+                ImageButton:
+                    source: "./buttons/prev.png"
+                    size_hint: 1, 0.8
+                    on_press: app.go_screen(1)
+
+            AnchorLayout:
+                anchor_x: 'right'
+                anchor_y: 'top'            
+                ImageButton:
+                    source: "./buttons/next.png"
+                    size_hint: 1, 0.8
+                    on_press: app.go_screen(3)
 
 <InputScreenLab>:
     BoxLayout:
@@ -261,7 +347,7 @@
                 ImageButton:
                     source: "./buttons/prev.png"
                     size_hint: 1, 0.8
-                    on_press: app.go_screen(1)
+                    on_press: app.go_screen(2)
 
             AnchorLayout:
                 anchor_x: 'right'
@@ -269,7 +355,7 @@
                 ImageButton:
                     source: "./buttons/next.png"
                     size_hint: 1, 0.8
-                    on_press: app.go_screen(3)
+                    on_press: app.go_screen(4)
 
 <InputScreenPCR>:
     BoxLayout:
@@ -345,7 +431,7 @@
             ImageButton:
                 source: "./buttons/prev.png"
                 size_hint: 0.5, 0.8
-                on_press: app.go_screen(2)
+                on_press: app.go_screen(3)
 
 <ResultScreen>:
     BoxLayout:

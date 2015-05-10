@@ -100,6 +100,9 @@ class InputScreen(Screen):
                 widget.text = units[var]
  
 # Declare all screens
+class InputScreenDemo(InputScreen):
+    pass
+
 class InputScreenChart(InputScreen):
     pass
 
@@ -118,10 +121,11 @@ class ResultScreen(Screen):
 class ImageButton(ButtonBehavior, Image):
     pass
 
-in_scr = [None] * 3
-in_scr[0] = InputScreenChart(name='input 1')
-in_scr[1] = InputScreenLab(name='input 2')
-in_scr[2] = InputScreenPCR(name='input 3')
+in_scr = [None] * 4
+in_scr[0] = InputScreenDemo(name='input 1')
+in_scr[1] = InputScreenChart(name='input 2')
+in_scr[2] = InputScreenLab(name='input 3')
+in_scr[3] = InputScreenPCR(name='input 4')
 res_scr = ResultScreen(name='result')
 sm = ScreenManager()
 for iscr in in_scr: sm.add_widget(iscr)
@@ -158,7 +162,7 @@ for pair in sorted_ranking:
 
 class EbolaCAREApp(App):
     def build(self):
-        self.categories = {"Unknown":"", "Yes":"1", "No":"0"}
+        self.categories = {"Unknown":"", "Yes":"1", "No":"0", "Female":"1", "Male":"0"}
         data_dir = getattr(self, 'user_data_dir') #get a writable path to save the file
         self.store = JsonStore(join(data_dir, 'units.json'))
         print "DATA DIR", data_dir
@@ -203,6 +207,15 @@ class EbolaCAREApp(App):
         sm.current = 'input ' + str(scr)
 
     def calc_risk(self):
+        if "AGE" in values:
+            age = float(values["AGE"])
+            if age < 10 or 50 < age: 
+                res_scr.curr_risk_color = [153.0/255, 93.0/255, 77.0/255, 1]
+                res_scr.curr_risk_label = 'HIGH RISK'            
+                res_scr.curr_risk_level = 1
+                sm.current = 'result'
+                return        
+
         # Find highest ranking model that contained in the provided variables
         model_dir = None
         model_vars = None
@@ -254,7 +267,7 @@ class EbolaCAREApp(App):
             if var in values:
                 try:                  
                     v[i + 1] = float(values[var])
-                    if not units[var] == var_def_unit[var]:
+                    if var in units and units[var] != var_def_unit[var]:
                         # Need to convert units
                         c, f = var_unit_conv[var]
                         print "convert",var,v[i + 1],"->",f*(v[i + 1] + c)
