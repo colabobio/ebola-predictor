@@ -49,13 +49,13 @@
             Spinner:
                 # How to customize a spinner:
                 # https://github.com/kivy/kivy/wiki/Styling-a-Spinner-and-SpinnerOption-in-KV
-                name: 'temp_unit'
+                name: "TEMP.unit"
                 text_size: self.size[0] - 10, self.size[1] 
                 halign: 'left'
                 valign: 'middle'
                 size_hint: 0.5, 1 
-                text: "°C"
-                values: ["°C", "°F"]
+                text: "C"
+                values: ["C", "F"]
                 on_text: app.set_var_unit("TEMP", self.text)
             Label:
                 font_name: 'LatoRegular'
@@ -77,7 +77,7 @@
                 font_name: 'LatoRegular'
                 text: "Weakness"
             Spinner:
-                name: 'weak_val'
+                name: "WEAK.val"
                 text: "Unknown"
                 values: ["Unknown", "Yes", "No"]
                 on_text: app.set_var_value("WEAK", self.text)
@@ -88,7 +88,7 @@
                 font_name: 'LatoRegular'
                 text: "Vomit"
             Spinner:
-                name: 'vomit_val'
+                name: "VOMIT.val"
                 text: "Unknown"
                 values: ["Unknown", "Yes", "No"]
                 on_text: app.set_var_value("VOMIT", self.text)
@@ -99,7 +99,7 @@
                 font_name: 'LatoRegular'
                 text: "Diarrhea"
             Spinner:
-                name: 'diarr_val'
+                name: "DIARR.val"
                 text: "Unknown"
                 values: ["Unknown", "Yes", "No"]
                 on_text: app.set_var_value("DIARR", self.text)
@@ -156,7 +156,7 @@
             row_force_default: True
 
             Label:
-                size_hint: 0.7, 1 
+                size_hint: 0.2, 1 
                 font_name: 'LatoRegular'
                 text: "AST"
             TextInput:
@@ -164,16 +164,17 @@
                 multiline: False
                 input_type: 'number'
                 input_filter: 'float'
+                size_hint: 0.4, 1
                 on_text: app.set_var_value("AST_1", args[1])
             Label:
                 text_size: self.size[0] - 10, self.size[1]
                 halign: 'left'
                 valign: 'middle'
-                size_hint: 0.7, 1 
+                size_hint: 0.4, 1 
                 font_name: 'LatoRegular'
                 text: "U/L"
             Label:
-                size_hint: 0.7, 1 
+                size_hint: 0.2, 1 
                 font_name: 'LatoRegular'
                 text: "ALK"
             TextInput:
@@ -181,16 +182,17 @@
                 multiline: False
                 input_type: 'number'
                 input_filter: 'float'
+                size_hint: 0.4, 1
                 on_text: app.set_var_value("AlkPhos_1", args[1])
             Label:
                 text_size: self.size[0] - 10, self.size[1]
                 halign: 'left'
                 valign: 'middle'
-                size_hint: 0.7, 1
+                size_hint: 0.4, 1
                 font_name: 'LatoRegular'
                 text: "U/L"
             Label:
-                size_hint: 0.7, 1 
+                size_hint: 0.2, 1 
                 font_name: 'LatoRegular'
                 text: "CRE"
             TextInput:
@@ -198,20 +200,21 @@
                 multiline: False
                 input_type: 'number'
                 input_filter: 'float'
+                size_hint: 0.4, 1
                 on_text: app.set_var_value("Cr_1", args[1])
             Spinner:
-                name: 'cre_unit'
+                name: "Cr_1.unit"
                 text_size: self.size[0] - 10, self.size[1]
                 halign: 'left'
                 valign: 'middle'
-                size_hint: 0.7, 1
+                size_hint: 0.4, 1
                 font_name: 'LatoRegular'
                 text: "U/L"
                 text: "umol/L"
                 values: ["umol/L", "mg/dL"]
                 on_text: app.set_var_unit("Cr_1", self.text)
             Label:
-                size_hint: 0.7, 1 
+                size_hint: 0.2, 1 
                 font_name: 'LatoRegular'
                 text: "tCO2"
             TextInput:
@@ -219,16 +222,17 @@
                 multiline: False
                 input_type: 'number'
                 input_filter: 'float'
+                size_hint: 0.4, 1
                 on_text: app.set_var_value("TCo2_1", args[1])
             Label:
                 text_size: self.size[0] - 10, self.size[1]
                 halign: 'left'
                 valign: 'middle'
-                size_hint: 0.7, 1
+                size_hint: 0.4, 1
                 font_name: 'LatoRegular'
                 text: "mmol/L"
             Label:
-                size_hint: 0.7, 1 
+                size_hint: 0.2, 1 
                 font_name: 'LatoRegular'
                 text: "BUN"
             TextInput:
@@ -236,13 +240,14 @@
                 multiline: False
                 input_type: 'number'
                 input_filter: 'float'
+                size_hint: 0.4, 1
                 on_text: app.set_var_value("BUN_1", args[1])
             Spinner:
-                name: 'bun_unit'
+                name: "BUN_1.unit"
                 text_size: self.size[0] - 10, self.size[1] 
                 halign: 'left'
                 valign: 'middle'
-                size_hint: 0.7, 1
+                size_hint: 0.4, 1
                 text: "mmol urea/L"
                 values: ["mmol urea/L", "mg/dL"]
                 on_text: app.set_var_unit("BUN_1", self.text)

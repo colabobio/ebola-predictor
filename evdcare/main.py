@@ -76,16 +76,6 @@ with open("variables.csv", "r") as vfile:
 
         units[name] = def_unit
         print name, label, kind, def_unit, alt_unit, unit_cf
-     
-####################################################################################
-# Create a Json store to save units
- 
-#data_dir = getattr(self, 'user_data_dir') #get a writable path to save the file
-#store = JsonStore(join(data_dir, 'user.json'))
-
-#store.put('score', best=50)
-#if store.exists('score'):
-#    best =  store.get('score')['best']
 
 ####################################################################################
 # Create the screen manager
@@ -97,9 +87,18 @@ class InputScreen(Screen):
             if type(widget) == kivy.uix.textinput.TextInput:
                 widget.text = ""
             elif type(widget) == kivy.uix.spinner.Spinner:
-                if not "_unit" in widget.name:
+                if not ".unit" in widget.name:
                     widget.text = "Unknown"
 
+    def set_units(self):
+        print units 
+        print "YEAHHHHH",self
+        for widget in self.walk():
+            if type(widget) == kivy.uix.spinner.Spinner and ".unit" in widget.name:
+                var,_ = widget.name.split(".")
+                print units[var]
+                widget.text = units[var]
+ 
 # Declare all screens
 class InputScreenChart(InputScreen):
     pass
@@ -157,8 +156,17 @@ for pair in sorted_ranking:
 ####################################################################################
 # Main app
 
-class EbolaPredictorApp(App):
+class EbolaCAREApp(App):
     def build(self):
+        self.categories = {"Unknown":"", "Yes":"1", "No":"0"}
+        data_dir = getattr(self, 'user_data_dir') #get a writable path to save the file
+        self.store = JsonStore(join(data_dir, 'units.json'))
+        print "DATA DIR", data_dir
+        # Load last used units
+        for var in units:
+            if self.store.exists(var):
+                units[var] = self.store.get(var)['unit']
+        for scr in in_scr: scr.set_units()
         return sm
 
     def on_pause(self):
@@ -170,23 +178,19 @@ class EbolaPredictorApp(App):
         pass
 
     def set_var_value(self, name, value):
-        categories = {"Unknown":"", "Yes":"1", "No":"0"}
-        if value in categories:
-            value = categories[value]
+        if value in self.categories:
+            value = self.categories[value]
         values[name] = value    
         print name, value
 
     def set_var_unit(self, name, unit):
         units[name] = unit
+        self.store.put(name, unit=unit)
         print name, unit
 
     def restart(self):
         values = {}
-        print "***********************"
-        in_scr[0].clear_widgets()
-        in_scr[1].clear_widgets()
-        in_scr[2].clear_widgets()
-        print "***********************"
+        for scr in in_scr: scr.clear_widgets()
         sm.transition = FallOutTransition()
         sm.current = 'input 1'
   
@@ -293,5 +297,5 @@ class EbolaPredictorApp(App):
         sm.current = 'result'
  
 if __name__ == '__main__':
-    EbolaPredictorApp().run()
+    EbolaCAREApp().run()
 

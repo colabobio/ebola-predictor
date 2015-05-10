@@ -1,6 +1,6 @@
 Name,Label,Kind,Default Unit,Common Unit,Unit Conversion
 PCR,Virus load,float,log units,log units,
-TEMP,Temperature,float,°C,°F,-32*0.5555
+TEMP,Temperature,float,C,F,-32*0.5555
 AST_1,AST,float,U/L,U/L,0*1
 AlkPhos_1,ALK,float,U/L,U/L,0*1
 Cr_1,CRE,float,umol/L,mg/dL,0*88.33
