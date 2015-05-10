@@ -1,11 +1,11 @@
 Name,Label,Kind,Default Unit,Common Unit,Unit Conversion
 PCR,Virus load,float,log units,log units,
-TEMP,Temperature,float,°C,°F,
-AST_1,AST,float,U/L,U/L,
-AlkPhos_1,ALK,float,U/L,U/L,
-Cr_1,CRE,float,umol/L,mg/dL,
-TCo2_1,tCO2,float,mmol/L,mmol/L,
-BUN_1,BUN,float,mmol urea/L,mg/dL,
+TEMP,Temperature,float,°C,°F,-32*0.5555
+AST_1,AST,float,U/L,U/L,0*1
+AlkPhos_1,ALK,float,U/L,U/L,0*1
+Cr_1,CRE,float,umol/L,mg/dL,0*88.33
+TCo2_1,tCO2,float,mmol/L,mmol/L,0*1
+BUN_1,BUN,float,mmol urea/L,mg/dL,0*0.357
 HRATE,Heart rate,float,,,
 DIARR,Diarrhea,category,,,
 WEAK,Weakness,category,,,

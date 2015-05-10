@@ -67,9 +67,16 @@ with open("variables.csv", "r") as vfile:
         var_kind[name] = kind
         var_def_unit[name] = def_unit
         var_alt_unit[name] = alt_unit
-        var_unit_conv[name] = unit_conv
-        print name, label, kind, def_unit, alt_unit, unit_conv
- 
+        if unit_conv:
+            c, f = unit_conv.split("*")
+            unit_cf = [float(c), float(f)]
+        else:
+            unit_cf = [0, 1]
+        var_unit_conv[name] = unit_cf
+
+        units[name] = def_unit
+        print name, label, kind, def_unit, alt_unit, unit_cf
+     
 ####################################################################################
 # Create a Json store to save units
  
@@ -144,7 +151,7 @@ for pair in sorted_ranking:
             parts = line.split()
             v.append(parts[0])
     info = [d, v] 
-    print info
+    #print info
     models_info.append(info)
 
 ####################################################################################
@@ -170,7 +177,8 @@ class EbolaPredictorApp(App):
         print name, value
 
     def set_var_unit(self, name, unit):
-        pass
+        units[name] = unit
+        print name, unit
 
     def restart(self):
         values = {}
@@ -201,7 +209,7 @@ class EbolaPredictorApp(App):
         for info in models_info: 
             v = set(info[1])
             res = v.issubset(vv)
-            print res, info[1]
+            #print res, info[1]
             if res:
                 model_dir = info[0]
                 model_vars = info[1]
