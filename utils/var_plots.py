@@ -1,5 +1,7 @@
 """
-Rank all available models
+Generates plots for all variables
+
+TODO: need to be generic for any type of dataset
 
 @copyright: The Broad Institute of MIT and Harvard 2015
 """
@@ -36,6 +38,32 @@ var_labels = { "OUT": "Outcome",
                "TP_1": "TP",
                "PDIAST": "Diastolic pressure",
                "PABD": "Abdominal pain" }
+
+var_pvalues = { "OUT": 0,
+                "PCR": 0.001,
+                "WEAK": 0.06,
+                "VOMIT": 0.15,
+                "AST_1": 0.0007,
+                "Ca_1": 0.48,
+                "AlkPhos_1": 0.008,
+                "EDEMA": 0.3,
+                "CONF": 0.56,
+                "Cl_1": 0.24,
+                "TEMP": 0.004,
+                "RRATE": 0.41,
+                "PBACK": 0.55,
+                "DIZZI": 0.17,
+                "ALT_1": 0.03,
+                "Cr_1": 0.04,
+                "TCo2_1": 0.009,
+                "PRETROS": 0.57,
+                "DIARR": 0.024,
+                "HRATE": 0.07,
+                "Alb_1": 0.16,
+                "BUN_1": 0.02,
+                "TP_1": 0.14,
+                "PDIAST": 0.59,
+                "PABD": 0.37 }
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-v", "--var_file", nargs=1, default=["./data/variables-master.txt"],
@@ -91,27 +119,35 @@ ranges = (df["DIAG"] == 1) & (10 <= df["AGE"]) & (df["AGE"] <= 50) & ((df["OUT"]
 
 # sns.set(style="whitegrid")
 
+binary_palette = sns.color_palette([(122/255.0, 192/255.0,119/255.0),(153/255.0, 94/255.0, 78/255.0)])
+# binary_palette = sns.color_palette("Set1", 2)
+# binary_palette = "coolwarm"
+# binary_palette = sns.xkcd_palette(["pale red", "denim blue"])
+
+# sns.set_context(rc = {'lines.linewidth': 0.0})
+
+sns.set_context("paper", rc={"lines.linewidth": 2})
+
+# sns.axes_style({'axes.linewidth': 1})
 for var in numvar:
-    #df[ranges].boxplot(var, by=depvar)
-    g = sns.factorplot("OUT", var, data=df[ranges], kind="box", ci=0, palette="coolwarm")
-    g.despine(offset=10, trim=True)
-    g.set_xticklabels(['Discharged', 'Died'])
-    plt.xlabel('Outcome')    
-    plt.ylabel(var_labels[var])
-    plt.savefig("./out/" + var + ".pdf")
-    plt.clf()
+    with mpl.rc_context({"lines.linewidth": 0.0, 'axes.linewidth': 0.0}):
+        g = sns.factorplot("OUT", var, data=df[ranges], kind="box", ci=0, size=3, aspect=1, palette=binary_palette)
+        g.despine(offset=10, trim=True)
+        g.set_xticklabels(['Discharged', 'Died'])
+        plt.title("P-value: " + str(var_pvalues[var]))
+        plt.xlabel('Outcome')    
+        plt.ylabel(var_labels[var])
+        plt.savefig("./out/" + var + ".pdf")
+        plt.clf()
 
 for var in catvar:
-	with mpl.rc_context({"lines.linewidth": 0.5}):
-# 		g = sns.barplot(df[ranges][var], df[ranges]["OUT"], palette="coolwarm")
-		g = sns.FacetGrid(df[ranges], aspect=1)
-		g.map(sns.barplot, "OUT", var, palette="coolwarm");
-		g.set_xticklabels(['Discharged', 'Died'])
-		g.set(ylim=(0.0, 1.0))
+    with mpl.rc_context({"lines.linewidth": 0.5, 'patch.linewidth': 0.0}):
+        g = sns.FacetGrid(df[ranges], aspect=1)
+        g.map(sns.barplot, "OUT", var, palette=binary_palette)
+        g.set_xticklabels(['Discharged', 'Died'])
+        g.set(ylim=(0.0, 1.0))
+        plt.title("P-value: " + str(var_pvalues[var]))		
         plt.xlabel('Outcome')    
         plt.ylabel(var_labels[var])		
-#     df[ranges].hist(var, by=depvar)
-#     df[ranges].plot(kind='area', var, by=depvar)
-# 
-    	plt.savefig("./out/" + var + ".pdf")
-    	plt.clf()
+        plt.savefig("./out/" + var + ".pdf")
+        plt.clf()
