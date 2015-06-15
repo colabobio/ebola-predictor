@@ -39,6 +39,33 @@ var_labels = { "OUT": "Outcome",
                "PDIAST": "Diastolic pressure",
                "PABD": "Abdominal pain" }
 
+var_units = { "OUT": "",
+              "PCR": "log(EBOV copies/mL plasma)",
+              "WEAK": "",
+              "VOMIT": "",
+              "AST_1": "U/L",
+              "Ca_1": "mmol/L",
+              "AlkPhos_1": "U/L",
+              "EDEMA": "",
+              "CONF": "",
+              "Cl_1": "mmol/L",
+              "TEMP": "Celsius",
+              "RRATE": "BPM",
+              "PBACK": "",
+              "DIZZI": "",
+              "ALT_1": "U/L",
+              "Cr_1": "umol/L",
+              "TCo2_1": "mmol/L",
+              "PRETROS": "",
+              "DIARR": "",
+              "HRATE": "BPM",
+              "Alb_1": "g/L",
+              "BUN_1": "mmol urea/L",
+              "TP_1": "g/L",
+              "PDIAST": "mm Hg",
+              "PABD": "" }
+
+
 var_pvalues = { "OUT": 0,
                 "PCR": 0.001,
                 "WEAK": 0.06,
@@ -134,9 +161,9 @@ for var in numvar:
         g = sns.factorplot("OUT", var, data=df[ranges], kind="box", ci=0, size=3, aspect=1, palette=binary_palette)
         g.despine(offset=10, trim=True)
         g.set_xticklabels(['Discharged', 'Died'])
-        plt.title("P-value: " + str(var_pvalues[var]))
-        plt.xlabel('Outcome')    
-        plt.ylabel(var_labels[var])
+        plt.title(var_labels[var] + " - P=" + str(var_pvalues[var]))
+        plt.xlabel('Outcome')
+        plt.ylabel(var_units[var])
         plt.savefig("./out/" + var + ".pdf")
         plt.clf()
 
@@ -146,8 +173,8 @@ for var in catvar:
         g.map(sns.barplot, "OUT", var, palette=binary_palette)
         g.set_xticklabels(['Discharged', 'Died'])
         g.set(ylim=(0.0, 1.0))
-        plt.title("P-value: " + str(var_pvalues[var]))		
-        plt.xlabel('Outcome')    
-        plt.ylabel(var_labels[var])		
+        plt.title(var_labels[var] + " - P=" + str(var_pvalues[var]))		
+        plt.xlabel('Outcome')
+        plt.ylabel("Fraction")
         plt.savefig("./out/" + var + ".pdf")
         plt.clf()
