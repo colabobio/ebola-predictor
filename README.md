@@ -28,7 +28,7 @@ a number of conventions.
 
 
 
-###Step by step examaples
+###Step by step examples
 
 **1) SINGLE TRAINING/TESTING RUN**
 
