@@ -1,5 +1,6 @@
 """
-This script creates the training and test sets.
+This script rebuilds the indices for training/testing sets, so it is possible to show the 
+rows in the original data that were used in the sets.
 
 @copyright: The Broad Institute of MIT and Harvard 2015
 """
