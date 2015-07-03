@@ -1,5 +1,5 @@
 """
-Creates scatter plot from ranking file
+Creates scatter plot from ranking file generated from rank_models
 
 @copyright: The Broad Institute of MIT and Harvard 2015
 """
@@ -11,111 +11,67 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 parser = argparse.ArgumentParser()
+parser.add_argument("-mode", "--index_mode", nargs=1, default=["PRED"],
+                    help="Indexing mode, either PRED or IMP")
 parser.add_argument("-rank", "--ranking_file", nargs=1, default=["./out/ranking.txt"],
                     help="Ranking file")
 parser.add_argument("-pdf", "--pdf_file", nargs=1, default=["./out/ranking.pdf"],
                     help="Ranking file")
+parser.add_argument("-extra", "--extra_tests", nargs=1, default=[""],
+                    help="Extra tests to include a prediction in the plot, comma separated")
 parser.add_argument("-pred", "--pred_file", nargs=1, default=["./out/predictors.tsv"],
                     help="Predictors file")
 parser.add_argument("-count", "--count_file", nargs=1, default=["./out/varcounts.csv"],
                     help="Predictors file")
+parser.add_argument("-op", "--opacity", type=int, nargs=1, default=[160],
+                    help="Opacity of data points")
+parser.add_argument("-col", "--columns", type=int, nargs=1, default=[2],
+                    help="Number of label columns, 0 for no labels")
+parser.add_argument("-r", "--radius", type=float, nargs=1, default=[0],
+                    help="Radius of data points, 0 for calculation based on number of variables")
+parser.add_argument("-x", "--exclude", nargs=1, default=["lreg,scikit_randf"],
+                    help="Predictors to exclude from plots")
 
 args = parser.parse_args()
+index_mode = args.index_mode[0]
 rank_file = args.ranking_file[0]
 pdf_file = args.pdf_file[0]
+extra_tests = args.extra_tests[0].split(",")
 pred_file = args.pred_file[0]
 count_file = args.count_file[0]
+excluded_predictors = args.exclude[0].split(",")
 
-excluded_predictors = ["scikit_lreg", "scikit_randf"]
+opacity = args.opacity[0]
+label_columns = args.columns[0]
+glyph_size = args.radius[0]
+fixed_size = 0 < glyph_size
 
-var_labels = { "OUT": "Outcome",
-               "PCR": "PCR",
-               "WEAK": "Weakness",
-               "VOMIT": "Vomit",
-               "AST_1": "AST",
-               "Ca_1": "Ca",
-               "AlkPhos_1": "ALK",
-               "EDEMA": "Edema",
-               "CONF": "Confussion",
-               "Cl_1": "Cl",
-               "TEMP": "Temperature",
-               "RRATE": "Respiratory rate",
-               "PBACK": "Back pain",
-               "DIZZI": "Dizziness",
-               "ALT_1": "ALT",
-               "Cr_1": "CRE",
-               "TCo2_1": "tCO2",
-               "PRETROS": "Retrosternal pain",
-               "DIARR": "Diarrhea",
-               "HRATE": "Heart rate",
-               "Alb_1": "Alb",
-               "BUN_1": "BUN",
-               "TP_1": "TP",
-               "PDIAST": "Diastolic pressure",
-               "PABD": "Abdominal pain" }
+var_labels = {}
+with open("./data/alias.txt", "r") as afile:
+    lines = afile.readlines()
+    for line in lines:
+        line = line.strip()
+        parts = line.split(" ", 1)
+        var_labels[parts[0]] = parts[1]
 
-index_mode = "PRED"
-# index_names = ["lreg", "nnet", "scikit_lreg", "scikit_dtree", "scikit_randf", "scikit_svm"]
-# index_names = ["lreg"]
-index_names = ["lreg", "nnet", "scikit_dtree", "scikit_svm"]
-index_labels = {"lreg": "Logistic Regression", "nnet": "Neural Network", "scikit_dtree": "Decision Tree", "scikit_svm": "Support Vector Machine"}
-index_acron = {"lreg": "LR", "nnet": "ANN", "scikit_dtree": "DT", "scikit_svm": "SVM"}
-glyph_colors = {"lreg":[171,217,233],
-                "nnet":[44,123,182],
-                "scikit_lreg":[178,223,138],
-                "scikit_dtree":[253,174,97],
-                "scikit_randf":[251,154,153],
-                "scikit_svm":[215,25,28]}
-opacity = 160
-label_columns = 2
-fixed_size = False
+if index_mode == "PRED":
+    options_file = "./data/predictors.txt"
+else:
+    options_file = "./data/imputation.txt"
 
-'''
-# Algorithm
-index_mode = "MODEL"
-index_names = ["amelia", "mice", "hmisc"]
-index_labels = {"amelia": "Amelia II", "mice": "MICE", "hmisc": "Hmisc"}
-index_acron = index_labels
-glyph_colors = {"amelia":[252,141,98],
-                "mice":[102,194,165],
-                "hmisc":[141,160,203]}
-opacity = 160
-label_columns = 3
-fixed_size = True
-glyph_size = 30
-'''
-
-'''
-# Samples
-index_mode = "MODEL"
-index_names = ["df1", "df5", "df10"]
-index_labels = {"df1": "1 imputation", "df5": "5 imputations", "df10": "10 imputations"}
-index_acron = {"df1": "#1", "df5": "#5", "df10": "#10"}
-glyph_colors = {"df1":[253,192,134],
-                "df5":[190,174,212],
-                "df10":[127,201,127]}
-opacity = 160
-label_columns = 3
-
-fixed_size = True
-glyph_size = 30
-'''
-
-'''
-# Percentage
-index_mode = "MODEL"
-index_names = ["t80", "t65", "t50"]
-index_labels = {"t80": "20% complete", "t65": "35% complete", "t50": "50% complete"}
-index_acron = {"t80": "20%", "t65": "35%", "t50": "50%"}
-glyph_colors = {"t80":[166,206,227],
-                "t65":[31,120,180],
-                "t50":[178,223,138]}
-opacity = 160
-label_columns = 3
-
-fixed_size = True
-glyph_size = 30
-'''
+index_names = []
+index_labels = {}
+index_acron = {}
+glyph_colors = {}
+with open(options_file, "r") as ofile:
+    lines = ofile.readlines()
+    for line in lines:
+        line = line.strip()
+        parts = line.split(',')
+        index_names.append(parts[0])
+        index_labels[parts[0]] = parts[1]
+        index_acron[parts[0]] = parts[2]
+        glyph_colors[parts[0]] = [int(x) for x in parts[3].split()]
 
 plt.clf()
 fig = plt.figure()
@@ -139,6 +95,8 @@ with open(rank_file, "r") as rfile:
         parts = line.split(" ")
 
         pred = parts[2]
+        if pred in excluded_predictors:
+            continue
         if index_mode == "PRED":
             idx = pred
         else:
@@ -147,7 +105,16 @@ with open(rank_file, "r") as rfile:
             for idx in index_names:
                 if idx in mdl_str:
                     break
-        if not idx in index_names or pred in excluded_predictors: continue
+        if not idx in index_names:
+            continue
+        if extra_tests:
+            missing = False
+            path_pieces =  parts[1].split(os.path.sep)
+            for ex in extra_tests:
+                if not ex in path_pieces:
+                    missing = True
+            if missing: 
+                 continue
 
         if idx in xdict:
             x = xdict[idx]
@@ -211,11 +178,12 @@ for k in index_names:
     plots.append(plt.scatter(x, y, s=s, color=c, marker='o'))
     labels.append(index_labels[k])
 
-plt.legend(tuple(plots),
-           tuple(labels),
-           loc='best',
-           ncol=label_columns,
-           prop={'size':9})
+if 0 < label_columns:
+    plt.legend(tuple(plots),
+               tuple(labels),
+               loc='best',
+               ncol=label_columns,
+               prop={'size':9})
 
 plt.xlabel('F1-score mean')
 plt.ylabel('F1-score error')
