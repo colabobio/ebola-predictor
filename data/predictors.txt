@@ -1,0 +1,6 @@
+lreg,Logistic Regression,LR,171 217 233
+nnet,Neural Network,ANN,44 123 182
+scikit_lreg,Logistic Regression,LR,178 223 138
+scikit_dtree,Decision Tree,DT,253 174 97
+scikit_randf,Random Forest,RF,251 154 153
+scikit_svm,Support Vector Machine,SVM,215 25 28

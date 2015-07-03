@@ -1,0 +1,25 @@
+OUT Outcome
+PCR PCR
+WEAK Weakness
+VOMIT Vomit
+AST_1 AST
+Ca_1 Ca
+AlkPhos_1 ALK
+EDEMA Edema
+CONF Confussion
+Cl_1 Cl
+TEMP Temperature
+RRATE Respiratory rate
+PBACK Back pain
+DIZZI Dizziness
+ALT_1 ALT
+Cr_1 CRE
+TCo2_1 tCO2
+PRETROS Retrosternal pain
+DIARR Diarrhea
+HRATE Heart rate
+Alb_1 Alb
+BUN_1 BUN
+TP_1 TP
+PDIAST Diastolic pressure
+PABD Abdominal pain
