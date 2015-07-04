@@ -5,7 +5,7 @@ Fisher exact test
 http://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.fisher_exact.html
 
 T-test for the mean of two samples 
-http://docs.scipy.org/doc/scipy-0.15.1/reference/generated/scipy.stats.ttest_ind.html
+http://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.ttest_ind.html
 
 @copyright: The Broad Institute of MIT and Harvard 2015
 """
@@ -22,7 +22,9 @@ var_file = "./data/variables.txt"
 range_file = "./data/ranges.txt"
 ignore_file = "./data/ignore.txt"
 
-def runtests(var_file):
+def runtests(var_file, out_file):
+    pvalue_lines = []
+
     input_file = ""
     with open(src_file, "rb") as sfile:
         for line in sfile.readlines():
@@ -34,7 +36,7 @@ def runtests(var_file):
             line = line.strip()
             if not line: continue
             model_variables.append(line.split()[0])
-      
+
     range_variables = [] 
     with open(range_file, "rb") as rfile:
         for line in rfile.readlines():
@@ -62,7 +64,7 @@ def runtests(var_file):
         r = 0
         for row in reader:
             if row[0] in ignore_records: continue
-            
+
             r0 += 1 # Starts at 1, because of titles
             all_missing = True
             some_missing = False
@@ -89,33 +91,17 @@ def runtests(var_file):
                 inside_range = inside_range and test
 
             if not all_missing and not missing_dvar and inside_range:
-#                 ids.append(row[0])
-#                 idx_info.append([r0, row[0], row[model_idx[0]]])
-#                 all_data.append([row[idx] for idx in model_idx])
                 for i in range(0, len(model_variables)):
                     var = model_variables[i]
                     idx = model_idx[i]
                     try:
                         val = float(row[idx])
                     except ValueError:
-                        val = np.NaN    
-                    all_data[var].append(val) 
-                
-                
-#                 if not some_missing: complete_rows.append(r)
+                        val = np.NaN
+                    all_data[var].append(val)
                 r += 1
 
-  
     data = pd.DataFrame(all_data)
-#     data = pd.read_csv(input_file, delimiter=",", na_values="\\N")
-
-    
-#     print pd.Series(all_data)
-#     print all_data["WEAK"]
-#     print pd.DataFrame(all_data)
-#     exit(1)
-#     print data["WEAK"]
-#     exit(1)
 
     cat_vars = []
     num_vars = []
@@ -123,8 +109,8 @@ def runtests(var_file):
     with open(var_file, "rb") as vfile:
         for line in vfile.readlines():
             line = line.strip()
-            if not line: continue   
-            parts = line.split()  
+            if not line: continue
+            parts = line.split()
             if count == 0: 
                 dvar = parts[0]
                 count = 1
@@ -136,7 +122,7 @@ def runtests(var_file):
                 num_vars.append(parts[0])
 
     for var in cat_vars:
-        print "***********************"      
+        print "***********************"
         print var
         dat = data.loc[:,(var, dvar)]
         dat["VALUES"] = pd.Series(np.ones(len(dat[var])), index=dat.index)
@@ -144,28 +130,33 @@ def runtests(var_file):
         counts = pivot_table(dat, values="VALUES", index=[var], columns=[dvar], aggfunc=np.sum, fill_value=0)
         fisher_ratio, fisher_pvalue = fisher_exact(counts)
         print counts
+        pvalue_lines.append(var + "\t" + str(fisher_pvalue))
         print fisher_ratio, fisher_pvalue
-     
+
     for var in num_vars:
         values0 = data[data[dvar] == 0][var]
         values1 = data[data[dvar] == 1][var]
-    
+
         values0 = values0[~np.isnan(values0)]
         values1 = values1[~np.isnan(values1)]
-        
-        print "***********************" 
+
+        print "***********************"
         print var
         print "mean/std for",dvar,"0:",np.mean(values0), "/", np.std(values0)
         print "mean/std for",dvar,"1:",np.mean(values1), "/", np.std(values1)
         ttest_stat, ttest_pvalue = ttest_ind(values0, values1, equal_var=False)
         print "Means are different at p-value",ttest_pvalue
+        pvalue_lines.append(var + "\t" + str(ttest_pvalue))
 
-
-
+    with open(out_file, "w") as ofile:
+        for line in pvalue_lines:
+            ofile.write(line + "\n")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-v", "--var_file", nargs=1, default=["./data/variables.txt"],
                         help="File with list of variables")
+    parser.add_argument("-o", "--out_file", nargs=1, default=["./out/variable-stats.tsv"],
+                        help="Output file storing the P-values")
     args = parser.parse_args()
-    runtests(args.var_file[0])
+    runtests(args.var_file[0], args.out_file[0])

@@ -1,0 +1,25 @@
+OUT
+PCR log(EBOV copies/mL plasma)
+WEAK
+VOMIT
+AST_1 U/L
+Ca_1 mmol/L
+AlkPhos_1 U/L
+EDEMA
+CONF
+Cl_1 mmol/L
+TEMP Celsius
+RRATE BPM
+PBACK
+DIZZI
+ALT_1 U/L
+Cr_1 umol/L
+TCo2_1 mmol/L
+PRETROS
+DIARR
+HRATE BPM
+Alb_1 g/L
+BUN_1 mmol urea/L
+TP_1 g/L
+PDIAST mm Hg
+PABD
