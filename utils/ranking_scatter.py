@@ -16,13 +16,13 @@ parser.add_argument("-mode", "--index_mode", nargs=1, default=["PRED"],
 parser.add_argument("-rank", "--ranking_file", nargs=1, default=["./out/ranking.txt"],
                     help="Ranking file")
 parser.add_argument("-pdf", "--pdf_file", nargs=1, default=["./out/ranking.pdf"],
-                    help="Ranking file")
+                    help="Output pdf file")
 parser.add_argument("-extra", "--extra_tests", nargs=1, default=[""],
                     help="Extra tests to include a prediction in the plot, comma separated")
 parser.add_argument("-pred", "--pred_file", nargs=1, default=["./out/predictors.tsv"],
                     help="Predictors file")
 parser.add_argument("-count", "--count_file", nargs=1, default=["./out/varcounts.csv"],
-                    help="Predictors file")
+                    help="Counts file")
 parser.add_argument("-op", "--opacity", type=int, nargs=1, default=[160],
                     help="Opacity of data points")
 parser.add_argument("-col", "--columns", type=int, nargs=1, default=[2],
