@@ -3,6 +3,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 from importlib import import_module
 from scipy.interpolate import interp1d
+from sklearn.metrics import roc_curve, roc_auc_score
 
 label_file = "./data/outcome.txt"
 target_names = []
@@ -131,7 +132,7 @@ def roc_plots(dir, module):
         trainfile = dir + "/training-data-completed-" + str(id) + ".csv"
         if os.path.exists(testfile) and os.path.exists(pfile) and os.path.exists(trainfile):
             print "Report for test set " + id + " ----------------------------------"
-            fpr, tpr, auc = module.eval(testfile, trainfile, pfile, 4, pltshow=False)
+            fpr, tpr, auc = module.eval(testfile, trainfile, pfile, 4, pltshow=False)       
             p, y = module.pred(testfile, trainfile, pfile)
             all_prob.extend(p)
             all_y.extend(y)
@@ -151,6 +152,9 @@ def roc_plots(dir, module):
     ave_tpr = np.mean(total_tpr, axis=0)
 #     std_fpr = np.std(total_fpr, axis=0)
     std_tpr = np.std(total_tpr, axis=0)
+
+    # The AUC of the aggregated curve
+    all_auc = roc_auc_score(all_y, all_prob)
     
 #    f2 = interp1d(ave_fpr, ave_tpr, kind='cubic')
     plt.plot(ave_fpr, ave_tpr, c="grey")
@@ -164,6 +168,7 @@ def roc_plots(dir, module):
     plt.ylabel('True Positive Rate')
     plt.title('Receiver operating characteristic')
     print "Average area under the ROC curve for " + module.title() + ": " + str(ave_auc)
+    print "Area under the aggregated ROC curve for " + module.title() + ": " + str(all_auc)    
     fig.savefig('./out/roc.pdf')
     print "Saved ROC curve to ./out/roc.pdf"
     
