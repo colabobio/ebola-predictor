@@ -120,7 +120,7 @@ with open(rank_file, "r") as rfile:
             roc = plt.plot(fpr, tpr, color=c, linewidth=1.0,)
             plots.append(roc)
 
-            top_line = index_acron[idx] + '\t' + ', '.join([var_labels[v] for v in vlist]) + '\t' + ("%.2f" % auc)
+            top_line = index_acron[idx] + '\t' + ', '.join([var_labels[v] for v in vlist]) + '\t' + str(auc)
             top_models.append(top_line)
 
 plt.plot([0, 1], [0, 1], 'k--', c='grey', linewidth=0.8)
