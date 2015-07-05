@@ -7,7 +7,7 @@ Careful: original files are overwritten!!
 @copyright: The Broad Institute of MIT and Harvard 2015
 """
 
-import sys, os, glob
+import sys, os, glob, argparse
 sys.path.append(os.path.abspath('./utils'))
 from pca_transform import do_pca
 
