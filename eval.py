@@ -4,7 +4,7 @@ from matplotlib import pyplot as plt
 from importlib import import_module
 from scipy.interpolate import interp1d
 
-label_file = "./data/labels.txt"
+label_file = "./data/outcome.txt"
 target_names = []
 with open(label_file, "rb") as vfile:
     for line in vfile.readlines():
