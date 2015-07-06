@@ -7,7 +7,7 @@ Creates ROC plots for all predictors over a set accuracy level
 import os, argparse
 import pandas as pd
 import matplotlib.pyplot as plt
-from sklearn.metrics import roc_curve, roc_auc_score
+from sklearn.metrics import roc_curve
 import seaborn as sns
 
 parser = argparse.ArgumentParser()
@@ -19,8 +19,6 @@ parser.add_argument("-rank", "--ranking_file", nargs=1, default=["./out/ranking.
                     help="Ranking file")
 parser.add_argument("-pdf", "--pdf_file", nargs=1, default=["./out/roc-over90.pdf"],
                     help="Pdf file")
-parser.add_argument("-pred", "--pred_file", nargs=1, default=["./out/predictors.tsv"],
-                    help="Predictors file")
 parser.add_argument("-extra", "--extra_tests", nargs=1, default=[""],
                     help="Extra tests to include a prediction in the plot, comma separated")
 parser.add_argument("-x", "--exclude", nargs=1, default=["lreg,scikit_randf"],
@@ -35,7 +33,6 @@ index_mode = args.index_mode[0]
 base_dir = args.base_dir[0]
 rank_file = args.ranking_file[0]
 pdf_file = args.pdf_file[0]
-pred_file = args.pred_file[0]
 extra_tests = args.extra_tests[0].split(",")
 excluded_predictors = args.exclude[0].split(",")
 opacity = args.opacity[0]
@@ -73,7 +70,6 @@ fig = plt.figure()
 
 print "Saving scatter plot to " + pdf_file + "..."
 plots = []
-top_models = []
 with open(rank_file, "r") as rfile:
     lines = rfile.readlines()
     for line in lines:
@@ -116,12 +112,8 @@ with open(rank_file, "r") as rfile:
             c = [e/255.0 for e in glyph_colors[pred]]
             c.append(opacity/255.0)
             fpr, tpr, _ = roc_curve(y, p)
-            auc = roc_auc_score(y, p)
             roc = plt.plot(fpr, tpr, color=c, linewidth=1.0,)
             plots.append(roc)
-
-            top_line = index_acron[idx] + '\t' + ', '.join([var_labels[v] for v in vlist]) + '\t' + str(auc)
-            top_models.append(top_line)
 
 plt.plot([0, 1], [0, 1], 'k--', c='grey', linewidth=0.8)
 plt.xlim([-0.1, 1.1])
@@ -134,12 +126,3 @@ plt.legend(loc='lower right', ncol=label_columns)
 # plt.show()
 fig.savefig(pdf_file)
 print "Done."
-
-print ""
-print "Saving list of predictors to " + pred_file + "..."
-with open(pred_file, "w") as pfile:
-    pfile.write("Predictor\tVariables\tAUC\n")
-    for line in top_models:
-        pfile.write(line + "\n")
-print "Done."
-
