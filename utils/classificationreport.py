@@ -7,7 +7,7 @@ Builds a text report showing precision, recall, F1 score.
 from sklearn.metrics import classification_report
 from sklearn.metrics import precision_recall_fscore_support
 
-label_file = "./data/labels.txt"
+label_file = "./data/outcome.txt"
 
 def report(probs, y_test):
     preds = [int(0.5 < p) for p in probs]
