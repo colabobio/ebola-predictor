@@ -1,3 +1,3 @@
 title=Ebola CARE
-author=Sabeti Lab
+author=Broad Institute
 orientation=sensor
