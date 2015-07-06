@@ -4,7 +4,7 @@ Creates a confusion matrix.
 @copyright: The Broad Institute of MIT and Harvard 2015
 """
 
-label_file = "./data/labels.txt"
+label_file = "./data/outcome.txt"
 
 def confusion(probs, y_test):
     target_names = []
