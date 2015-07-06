@@ -38,7 +38,7 @@ pdf_file = args.pdf_file[0]
 extra_tests = args.extra_tests[0].split(",")
 excluded_predictors = args.exclude[0].split(",")
 opacity = args.opacity[0]
-weight = args.interval[0]
+weight = args.weight[0]
 label_columns = args.columns[0]
 
 var_labels = {}

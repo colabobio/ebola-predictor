@@ -33,7 +33,7 @@ pdf_file = args.pdf_file[0]
 excluded_predictors = args.exclude[0].split(",")
 opacity = args.opacity[0]
 label_columns = args.columns[0]
-weight = args.interval[0]
+weight = args.weight[0]
 interval = args.interval[0]
 
 pred_names = []
