@@ -25,6 +25,8 @@ parser.add_argument("-x", "--exclude", nargs=1, default=["lreg,scikit_randf"],
                     help="Predictors to exclude from plots")
 parser.add_argument("-op", "--opacity", type=int, nargs=1, default=[160],
                     help="Opacity of data points")
+parser.add_argument("-w", "--weight", type=int, nargs=1, default=[1],
+                    help="Line weight")
 parser.add_argument("-col", "--columns", type=int, nargs=1, default=[2],
                     help="Number of label columns, 0 for no labels")
 
@@ -36,6 +38,7 @@ pdf_file = args.pdf_file[0]
 extra_tests = args.extra_tests[0].split(",")
 excluded_predictors = args.exclude[0].split(",")
 opacity = args.opacity[0]
+weight = args.interval[0]
 label_columns = args.columns[0]
 
 var_labels = {}
@@ -112,10 +115,10 @@ with open(rank_file, "r") as rfile:
             c = [e/255.0 for e in glyph_colors[pred]]
             c.append(opacity/255.0)
             fpr, tpr, _ = roc_curve(y, p)
-            roc = plt.plot(fpr, tpr, color=c, linewidth=1.0,)
+            roc = plt.plot(fpr, tpr, color=c, linewidth=weight)
             plots.append(roc)
 
-plt.plot([0, 1], [0, 1], 'k--', c='grey', linewidth=0.8)
+plt.plot([0, 1], [0, 1], 'k--', c='grey', linewidth=0.8 * weight)
 plt.xlim([-0.1, 1.1])
 plt.ylim([-0.1, 1.1])
 plt.xlabel('False Positive Rate')

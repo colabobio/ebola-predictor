@@ -22,6 +22,8 @@ parser.add_argument("-op", "--opacity", type=int, nargs=1, default=[255],
                     help="Opacity of curves")
 parser.add_argument("-col", "--columns", type=int, nargs=1, default=[2],
                     help="Number of label columns, 0 for no labels")
+parser.add_argument("-w", "--weight", type=int, nargs=1, default=[1],
+                    help="Line weight")
 parser.add_argument("-i", "--interval", type=int, nargs=1, default=[1],
                     help="Interval between models")
 
@@ -31,6 +33,7 @@ pdf_file = args.pdf_file[0]
 excluded_predictors = args.exclude[0].split(",")
 opacity = args.opacity[0]
 label_columns = args.columns[0]
+weight = args.interval[0]
 interval = args.interval[0]
 
 pred_names = []
@@ -93,10 +96,10 @@ for pred_name in pred_names:
     auc = roc_auc_score(ydata, pdata)
     c = [e/255.0 for e in curve_colors[pred_name]]
     c.append(opacity/255.0)
-    plots.append(plt.plot(fpr, tpr, color=c, linewidth=1.0, label=pred_labels[pred_name]))
+    plots.append(plt.plot(fpr, tpr, color=c, linewidth=weight, label=pred_labels[pred_name]))
     print "Predictor",pred_name,"=",auc
 
-plt.plot([0, 1], [0, 1], 'k--', c='grey', linewidth=0.8)
+plt.plot([0, 1], [0, 1], 'k--', c='grey', linewidth=0.8 * weight)
 plt.xlim([-0.1, 1.1])
 plt.ylim([-0.1, 1.1])
 plt.xlabel('False Positive Rate')
