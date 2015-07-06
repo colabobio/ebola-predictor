@@ -22,6 +22,8 @@ import pandas as pd
 import numpy as np
 from sklearn.utils import column_or_1d
 from sklearn.preprocessing import label_binarize
+from sklearn.metrics import roc_auc_score
+from sklearn.metrics import precision_score, recall_score, f1_score
 
 def _num_samples(x):
     """Return number of samples in array-like x."""
@@ -74,7 +76,6 @@ def _check_binary_probabilistic_predictions(y_true, y_prob):
         raise ValueError("y_prob contains values less than 0.")
 
     return label_binarize(y_true, labels)[:, 0]
-
 
 def brier_score_loss(y_true, y_prob, sample_weight=None, pos_label=None):
     """Compute the Brier score.
@@ -146,18 +147,21 @@ parser.add_argument("-B", "--base_dir", nargs=1, default=["./"],
                     help="Base folder")
 parser.add_argument("-rank", "--ranking_file", nargs=1, default=["./out/ranking.txt"],
                     help="Ranking file")
-parser.add_argument("-pred", "--pred_file", nargs=1, default=["./out/predictors.tsv"],
-                    help="Predictors file")
+parser.add_argument("-out", "--output_file", nargs=1, default=["./out/scores.tsv"],
+                    help="Output file")
+parser.add_argument("-s", "--scores", nargs=1, default=["precision,recall,f1,brier,auc"],
+                    help="Scores to compute")
 parser.add_argument("-extra", "--extra_tests", nargs=1, default=[""],
                     help="Extra tests to include a prediction in the plot, comma separated")
 parser.add_argument("-x", "--exclude", nargs=1, default=["lreg,scikit_randf"],
-                    help="Predictors to exclude from plots")
+                    help="Predictors to exclude from analysis")
 
 args = parser.parse_args()
 index_mode = args.index_mode[0]
 base_dir = args.base_dir[0]
 rank_file = args.ranking_file[0]
-pred_file = args.pred_file[0]
+output_file = args.output_file[0]
+scores = args.scores[0].split(",")
 extra_tests = args.extra_tests[0].split(",")
 excluded_predictors = args.exclude[0].split(",")
 
@@ -186,8 +190,8 @@ with open(options_file, "r") as ofile:
         index_labels[parts[0]] = parts[1]
         index_acron[parts[0]] = parts[2]
 
-print "Collecting Brier scores..."
-top_models = []
+print "Calculating scores..."
+score_lines = []
 with open(rank_file, "r") as rfile:
     lines = rfile.readlines()
     for line in lines:
@@ -223,21 +227,43 @@ with open(rank_file, "r") as rfile:
 
         if 0.9 <= f1_mean and 0.05 <= f1_std:
             id = os.path.split(mdl_str)[1]
-            os.system("python eval.py -B " + base_dir + " -N " + id + " -p " + pred + " -m roc > ./out/roc.tmp")
-            df = pd.read_csv("./out/roc.csv", delimiter=",")
+            os.system("python utils/aggregate.py -B " + base_dir + " -N " + id + " -p " + pred)
+            df = pd.read_csv("./out/predictions.csv", delimiter=",")
             y = df["Y"]
             p = df["P"]
-            brier = brier_score_loss(y, p)
-            top_line = index_acron[idx] + '\t' + ', '.join([var_labels[v] for v in vlist]) + '\t' + str(brier)
-            top_models.append(top_line)
+            if len(y) == 0: continue
+            pb = [int(0.5 < x) for x in p]
+            
+            score_line = index_acron[idx] + '\t' + ', '.join([var_labels[v] for v in vlist])
+            for score in scores:
+                if score == "precision":
+                    precision = precision_score(y, pb)
+                    score_line = score_line + '\t' + ("%.3f" % precision)
+                elif score == "recall":
+                    recall = recall_score(y, pb)
+                    score_line = score_line + '\t' + ("%.3f" % recall)
+                elif score == "f1":
+                    f1 = f1_score(y, pb)
+                    score_line = score_line + '\t' + ("%.3f" % f1)
+                elif score == "brier":
+                    brier = brier_score_loss(y, p)
+                    score_line = score_line + '\t' + ("%.3f" % brier)
+                elif score == "auc":
+                    auc = roc_auc_score(y, p)
+                    score_line = score_line + '\t' + ("%.3f" % auc)
+            print score_line
+            score_lines.append(score_line)
 
 print "Done."
 
 print ""
-print "Saving list of predictors to " + pred_file + "..."
-with open(pred_file, "w") as pfile:
-    pfile.write("Predictor\tVariables\tBrier\n")
-    for line in top_models:
-        pfile.write(line + "\n")
+print "Saving list of scores to " + output_file + "..."
+with open(output_file, "w") as ofile:
+    ofile.write("Predictor\tVariables")
+    for score in scores:
+        ofile.write("\t" + score)
+    ofile.write("\n")
+    for line in score_lines:
+        ofile.write(line + "\n")
 print "Done."
 
