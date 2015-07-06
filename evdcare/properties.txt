@@ -1,0 +1,9 @@
+name=Ebola CARE
+version=0.6
+package=org.broadinstitute.ebolacare
+orientation=sensor
+images.icon=images/icon.png
+images.load=images/loading.jpg
+sdk.target=19
+sdk.minimum=19
+
