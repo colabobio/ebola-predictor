@@ -4,6 +4,6 @@ package=org.broadinstitute.ebolacare
 orientation=sensor
 images.icon=images/icon.png
 images.load=images/loading.jpg
-sdk.target=19
-sdk.minimum=19
+sdk.target=15
+sdk.minimum=15
 

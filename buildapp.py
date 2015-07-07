@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import os, argparse
+import os, argparse, shutil
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-d", "--dir", nargs=1, default=["test"],
@@ -8,6 +8,16 @@ parser.add_argument("-d", "--dir", nargs=1, default=["test"],
 parser.add_argument("-b", "--build", nargs=1, default=["release"],
                     help="Build options")
 args = parser.parse_args()
+
+p4a_dist = ''
+with open("./settings.cfg", "r") as sfile:
+    lines = sfile.readlines()
+    for line in lines:
+        line = line.strip()
+        if not line: continue
+        key, val = line.split("=")
+        if key == "python-for-android":
+            p4a_dist = val 
 
 app_dir = args.dir[0]
 propfile = os.path.join(app_dir, "properties.txt")
@@ -42,14 +52,6 @@ with open(propfile, "r") as pfile:
         elif key == "sdk.minimum":
             sdk_minimum = val
 
-p4a_dist = ''
-with open("./settings.cfg", "r") as sfile:
-    lines = sfile.readlines()
-    for line in lines:
-        line = line.strip()
-        if not line: continue
-        p4a_dist = line
-
 build_options = args.build[0]
 #build_options = 'debug installd'
 #build_options = 'release'
@@ -62,9 +64,22 @@ p4a_dir = os.path.abspath(p4a_dist)
 
 cmd_str = './build.py --package ' + package + ' --sdk ' + sdk_target + ' --minsdk ' + sdk_minimum + ' --name "' + name + '" --version ' + version + ' --dir ' + app_dir + ' --orientation "' + orientation + '" --icon ' + icon_file + ' --presplash ' + load_file + ' ' + build_options
 
+if "release" in build_options:
+    build="release"
+elif "debug" in build_options:
+    build="debug"
+
+package_name = name.replace(" ", "") + "-" + version + "-" + build + "-unsigned.apk"
+
+src_file = os.path.join(p4a_dir, "bin", package_name)
+dst_file = os.path.join(app_dir, "bin", package_name)
+
 os.chdir(p4a_dir)
+#print cmd_str
 os.system(cmd_str)
 os.chdir(curr_dir)
 
-
+shutil.copyfile(src_file, dst_file)
+print ""
+print "Copied app package from",src_file,"to",dst_file
 
