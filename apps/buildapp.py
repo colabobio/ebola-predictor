@@ -65,11 +65,11 @@ p4a_dir = os.path.abspath(p4a_dist)
 cmd_str = './build.py --package ' + package + ' --sdk ' + sdk_target + ' --minsdk ' + sdk_minimum + ' --name "' + name + '" --version ' + version + ' --dir ' + app_dir + ' --orientation "' + orientation + '" --icon ' + icon_file + ' --presplash ' + load_file + ' ' + build_options
 
 if "release" in build_options:
-    build="release"
+    build="release-unsigned"
 elif "debug" in build_options:
     build="debug"
 
-package_name = name.replace(" ", "") + "-" + version + "-" + build + "-unsigned.apk"
+package_name = name.replace(" ", "") + "-" + version + "-" + build + ".apk"
 
 src_file = os.path.join(p4a_dir, "bin", package_name)
 dst_file = os.path.join(app_dir, "bin", package_name)

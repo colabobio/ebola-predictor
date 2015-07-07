@@ -2,6 +2,6 @@
 */.DS_Store
 *.pyc
 */*.pyc
-*/*.pyo
+apps/*/*.pyo
 *.sh
-evdcare/bin
+apps/*/bin
