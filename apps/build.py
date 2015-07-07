@@ -1,5 +1,11 @@
 #!/usr/bin/env python
 
+"""
+Build a Kivy app for the selected platform.
+
+@copyright: The Broad Institute of MIT and Harvard 2015
+"""
+
 import os, argparse, shutil
 
 parser = argparse.ArgumentParser()

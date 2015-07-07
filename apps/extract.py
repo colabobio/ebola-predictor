@@ -1,5 +1,5 @@
 """
-Extracts models for the app.
+Extracts models for a prognosis app.
 
 @copyright: The Broad Institute of MIT and Harvard 2015
 """

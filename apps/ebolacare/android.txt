@@ -1,3 +1,0 @@
-title=Ebola CARE
-author=Broad Institute
-orientation=sensor
