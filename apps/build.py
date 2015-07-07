@@ -59,8 +59,6 @@ with open(propfile, "r") as pfile:
             sdk_minimum = val
 
 build_options = args.build[0]
-#build_options = 'debug installd'
-#build_options = 'release'
 
 curr_dir = os.getcwd()
 app_dir = os.path.join(curr_dir, app_dir)
@@ -77,11 +75,16 @@ elif "debug" in build_options:
 
 package_name = name.replace(" ", "") + "-" + version + "-" + build + ".apk"
 
-src_file = os.path.join(p4a_dir, "bin", package_name)
+bin_dir = os.path.join(p4a_dir, "bin")
+src_file = os.path.join(bin_dir, package_name)
 dst_file = os.path.join(app_dir, "bin", package_name)
 
+if os.path.exists(bin_dir):
+    shutil.rmtree(bin_dir)
+if os.path.exists(dst_file):
+    os.remove(dst_file)
+
 os.chdir(p4a_dir)
-#print cmd_str
 os.system(cmd_str)
 os.chdir(curr_dir)
 
