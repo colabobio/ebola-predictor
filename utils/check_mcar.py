@@ -3,12 +3,19 @@ Tests for Missing Completely At Random (MCAR) using LittleMCAR function in Baylo
 
 http://cran.r-project.org/web/packages/BaylorEdPsych/
 
+or the Test Homoscedasticity, Multivariate Normality, and Missing Completely at Random from
+Jamshidian and Jalal.
+
 http://cran.r-project.org/web/packages/MissMech/
 
-based on the multivariate test described in
+References:
 
 Little, R (1988). A test of missing completely at random for multivariate data with missing
 values. Journal of the American Statistical Association, 83 (404), 1198-1202
+
+Jamshidian, M. Jalal, S., and Jansen, C. (2014). "MissMech: An R Package for Testing 
+Homoscedasticity, Multivariate Normality, and Missing Completely at Random (MCAR)," Journal 
+of Statistical Software, 56(6), 1-31
 
 @copyright: The Broad Institute of MIT and Harvard 2015
 """
@@ -104,33 +111,29 @@ def run_test(var_file, mcar_test, pvalue_threshold):
         robjects.r('res <- LittleMCAR(dat)')
         print ""
         res = robjects.r['res']
-        print res
-    else:
+        chisq = res[0][0]
+        pvalue = res[2][0]
+        print "Value of Little'schi-squared statistic:", chisq
+        print "P-value of Little's chi-squared test  :", pvalue        
+#        print res
+#        print ""
+#        print "Missingness patterns *****************************************************"
+#        print ""
+#        i = 0 
+#        for patrn in res[5]:
+#            print "Pattern",i,"----------------------------------------------------------"
+#            i += 1
+#            print patrn
+#            print "IDs"
+#            for rn in patrn.rownames:
+#                print idx_info[int(rn) - 1][1]
+#            print ""        
+    elif mcar_test == "hawkins":
         robjects.r('library(MissMech)')
         robjects.r('res <- TestMCARNormality(dat, alpha = ' + str(pvalue_threshold) + ')')
         res = robjects.r['res']
         print res
 
-#     chisq = res[0][0]
-#     pvalue = res[2][0]
-#     print "Value of Little'schi-squared statistic:", chisq
-#     print "P-value of Little's chi-squared test  :", pvalue
-#     if pvalue_threshold < pvalue:
-#         print "Therefore, MCAR hypothesis cannot be rejected at " + str(pvalue_threshold) + " significance level" 
-#     else:
-#         print ""
-#         print "Missingness patterns *****************************************************"
-#         print ""
-#         i = 0 
-#         for patrn in res[5]:
-#             print "Pattern",i,"----------------------------------------------------------"
-#             i += 1
-#             print patrn
-#             print "IDs"
-#             for rn in patrn.rownames:
-#                 print idx_info[int(rn) - 1][1]
-#             print ""
-    
     os.remove(test_filename)
 
 if __name__ == "__main__":
