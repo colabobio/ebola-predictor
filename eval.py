@@ -9,7 +9,7 @@ label_file = "./data/outcome.txt"
 target_names = []
 with open(label_file, "rb") as vfile:
     for line in vfile.readlines():
-        target_names.append(line.split()[1])
+        target_names.append(line.split(',')[1])
 
 def avg_cal_dis(dir, module):
     test_files = glob.glob(dir + "/testing-data-*.csv")
