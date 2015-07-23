@@ -9,6 +9,8 @@ label_file = "./data/outcome.txt"
 target_names = []
 with open(label_file, "rb") as vfile:
     for line in vfile.readlines():
+        line = line.strip()
+        if not line: continue
         target_names.append(line.split(',')[1])
 
 def avg_cal_dis(dir, module):
