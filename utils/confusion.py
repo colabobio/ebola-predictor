@@ -12,7 +12,8 @@ def confusion(probs, y_test):
         for line in vfile.readlines():
             line = line.strip()
             if not line: continue
-            target_names.append(line.split()[1])
+            print line
+            target_names.append(line.split(',')[1])
 
     n_hit = 0          # Hit or True Positive (TP)
     n_correct_rej = 0  # Correct rejection or True Negative (TN)

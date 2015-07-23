@@ -17,7 +17,7 @@ def report(probs, y_test):
         for line in vfile.readlines():
             line = line.strip()
             if not line: continue
-            target_names.append(line.split()[1])
+            target_names.append(line.split(',')[1])
 
     report = classification_report(y_test, preds, target_names=target_names)
 
