@@ -13,6 +13,7 @@ from os.path import join
 
 from kivy.uix.image import Image
 from kivy.uix.behaviors import ButtonBehavior
+from kivy import platform
 
 import os
 import re
@@ -37,8 +38,13 @@ for font in KIVY_FONTS:
 # Load the kv file specifying the UI, otherwise needs to be named
 # EbolaPredictor.kv (see note in App class below) and will be loaded
 # automatically.
-Builder.load_file('ui.kv')
-
+if platform == 'android':
+    Builder.load_file('ui-android.kv')
+elif platform == 'ios':
+    Builder.load_file('ui-ios.kv')
+else:
+    Builder.load_file('ui.kv')
+        
 ####################################################################################
 # Load variables
 values = {}
