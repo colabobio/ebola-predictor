@@ -139,6 +139,47 @@ def brier_score_loss(y_true, y_prob, sample_weight=None, pos_label=None):
     y_true = _check_binary_probabilistic_predictions(y_true, y_prob)
     return np.average((y_true - y_prob) ** 2, weights=sample_weight)
 
+# http://stackoverflow.com/questions/19124239/scikit-learn-roc-curve-with-confidence-intervals
+def score_bootstrap(score_fun, y_true, y_pred, pvalue, iter):
+    n_bootstraps = iter
+    bootstrapped_scores = []
+#     rng_seed = 42  # control reproducibility
+#     rng = np.random.RandomState(rng_seed)
+    rng = np.random.RandomState()
+    for i in range(n_bootstraps):
+        # bootstrap by sampling with replacement on the prediction indices
+        indices = rng.random_integers(0, len(y_pred) - 1, len(y_pred))
+        if len(np.unique(y_true[indices])) < 2:
+            # We need at least one positive and one negative sample for ROC AUC
+            # to be defined: reject the sample
+            continue
+
+        score = score_fun(y_true[indices], y_pred[indices])
+        bootstrapped_scores.append(score)
+    
+    sorted_scores = np.array(bootstrapped_scores)
+    sorted_scores.sort()
+
+    confidence_lower = sorted_scores[int(pvalue * len(sorted_scores))]
+    confidence_upper = sorted_scores[int((1 - pvalue) * len(sorted_scores))]
+    return [confidence_lower, confidence_upper]
+
+def precision_bootstrap(y_true, y_pred, pvalue, iter):
+    return score_bootstrap(precision_score, y_true, y_pred, pvalue, iter)
+
+def recall_bootstrap(y_true, y_pred, pvalue, iter):
+    return score_bootstrap(recall_score, y_true, y_pred, pvalue, iter)
+
+def f1_bootstrap(y_true, y_pred, pvalue, iter):
+    return score_bootstrap(f1_score, y_true, y_pred, pvalue, iter)
+
+def brier_bootstrap(y_true, y_pred, pvalue, iter):
+    return score_bootstrap(brier_score_loss, y_true, y_pred, pvalue, iter)
+
+def roc_bootstrap(y_true, y_pred, pvalue, iter):
+    return score_bootstrap(roc_auc_score, y_true, y_pred, pvalue, iter)
+
+##########################################################################################
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-mode", "--index_mode", nargs=1, default=["PRED"],
@@ -155,6 +196,12 @@ parser.add_argument("-extra", "--extra_tests", nargs=1, default=[""],
                     help="Extra tests to include a prediction in the plot, comma separated")
 parser.add_argument("-x", "--exclude", nargs=1, default=["lreg,scikit_randf"],
                     help="Predictors to exclude from analysis")
+parser.add_argument("-c", "--confidence", type=float, nargs=1, default=[95],
+                    help="Confidence to use in the bootstrap intervals")
+parser.add_argument("-i", "--iterations", type=int, nargs=1, default=[1000],
+                    help="Confidence to use in the bootstrap intervals")
+parser.add_argument("-b", "--bootstrap", action="store_true",
+                    help="use bootstrap to generate confidence intervals")
 
 args = parser.parse_args()
 index_mode = args.index_mode[0]
@@ -164,6 +211,9 @@ output_file = args.output_file[0]
 scores = args.scores[0].split(",")
 extra_tests = args.extra_tests[0].split(",")
 excluded_predictors = args.exclude[0].split(",")
+bootstrap = args.bootstrap
+pvalue = 1.0 - args.confidence[0] / 100.0
+iter = args.iterations[0]
 
 var_labels = {}
 with open("./data/alias.txt", "r") as afile:
@@ -232,25 +282,50 @@ with open(rank_file, "r") as rfile:
             y = df["Y"]
             p = df["P"]
             if len(y) == 0: continue
-            pb = [int(0.5 < x) for x in p]
+            pb = np.array([int(0.5 < x) for x in p])
             
             score_line = index_acron[idx] + '\t' + ', '.join([var_labels[v] for v in vlist])
             for score in scores:
                 if score == "precision":
                     precision = precision_score(y, pb)
-                    score_line = score_line + '\t' + ("%.3f" % precision)
+                    if bootstrap:
+                        lo, hi = precision_bootstrap(y, pb, pvalue, iter)
+                        scores_str = ("%.3f" % lo) + "," + ("%.3f" % precision) + "," + ("%.3f" % hi)
+                    else:
+                        scores_str = ("%.3f" % precision)
+                    score_line = score_line + '\t' + scores_str
                 elif score == "recall":
                     recall = recall_score(y, pb)
-                    score_line = score_line + '\t' + ("%.3f" % recall)
+                    if bootstrap:
+                        lo, hi = recall_bootstrap(y, pb, pvalue, iter)
+                        scores_str = ("%.3f" % lo) + "," + ("%.3f" % recall) + "," + ("%.3f" % hi)
+                    else:
+                        scores_str = ("%.3f" % recall)
+                    score_line = score_line + '\t' + scores_str
                 elif score == "f1":
                     f1 = f1_score(y, pb)
-                    score_line = score_line + '\t' + ("%.3f" % f1)
+                    if bootstrap:
+                        lo, hi = f1_bootstrap(y, pb, pvalue, iter)
+                        scores_str = ("%.3f" % lo) + "," + ("%.3f" % f1) + "," + ("%.3f" % hi)
+                    else:
+                        scores_str = ("%.3f" % f1)
+                    score_line = score_line + '\t' + scores_str
                 elif score == "brier":
                     brier = brier_score_loss(y, p)
-                    score_line = score_line + '\t' + ("%.3f" % brier)
+                    if bootstrap:
+                        lo, hi = brier_bootstrap(y, p, pvalue, iter)
+                        scores_str = ("%.3f" % lo) + "," + ("%.3f" % brier) + "," + ("%.3f" % hi)
+                    else:
+                        scores_str = ("%.3f" % brier)
+                    score_line = score_line + '\t' + scores_str
                 elif score == "auc":
                     auc = roc_auc_score(y, p)
-                    score_line = score_line + '\t' + ("%.3f" % auc)
+                    if bootstrap:
+                        lo, hi = roc_bootstrap(y, p, pvalue, iter)
+                        scores_str = ("%.3f" % lo) + "," + ("%.3f" % auc) + "," + ("%.3f" % hi)
+                    else:
+                        scores_str = ("%.3f" % auc)
+                    score_line = score_line + '\t' + scores_str
             print score_line
             score_lines.append(score_line)
 
