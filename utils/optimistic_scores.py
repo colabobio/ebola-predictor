@@ -138,7 +138,7 @@ def brier_score_loss(y_true, y_prob, sample_weight=None, pos_label=None):
         pos_label = y_true.max()
     y_true = np.array(y_true == pos_label, int)
     y_true = _check_binary_probabilistic_predictions(y_true, y_prob)
-    return np.average((y_true - y_prob) ** 2, weights=sample_weight)
+    return 1 - np.average((y_true - y_prob) ** 2, weights=sample_weight)
 
 # http://stackoverflow.com/questions/19124239/scikit-learn-roc-curve-with-confidence-intervals
 def score_bootstrap(score_fun, y_true, y_pred, pvalue, iter):
@@ -243,6 +243,7 @@ with open(options_file, "r") as ofile:
 
 print "Calculating scores..."
 score_lines = []
+count = 0
 with open(rank_file, "r") as rfile:
     lines = rfile.readlines()
     for line in lines:
@@ -277,6 +278,7 @@ with open(rank_file, "r") as rfile:
         vlist = vars.split(",")
 
         if 0.9 <= f1_mean:
+            count += 1
             id = os.path.split(mdl_str)[1]
             mdl_dir = os.path.join(base_dir, "models", id)
             var_file = os.path.join(mdl_dir, "variables.txt")
@@ -295,21 +297,135 @@ with open(rank_file, "r") as rfile:
                     lines = tfile.readlines()
                     data.extend(lines[1:])
 
-                test_dir = "./models/test/"
+                test_dir = "./models/test"
                 if os.path.exists(test_dir):
                     shutil.rmtree(test_dir)
                 os.mkdir(test_dir)
                 shutil.copyfile(var_file, os.path.join(test_dir, "variables.txt"))
 
-                train_file = os.path.join(test_dir, "training-data-completed.csv")
-                test_file = os.path.join(test_dir, "testing-data.csv")
-                with open(train_file, "wb") as tfile:
+                param_file0 = os.path.join(test_dir, pred + "-params-0")
+                train_file0 = os.path.join(test_dir, "training-data-completed-0.csv")
+                test_file0 = os.path.join(test_dir, "testing-data-0.csv")
+                with open(train_file0, "wb") as tfile:
                     tfile.write(title)
                     for line in data:
                         tfile.write(line)
-                shutil.copyfile(train_file, test_file)
+                shutil.copyfile(train_file0, test_file0)
                 
-                # Calculate
+                os.system("python " + pred + "/train.py -p " + param_file0 + " -t " + train_file0)
+                os.system("python utils/aggregate.py -B " + base_dir + " -N test -p " + pred)
+                df = pd.read_csv("./out/predictions.csv", delimiter=",")
+                y = df["Y"]
+                p = df["P"]
+                if len(y) == 0: continue
+                pb = np.array([int(0.5 < x) for x in p])
+                
+                # Calculating apparent scores
+                precision_app = precision_score(y, pb)
+                recall_app = recall_score(y, pb)
+                f1_app = f1_score(y, pb)
+                brier_app = brier_score_loss(y, p)
+                auc_app = roc_auc_score(y, p)
+                print precision_app, recall_app, f1_app, brier_app, auc_app
+                
+                # Bootstrap iterations
+                n_bootstraps = 10
+                rng = np.random.RandomState()
+                precision_optim = []
+                recall_optim = []
+                f1_optim = []
+                brier_optim = []
+                auc_optim = []
+                for n in range(n_bootstraps):
+                    # Sample data indices with replacement
+                    indices = rng.random_integers(0, len(data) - 1, len(data))
+                    
+                    boot_dir = "./models/boot" + str(n)
+                    if os.path.exists(boot_dir):
+                        shutil.rmtree(boot_dir)
+                    os.mkdir(boot_dir)
+                    shutil.copyfile(var_file, os.path.join(boot_dir, "variables.txt"))
+    
+                    param_file = os.path.join(boot_dir, pred + "-params-0")
+                    train_file = os.path.join(boot_dir, "training-data-completed-0.csv")
+                    test_file = os.path.join(boot_dir, "testing-data-0.csv")
+                    with open(train_file, "wb") as tfile:
+                        tfile.write(title)
+                        for i in indices:
+                            tfile.write(data[i])
+
+                    # Training on the bootstrap data
+                    os.system("python " + pred + "/train.py -p " + param_file + " -t " + train_file)
+                    
+                    shutil.copyfile(train_file, test_file) # use bootstrap data for testing
+                    os.system("python utils/aggregate.py -B " + base_dir + " -N boot" + str(n) + " -p " + pred)
+                    df = pd.read_csv("./out/predictions.csv", delimiter=",")
+                    y = df["Y"]
+                    p = df["P"]
+                    if len(y) == 0: continue
+                    pb = np.array([int(0.5 < x) for x in p])
+                    # Calculating bootstrap scores
+                    precision_boot = precision_score(y, pb)
+                    recall_boot = recall_score(y, pb)
+                    f1_boot = f1_score(y, pb)
+                    brier_boot = brier_score_loss(y, p)
+                    auc_boot = roc_auc_score(y, p)
+
+                    shutil.copyfile(test_file0, test_file) # use original data for testing
+                    os.system("python utils/aggregate.py -B " + base_dir + " -N boot" + str(n) + " -p " + pred)
+                    df = pd.read_csv("./out/predictions.csv", delimiter=",")
+                    y = df["Y"]
+                    p = df["P"]
+                    if len(y) == 0: continue
+                    pb = np.array([int(0.5 < x) for x in p])
+                    # Calculating bootstrap scores
+                    precision_orig = precision_score(y, pb)
+                    recall_orig = recall_score(y, pb)
+                    f1_orig = f1_score(y, pb)
+                    brier_orig = brier_score_loss(y, p)
+                    auc_orig = roc_auc_score(y, p)
+                    
+                    precision_o = precision_boot - precision_orig
+                    recall_o = recall_boot - recall_orig
+                    f1_o = f1_boot - f1_orig
+                    brier_o = brier_boot - brier_orig
+                    auc_o = auc_boot - auc_orig
+      
+                    precision_optim.append(precision_o)
+                    recall_optim.append(recall_o)
+                    f1_optim.append(f1_o)
+                    brier_optim.append(brier_o)
+                    auc_optim.append(auc_o)
+#                     print precision_o, recall_o, f1_o, brier_o, auc_o
+                    
+                precision_optim_mean = np.mean(np.array(precision_optim), axis=0)
+                recall_optim_mean = np.mean(np.array(recall_optim), axis=0)
+                f1_optim_mean = np.mean(np.array(f1_optim), axis=0)
+                brier_optim_mean = np.mean(np.array(brier_optim), axis=0)
+                auc_optim_mean = np.mean(np.array(auc_optim), axis=0)
+
+                precision_optim_std = np.std(np.array(precision_optim), axis=0)
+                recall_optim_std = np.std(np.array(recall_optim), axis=0)
+                f1_optim_std = np.std(np.array(f1_optim), axis=0)
+                brier_optim_std = np.std(np.array(brier_optim), axis=0)
+                auc_optim_std = np.std(np.array(auc_optim), axis=0)
+
+                print precision_app, precision_optim_mean, precision_optim_std, precision_app - precision_optim_mean
+                print recall_app, recall_optim_mean, recall_optim_std, recall_app - recall_optim_mean
+                print f1_app, f1_optim_mean, f1_optim_std, f1_app - f1_optim_mean
+                print brier_app, brier_optim_mean, brier_optim_std, brier_app - brier_optim_mean
+                print auc_app, auc_optim_mean, auc_optim_std, auc_app - auc_optim_mean
+
+#                 avg_prec = np.mean(np.array(total_prec), axis=0)
+#                 avg_rec = np.mean(np.array(total_rec), axis=0)
+#                 avg_f1 = np.mean(np.array(total_f1), axis=0)
+# 
+#                 std_prec = np.std(np.array(total_prec), axis=0)
+#                 std_rec = np.std(np.array(total_rec), axis=0)
+#                 std_f1 = np.std(np.array(total_f1), axis=0)
+ 
+                if 3 < count:
+                    break
 
                 
 #             os.system("python utils/aggregate.py -B " + base_dir + " -N " + id + " -p " + pred)
