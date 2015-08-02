@@ -199,9 +199,9 @@ parser.add_argument("-x", "--exclude", nargs=1, default=["lreg,scikit_randf"],
 parser.add_argument("-c", "--confidence", type=float, nargs=1, default=[95],
                     help="Confidence to use in the bootstrap intervals")
 parser.add_argument("-i", "--iterations", type=int, nargs=1, default=[1000],
-                    help="Confidence to use in the bootstrap intervals")
+                    help="Number of bootstrap iterations")
 parser.add_argument("-b", "--bootstrap", action="store_true",
-                    help="use bootstrap to generate confidence intervals")
+                    help="Use bootstrap to generate confidence intervals")
 
 args = parser.parse_args()
 index_mode = args.index_mode[0]
