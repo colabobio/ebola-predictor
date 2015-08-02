@@ -1,9 +1,10 @@
 """
-Calculates Brier score over aggregated predictions for models with F1-score above 0.9.
+Applies Harrel's bootstrap method to calculate optimistic-corrected scores
 
-http://scikit-learn.org/stable/modules/generated/sklearn.metrics.brier_score_loss.html
+Harrell FE Jr, Lee KL, Mark DB. Multivariable prognostic models: issues in developing models,
+evaluating assumptions and adequacy, and measuring and reducing errors. Stat Med. 1996;15(4):361-387
 
-Backported from 0.16.1 to work with earlier versions of scitkit-learn
+Brier score backported from 0.16.1 to work with earlier versions of scitkit-learn
 
 @copyright: The Broad Institute of MIT and Harvard 2015
 
@@ -138,47 +139,9 @@ def brier_score_loss(y_true, y_prob, sample_weight=None, pos_label=None):
         pos_label = y_true.max()
     y_true = np.array(y_true == pos_label, int)
     y_true = _check_binary_probabilistic_predictions(y_true, y_prob)
-    return 1 - np.average((y_true - y_prob) ** 2, weights=sample_weight)
-
-# http://stackoverflow.com/questions/19124239/scikit-learn-roc-curve-with-confidence-intervals
-def score_bootstrap(score_fun, y_true, y_pred, pvalue, iter):
-    n_bootstraps = iter
-    bootstrapped_scores = []
-#     rng_seed = 42  # control reproducibility
-#     rng = np.random.RandomState(rng_seed)
-    rng = np.random.RandomState()
-    for i in range(n_bootstraps):
-        # bootstrap by sampling with replacement on the prediction indices
-        indices = rng.random_integers(0, len(y_pred) - 1, len(y_pred))
-        if len(np.unique(y_true[indices])) < 2:
-            # We need at least one positive and one negative sample for ROC AUC
-            # to be defined: reject the sample
-            continue
-
-        score = score_fun(y_true[indices], y_pred[indices])
-        bootstrapped_scores.append(score)
     
-    sorted_scores = np.array(bootstrapped_scores)
-    sorted_scores.sort()
-
-    confidence_lower = sorted_scores[int(pvalue * len(sorted_scores))]
-    confidence_upper = sorted_scores[int((1 - pvalue) * len(sorted_scores))]
-    return [confidence_lower, confidence_upper]
-
-def precision_bootstrap(y_true, y_pred, pvalue, iter):
-    return score_bootstrap(precision_score, y_true, y_pred, pvalue, iter)
-
-def recall_bootstrap(y_true, y_pred, pvalue, iter):
-    return score_bootstrap(recall_score, y_true, y_pred, pvalue, iter)
-
-def f1_bootstrap(y_true, y_pred, pvalue, iter):
-    return score_bootstrap(f1_score, y_true, y_pred, pvalue, iter)
-
-def brier_bootstrap(y_true, y_pred, pvalue, iter):
-    return score_bootstrap(brier_score_loss, y_true, y_pred, pvalue, iter)
-
-def roc_bootstrap(y_true, y_pred, pvalue, iter):
-    return score_bootstrap(roc_auc_score, y_true, y_pred, pvalue, iter)
+    # the brier score is modified to be close to 1 when the predictor is better
+    return 1 - np.average((y_true - y_prob) ** 2, weights=sample_weight)
 
 ##########################################################################################
 
@@ -197,12 +160,8 @@ parser.add_argument("-extra", "--extra_tests", nargs=1, default=[""],
                     help="Extra tests to include a prediction in the plot, comma separated")
 parser.add_argument("-x", "--exclude", nargs=1, default=["lreg,scikit_randf"],
                     help="Predictors to exclude from analysis")
-parser.add_argument("-c", "--confidence", type=float, nargs=1, default=[95],
-                    help="Confidence to use in the bootstrap intervals")
-parser.add_argument("-i", "--iterations", type=int, nargs=1, default=[1000],
-                    help="Confidence to use in the bootstrap intervals")
-parser.add_argument("-b", "--bootstrap", action="store_true",
-                    help="use bootstrap to generate confidence intervals")
+parser.add_argument("-i", "--iterations", type=int, nargs=1, default=[100],
+                    help="Number of bootstrap iterations")
 
 args = parser.parse_args()
 index_mode = args.index_mode[0]
@@ -212,8 +171,6 @@ output_file = args.output_file[0]
 scores = args.scores[0].split(",")
 extra_tests = args.extra_tests[0].split(",")
 excluded_predictors = args.exclude[0].split(",")
-bootstrap = args.bootstrap
-pvalue = 1.0 - args.confidence[0] / 100.0
 iter = args.iterations[0]
 
 var_labels = {}
@@ -285,8 +242,8 @@ with open(rank_file, "r") as rfile:
             train_file = os.path.join(mdl_dir, "training-data-completed-0.csv")
             test_file = os.path.join(mdl_dir, "testing-data-0.csv")
             if os.path.exists(var_file) and os.path.exists(train_file) and os.path.exists(test_file):
-                print var_file, pred, f1_mean, f1_std
-                
+                print "bootstrapping", id, pred
+
                 title = []
                 data = []
                 with open(train_file) as tfile:
@@ -311,7 +268,7 @@ with open(rank_file, "r") as rfile:
                     for line in data:
                         tfile.write(line)
                 shutil.copyfile(train_file0, test_file0)
-                
+
                 os.system("python " + pred + "/train.py -p " + param_file0 + " -t " + train_file0)
                 os.system("python utils/aggregate.py -B " + base_dir + " -N test -p " + pred)
                 df = pd.read_csv("./out/predictions.csv", delimiter=",")
@@ -319,17 +276,16 @@ with open(rank_file, "r") as rfile:
                 p = df["P"]
                 if len(y) == 0: continue
                 pb = np.array([int(0.5 < x) for x in p])
-                
+
                 # Calculating apparent scores
                 precision_app = precision_score(y, pb)
                 recall_app = recall_score(y, pb)
                 f1_app = f1_score(y, pb)
                 brier_app = brier_score_loss(y, p)
                 auc_app = roc_auc_score(y, p)
-                print precision_app, recall_app, f1_app, brier_app, auc_app
-                
+
                 # Bootstrap iterations
-                n_bootstraps = 10
+                n_bootstraps = iter
                 rng = np.random.RandomState()
                 precision_optim = []
                 recall_optim = []
@@ -345,7 +301,7 @@ with open(rank_file, "r") as rfile:
                         shutil.rmtree(boot_dir)
                     os.mkdir(boot_dir)
                     shutil.copyfile(var_file, os.path.join(boot_dir, "variables.txt"))
-    
+
                     param_file = os.path.join(boot_dir, pred + "-params-0")
                     train_file = os.path.join(boot_dir, "training-data-completed-0.csv")
                     test_file = os.path.join(boot_dir, "testing-data-0.csv")
@@ -356,7 +312,7 @@ with open(rank_file, "r") as rfile:
 
                     # Training on the bootstrap data
                     os.system("python " + pred + "/train.py -p " + param_file + " -t " + train_file)
-                    
+
                     shutil.copyfile(train_file, test_file) # use bootstrap data for testing
                     os.system("python utils/aggregate.py -B " + base_dir + " -N boot" + str(n) + " -p " + pred)
                     df = pd.read_csv("./out/predictions.csv", delimiter=",")
@@ -384,112 +340,72 @@ with open(rank_file, "r") as rfile:
                     f1_orig = f1_score(y, pb)
                     brier_orig = brier_score_loss(y, p)
                     auc_orig = roc_auc_score(y, p)
-                    
+
                     precision_o = precision_boot - precision_orig
                     recall_o = recall_boot - recall_orig
                     f1_o = f1_boot - f1_orig
                     brier_o = brier_boot - brier_orig
                     auc_o = auc_boot - auc_orig
-      
+
                     precision_optim.append(precision_o)
                     recall_optim.append(recall_o)
                     f1_optim.append(f1_o)
                     brier_optim.append(brier_o)
                     auc_optim.append(auc_o)
-#                     print precision_o, recall_o, f1_o, brier_o, auc_o
-                    
-                precision_optim_mean = np.mean(np.array(precision_optim), axis=0)
-                recall_optim_mean = np.mean(np.array(recall_optim), axis=0)
-                f1_optim_mean = np.mean(np.array(f1_optim), axis=0)
-                brier_optim_mean = np.mean(np.array(brier_optim), axis=0)
-                auc_optim_mean = np.mean(np.array(auc_optim), axis=0)
 
+                precision_optim_mean = np.mean(np.array(precision_optim), axis=0)
                 precision_optim_std = np.std(np.array(precision_optim), axis=0)
+
+                recall_optim_mean = np.mean(np.array(recall_optim), axis=0)
                 recall_optim_std = np.std(np.array(recall_optim), axis=0)
+
+                f1_optim_mean = np.mean(np.array(f1_optim), axis=0)
                 f1_optim_std = np.std(np.array(f1_optim), axis=0)
+
+                brier_optim_mean = np.mean(np.array(brier_optim), axis=0)
                 brier_optim_std = np.std(np.array(brier_optim), axis=0)
+
+                auc_optim_mean = np.mean(np.array(auc_optim), axis=0)
                 auc_optim_std = np.std(np.array(auc_optim), axis=0)
 
-                print precision_app, precision_optim_mean, precision_optim_std, precision_app - precision_optim_mean
-                print recall_app, recall_optim_mean, recall_optim_std, recall_app - recall_optim_mean
-                print f1_app, f1_optim_mean, f1_optim_std, f1_app - f1_optim_mean
-                print brier_app, brier_optim_mean, brier_optim_std, brier_app - brier_optim_mean
-                print auc_app, auc_optim_mean, auc_optim_std, auc_app - auc_optim_mean
-
-#                 avg_prec = np.mean(np.array(total_prec), axis=0)
-#                 avg_rec = np.mean(np.array(total_rec), axis=0)
-#                 avg_f1 = np.mean(np.array(total_f1), axis=0)
-# 
-#                 std_prec = np.std(np.array(total_prec), axis=0)
-#                 std_rec = np.std(np.array(total_rec), axis=0)
-#                 std_f1 = np.std(np.array(total_f1), axis=0)
+#                 print precision_app, precision_optim_mean, precision_optim_std, precision_app - precision_optim_mean
+#                 print recall_app, recall_optim_mean, recall_optim_std, recall_app - recall_optim_mean
+#                 print f1_app, f1_optim_mean, f1_optim_std, f1_app - f1_optim_mean
+#                 print brier_app, brier_optim_mean, brier_optim_std, brier_app - brier_optim_mean
+#                 print auc_app, auc_optim_mean, auc_optim_std, auc_app - auc_optim_mean
  
+                score_line = index_acron[idx] + '\t' + ', '.join([var_labels[v] for v in vlist])
+                for score in scores:
+                    if score == "precision":
+                        scores_str = "%.3f,%.3f,%.3f,%.3f" % (precision_app, precision_optim_mean, precision_optim_std, precision_app - precision_optim_mean)
+                        score_line = score_line + '\t' + scores_str
+                    elif score == "recall":
+                        scores_str = "%.3f,%.3f,%.3f,%.3f" % (recall_app, recall_optim_mean, recall_optim_std, recall_app - recall_optim_mean)
+                        score_line = score_line + '\t' + scores_str
+                    elif score == "f1":
+                        scores_str = "%.3f,%.3f,%.3f,%.3f" % (f1_app, f1_optim_mean, f1_optim_std, f1_app - f1_optim_mean)
+                        score_line = score_line + '\t' + scores_str
+                    elif score == "brier":
+                        scores_str = "%.3f,%.3f,%.3f,%.3f" % (brier_app, brier_optim_mean, brier_optim_std, brier_app - brier_optim_mean)
+                        score_line = score_line + '\t' + scores_str
+                    elif score == "auc":
+                        scores_str = "%.3f,%.3f,%.3f,%.3f" % (auc_app, auc_optim_mean, auc_optim_std, auc_app - auc_optim_mean)
+                        score_line = score_line + '\t' + scores_str
+                score_line = score_line + '\t' + scores_str
+                score_lines.append(score_line)
                 if 3 < count:
                     break
 
-                
-#             os.system("python utils/aggregate.py -B " + base_dir + " -N " + id + " -p " + pred)
-#             df = pd.read_csv("./out/predictions.csv", delimiter=",")
-#             y = df["Y"]
-#             p = df["P"]
-#             if len(y) == 0: continue
-#             pb = np.array([int(0.5 < x) for x in p])
-#             
-#             score_line = index_acron[idx] + '\t' + ', '.join([var_labels[v] for v in vlist])
-#             for score in scores:
-#                 if score == "precision":
-#                     precision = precision_score(y, pb)
-#                     if bootstrap:
-#                         lo, hi = precision_bootstrap(y, pb, pvalue, iter)
-#                         scores_str = ("%.3f" % lo) + "," + ("%.3f" % precision) + "," + ("%.3f" % hi)
-#                     else:
-#                         scores_str = ("%.3f" % precision)
-#                     score_line = score_line + '\t' + scores_str
-#                 elif score == "recall":
-#                     recall = recall_score(y, pb)
-#                     if bootstrap:
-#                         lo, hi = recall_bootstrap(y, pb, pvalue, iter)
-#                         scores_str = ("%.3f" % lo) + "," + ("%.3f" % recall) + "," + ("%.3f" % hi)
-#                     else:
-#                         scores_str = ("%.3f" % recall)
-#                     score_line = score_line + '\t' + scores_str
-#                 elif score == "f1":
-#                     f1 = f1_score(y, pb)
-#                     if bootstrap:
-#                         lo, hi = f1_bootstrap(y, pb, pvalue, iter)
-#                         scores_str = ("%.3f" % lo) + "," + ("%.3f" % f1) + "," + ("%.3f" % hi)
-#                     else:
-#                         scores_str = ("%.3f" % f1)
-#                     score_line = score_line + '\t' + scores_str
-#                 elif score == "brier":
-#                     brier = brier_score_loss(y, p)
-#                     if bootstrap:
-#                         lo, hi = brier_bootstrap(y, p, pvalue, iter)
-#                         scores_str = ("%.3f" % lo) + "," + ("%.3f" % brier) + "," + ("%.3f" % hi)
-#                     else:
-#                         scores_str = ("%.3f" % brier)
-#                     score_line = score_line + '\t' + scores_str
-#                 elif score == "auc":
-#                     auc = roc_auc_score(y, p)
-#                     if bootstrap:
-#                         lo, hi = roc_bootstrap(y, p, pvalue, iter)
-#                         scores_str = ("%.3f" % lo) + "," + ("%.3f" % auc) + "," + ("%.3f" % hi)
-#                     else:
-#                         scores_str = ("%.3f" % auc)
-#                     score_line = score_line + '\t' + scores_str
-#             print score_line
-#             score_lines.append(score_line)
-
 print "Done."
 
-# print ""
-# print "Saving list of scores to " + output_file + "..."
-# with open(output_file, "w") as ofile:
-#     ofile.write("Predictor\tVariables")
-#     for score in scores:
-#         ofile.write("\t" + score)
-#     ofile.write("\n")
-#     for line in score_lines:
-#         ofile.write(line + "\n")
-# print "Done."
+print ""
+print "Saving list of scores to " + output_file + "..."
+with open(output_file, "w") as ofile:
+    ofile.write("Predictor\tVariables")
+    for score in scores:
+        ofile.write("\t" + score)
+    ofile.write("\n")
+    for line in score_lines:
+        ofile.write(line + "\n")
+print "Done."
 
