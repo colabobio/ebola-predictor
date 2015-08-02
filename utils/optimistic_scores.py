@@ -200,7 +200,6 @@ with open(options_file, "r") as ofile:
 
 print "Calculating scores..."
 score_lines = []
-count = 0
 with open(rank_file, "r") as rfile:
     lines = rfile.readlines()
     for line in lines:
@@ -393,8 +392,6 @@ with open(rank_file, "r") as rfile:
                         score_line = score_line + '\t' + scores_str
                 score_line = score_line + '\t' + scores_str
                 score_lines.append(score_line)
-                if 3 < count:
-                    break
 
 print "Done."
 
