@@ -234,7 +234,6 @@ with open(rank_file, "r") as rfile:
         vlist = vars.split(",")
 
         if 0.9 <= f1_mean:
-            count += 1
             id = os.path.split(mdl_str)[1]
             mdl_dir = os.path.join(base_dir, "models", id)
             var_file = os.path.join(mdl_dir, "variables.txt")
