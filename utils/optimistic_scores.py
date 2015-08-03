@@ -257,7 +257,8 @@ with open(rank_file, "r") as rfile:
                     shutil.rmtree(archive_dir)
                 os.mkdir(archive_dir)
 
-                test_dir = os.path.join(base_dir, "models/test-" + id + "-" + pred)
+                test_name = "test-" + id + "-" + pred
+                test_dir = os.path.join(base_dir, "models", test_name)
                 if os.path.exists(test_dir):
                     shutil.rmtree(test_dir)
                 os.mkdir(test_dir)
@@ -273,7 +274,7 @@ with open(rank_file, "r") as rfile:
                 shutil.copyfile(train_file0, test_file0)
 
                 os.system("python " + pred + "/train.py -p " + param_file0 + " -t " + train_file0)
-                os.system("python utils/aggregate.py -B " + base_dir + " -N test -p " + pred)
+                os.system("python utils/aggregate.py -B " + base_dir + " -N " + test_name + " -p " + pred)
                 df = pd.read_csv("./out/predictions.csv", delimiter=",")
                 y = df["Y"]
                 p = df["P"]
@@ -298,8 +299,9 @@ with open(rank_file, "r") as rfile:
                 for n in range(n_bootstraps):
                     # Sample data indices with replacement
                     indices = rng.random_integers(0, len(data) - 1, len(data))
-                    
-                    boot_dir = os.path.join(base_dir, "models/boot" + str(n) + "-" + id + "-" + pred)
+
+                    boot_name = "boot" + str(n) + "-" + id + "-" + pred
+                    boot_dir = os.path.join(base_dir, "models", boot_name)
                     if os.path.exists(boot_dir):
                         shutil.rmtree(boot_dir)
                     os.mkdir(boot_dir)
@@ -317,7 +319,7 @@ with open(rank_file, "r") as rfile:
                     os.system("python " + pred + "/train.py -p " + param_file + " -t " + train_file)
 
                     shutil.copyfile(train_file, test_file) # use bootstrap data for testing
-                    os.system("python utils/aggregate.py -B " + base_dir + " -N boot" + str(n) + " -p " + pred)
+                    os.system("python utils/aggregate.py -B " + base_dir + " -N " + boot_name + " -p " + pred)
                     df = pd.read_csv("./out/predictions.csv", delimiter=",")
                     y = df["Y"]
                     p = df["P"]
@@ -331,7 +333,7 @@ with open(rank_file, "r") as rfile:
                     auc_boot = roc_auc_score(y, p)
 
                     shutil.copyfile(test_file0, test_file) # use original data for testing
-                    os.system("python utils/aggregate.py -B " + base_dir + " -N boot" + str(n) + " -p " + pred)
+                    os.system("python utils/aggregate.py -B " + base_dir + " -N " + boot_name + " -p " + pred)
                     df = pd.read_csv("./out/predictions.csv", delimiter=",")
                     y = df["Y"]
                     p = df["P"]
