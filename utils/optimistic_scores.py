@@ -255,6 +255,7 @@ with open(rank_file, "r") as rfile:
                 archive_dir = os.path.join(base_dir, "models/boot-" + id)
                 if os.path.exists(archive_dir):
                     shutil.rmtree(archive_dir)
+                os.mkdir(archive_dir)
 
                 test_dir = os.path.join(base_dir, "models/test-" + id)
                 if os.path.exists(test_dir):
