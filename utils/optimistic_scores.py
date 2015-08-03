@@ -150,8 +150,6 @@ parser.add_argument("-mode", "--index_mode", nargs=1, default=["PRED"],
                     help="Indexing mode, either PRED or IMP")
 parser.add_argument("-B", "--base_dir", nargs=1, default=["./"],
                     help="Base folder")
-parser.add_argument('-N', '--name', nargs=1, default=[""],
-                    help="Name prefix")
 parser.add_argument("-rank", "--ranking_file", nargs=1, default=["./out/ranking.txt"],
                     help="Ranking file")
 parser.add_argument("-out", "--output_file", nargs=1, default=["./out/scores.tsv"],
@@ -168,7 +166,6 @@ parser.add_argument("-i", "--iterations", type=int, nargs=1, default=[100],
 args = parser.parse_args()
 index_mode = args.index_mode[0]
 base_dir = args.base_dir[0]
-name = args.name[0]
 rank_file = args.ranking_file[0]
 output_file = args.output_file[0]
 scores = args.scores[0].split(",")
@@ -255,7 +252,11 @@ with open(rank_file, "r") as rfile:
                     lines = tfile.readlines()
                     data.extend(lines[1:])
 
-                test_dir = os.path.join(base_dir, "models/test-" + name + "-" + id)
+                archive_dir = os.path.join(base_dir, "models/boot-" + id)
+                if os.path.exists(archive_dir):
+                    shutil.rmtree(archive_dir)
+
+                test_dir = os.path.join(base_dir, "models/test-" + id)
                 if os.path.exists(test_dir):
                     shutil.rmtree(test_dir)
                 os.mkdir(test_dir)
@@ -297,7 +298,7 @@ with open(rank_file, "r") as rfile:
                     # Sample data indices with replacement
                     indices = rng.random_integers(0, len(data) - 1, len(data))
                     
-                    boot_dir = os.path.join(base_dir, "models/boot" + str(n) + "-" + name + "-" + id)
+                    boot_dir = os.path.join(base_dir, "models/boot" + str(n) + "-" + id)
                     if os.path.exists(boot_dir):
                         shutil.rmtree(boot_dir)
                     os.mkdir(boot_dir)
@@ -354,6 +355,8 @@ with open(rank_file, "r") as rfile:
                     brier_optim.append(brier_o)
                     auc_optim.append(auc_o)
 
+                    shutil.move(boot_dir, archive_dir)
+
                 precision_optim_mean = np.mean(np.array(precision_optim), axis=0)
                 precision_optim_std = np.std(np.array(precision_optim), axis=0)
 
@@ -394,6 +397,7 @@ with open(rank_file, "r") as rfile:
                         score_line = score_line + '\t' + scores_str
                 score_line = score_line + '\t' + scores_str
                 score_lines.append(score_line)
+                shutil.move(test_dir, archive_dir)
 
 print "Done."
 
