@@ -273,9 +273,10 @@ with open(rank_file, "r") as rfile:
                         tfile.write(line)
                 shutil.copyfile(train_file0, test_file0)
 
+                pred_file = os.path.join(test_dir, "predictions.csv")
                 os.system("python " + pred + "/train.py -p " + param_file0 + " -t " + train_file0)
-                os.system("python utils/aggregate.py -B " + base_dir + " -N " + test_name + " -p " + pred)
-                df = pd.read_csv("./out/predictions.csv", delimiter=",")
+                os.system("python utils/aggregate.py -B " + base_dir + " -N " + test_name + " -p " + pred + " -out " + pred_file)
+                df = pd.read_csv(pred_file, delimiter=",")
                 y = df["Y"]
                 p = df["P"]
                 if len(y) == 0: continue
@@ -319,8 +320,9 @@ with open(rank_file, "r") as rfile:
                     os.system("python " + pred + "/train.py -p " + param_file + " -t " + train_file)
 
                     shutil.copyfile(train_file, test_file) # use bootstrap data for testing
-                    os.system("python utils/aggregate.py -B " + base_dir + " -N " + boot_name + " -p " + pred)
-                    df = pd.read_csv("./out/predictions.csv", delimiter=",")
+                    pred_file = os.path.join(boot_dir, "predictions-boot.csv")
+                    os.system("python utils/aggregate.py -B " + base_dir + " -N " + boot_name + " -p " + pred + " -out " + pred_file)
+                    df = pd.read_csv(pred_file, delimiter=",")
                     y = df["Y"]
                     p = df["P"]
                     if len(y) == 0: continue
@@ -333,8 +335,9 @@ with open(rank_file, "r") as rfile:
                     auc_boot = roc_auc_score(y, p)
 
                     shutil.copyfile(test_file0, test_file) # use original data for testing
-                    os.system("python utils/aggregate.py -B " + base_dir + " -N " + boot_name + " -p " + pred)
-                    df = pd.read_csv("./out/predictions.csv", delimiter=",")
+                    pred_file = os.path.join(boot_dir, "predictions-orig.csv")
+                    os.system("python utils/aggregate.py -B " + base_dir + " -N " + boot_name + " -p " + pred + " -out " + pred_file)
+                    df = pd.read_csv(pred_file, delimiter=",")
                     y = df["Y"]
                     p = df["P"]
                     if len(y) == 0: continue
