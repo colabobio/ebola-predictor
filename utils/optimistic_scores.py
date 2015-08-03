@@ -252,7 +252,7 @@ with open(rank_file, "r") as rfile:
                     lines = tfile.readlines()
                     data.extend(lines[1:])
 
-                test_dir = "./models/test"
+                test_dir = os.path.join(base_dir, "models/test")
                 if os.path.exists(test_dir):
                     shutil.rmtree(test_dir)
                 os.mkdir(test_dir)
@@ -294,7 +294,7 @@ with open(rank_file, "r") as rfile:
                     # Sample data indices with replacement
                     indices = rng.random_integers(0, len(data) - 1, len(data))
                     
-                    boot_dir = "./models/boot" + str(n)
+                    boot_dir = os.path.join(base_dir, "models/boot" + str(n))
                     if os.path.exists(boot_dir):
                         shutil.rmtree(boot_dir)
                     os.mkdir(boot_dir)
