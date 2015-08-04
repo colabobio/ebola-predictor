@@ -23,6 +23,8 @@ parser.add_argument("-extra", "--extra_tests", nargs=1, default=[""],
                     help="Extra tests to include a prediction in the plot, comma separated")
 parser.add_argument("-x", "--exclude", nargs=1, default=["lreg,scikit_randf"],
                     help="Predictors to exclude from plots")
+parser.add_argument("-f1", "--f1_min", type=float, nargs=1, default=[0.9],
+                    help="Minimum F1-score of predictors to include")
 parser.add_argument("-op", "--opacity", type=int, nargs=1, default=[160],
                     help="Opacity of data points")
 parser.add_argument("-w", "--weight", type=int, nargs=1, default=[1],
@@ -37,6 +39,7 @@ rank_file = args.ranking_file[0]
 pdf_file = args.pdf_file[0]
 extra_tests = args.extra_tests[0].split(",")
 excluded_predictors = args.exclude[0].split(",")
+f1_min = args.f1_min[0]
 opacity = args.opacity[0]
 weight = args.weight[0]
 label_columns = args.columns[0]
@@ -106,7 +109,7 @@ with open(rank_file, "r") as rfile:
         f1_std = float(parts[5])
         vlist = vars.split(",")
 
-        if 0.9 <= f1_mean and 0.05 <= f1_std:
+        if f1_min <= f1_mean:
             id = os.path.split(mdl_str)[1]
             os.system("python eval.py -B " + base_dir + " -N " + id + " -p " + pred + " -m roc > ./out/roc.tmp")
             df = pd.read_csv("./out/roc.csv", delimiter=",")

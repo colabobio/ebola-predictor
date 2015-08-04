@@ -23,6 +23,8 @@ parser.add_argument("-pred", "--pred_file", nargs=1, default=["./out/predictors.
                     help="Predictors file")
 parser.add_argument("-count", "--count_file", nargs=1, default=["./out/varcounts.csv"],
                     help="Counts file")
+parser.add_argument("-f1", "--f1_min", type=float, nargs=1, default=[0.9],
+                    help="Minimum F1-score of predictors to include")
 parser.add_argument("-op", "--opacity", type=int, nargs=1, default=[160],
                     help="Opacity of data points")
 parser.add_argument("-col", "--columns", type=int, nargs=1, default=[2],
@@ -41,6 +43,7 @@ pred_file = args.pred_file[0]
 count_file = args.count_file[0]
 excluded_predictors = args.exclude[0].split(",")
 
+f1_min = args.f1_min[0]
 opacity = args.opacity[0]
 label_columns = args.columns[0]
 glyph_size = args.radius[0]
@@ -133,10 +136,9 @@ with open(rank_file, "r") as rfile:
         f1_mean = float(parts[4])
         f1_std = float(parts[5])
 
-        if 0.05 <= f1_std:
-            if 0.9 <= f1_mean: counts[idx] = counts[idx] + 1
-            x.append(f1_mean)
-            y.append(f1_std)
+        if f1_min <= f1_mean: counts[idx] = counts[idx] + 1
+        x.append(f1_mean)
+        y.append(f1_std)
 
         vlist = vars.split(",")
 
@@ -148,7 +150,7 @@ with open(rank_file, "r") as rfile:
            z = 30 * l /10.0
            s.append(z)
 
-        if 0.9 <= f1_mean and 0.05 <= f1_std:
+        if f1_min <= f1_mean:
             top_line = index_acron[idx] + '\t' + ', '.join([var_labels[v] for v in vlist]) + '\t' + ("%.2f" % f1_mean) + '\t' + ("%.2f" % f1_std)
             top_models.append(top_line)
             for v in vlist:

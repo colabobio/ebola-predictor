@@ -192,6 +192,8 @@ parser.add_argument("-out", "--output_file", nargs=1, default=["./out/scores.tsv
                     help="Output file")
 parser.add_argument("-s", "--scores", nargs=1, default=["precision,recall,f1,brier,auc"],
                     help="Scores to compute")
+parser.add_argument("-f1", "--f1_min", type=float, nargs=1, default=[0.9],
+                    help="Minimum F1-score of predictors to include")
 parser.add_argument("-extra", "--extra_tests", nargs=1, default=[""],
                     help="Extra tests to include a prediction in the plot, comma separated")
 parser.add_argument("-x", "--exclude", nargs=1, default=["lreg,scikit_randf"],
@@ -209,6 +211,7 @@ base_dir = args.base_dir[0]
 rank_file = args.ranking_file[0]
 output_file = args.output_file[0]
 scores = args.scores[0].split(",")
+f1_min = args.f1_min[0]
 extra_tests = args.extra_tests[0].split(",")
 excluded_predictors = args.exclude[0].split(",")
 bootstrap = args.bootstrap
@@ -275,7 +278,7 @@ with open(rank_file, "r") as rfile:
         f1_std = float(parts[5])
         vlist = vars.split(",")
 
-        if 0.9 <= f1_mean and 0.05 <= f1_std:
+        if f1_min <= f1_mean:
             id = os.path.split(mdl_str)[1]
             os.system("python utils/aggregate.py -B " + base_dir + " -N " + id + " -p " + pred)
             df = pd.read_csv("./out/predictions.csv", delimiter=",")
