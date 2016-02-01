@@ -4,9 +4,11 @@ Runs the app on all the data instances
 @copyright: The Broad Institute of MIT and Harvard 2015
 """
 
-import os, glob, operator
+import sys, os, glob, operator
 import pandas as pd
-
+import numpy as np
+sys.path.append(os.path.abspath('./ebolacare'))
+from utils import gen_predictor
 
 ####################################################################################
 # Read the variables
@@ -76,16 +78,104 @@ for pair in sorted_ranking:
 
 data = pd.read_csv("../data/data.csv", delimiter=",", na_values="\\N")
 
+count = 0
+nmiss = 0
+nmatch = 0
 for idx, row in data.iterrows():
     age = row['AGE']
-    if age < 10 or 50 < age: continue
-    print row['GID'],
+    out = row['OUT']    
+    if age < 10 or 50 < age or np.isnan(out): continue
+    vv = set([])
+    values = {}
+    
     for var in variables:
         val = row[var]
-        print var + ":" + str(val),
-    print    
+        if not np.isnan(val): 
+            values[var] = val
+            vv.add(var)
 
-    
+    if vv:
+        model_dir = None
+        model_vars = None
+        for info in models_info: 
+            v = set(info[1])
+            res = v.issubset(vv)
+            #print res, info[1]
+            if res:
+                model_dir = info[0]
+                model_vars = info[1]
+                break
+                
+        if not model_dir or not models_info:
+            continue
+            
+        count += 1
+        
+        predictor = gen_predictor(os.path.join(model_dir, 'nnet-params'))
+        N = len(model_vars)
+
+        model_min = []
+        model_max = []
+        with open(os.path.join(model_dir, 'bounds.txt')) as bfile:
+            lines = bfile.readlines()
+            for line in lines:
+                line = line.strip()
+                parts = line.split()
+                model_min.append(float(parts[1]))  
+                model_max.append(float(parts[2]))
+
+#         print model_min
+#         print model_max                 
+        
+        v = [None] * (N + 1)
+        v[0] = 1
+        for i in range(N):
+            var = model_vars[i]
+            if var in values:
+                try:                  
+                    v[i + 1] = float(values[var])
+                    if var in units and units[var] != var_def_unit[var]:
+                        # Need to convert units
+                        c, f = var_unit_conv[var]
+                        print "convert",var,v[i + 1],"->",f*(v[i + 1] + c)
+                        v[i + 1] = f * (v[i + 1] + c)
+                except ValueError:
+                    pass
+                except TypeError:
+                    pass
+                    
+        if None in v:
+            print 'INSUFFICIENT DATA'
+            continue
+
+        for i in range(N):
+            f = (v[i + 1] - model_min[i]) / (model_max[i] - model_min[i]) 
+            if f < 0: v[i + 1] = 0
+            elif 1 < f: v[i + 1] = 1
+            else: v[i + 1] = f
+
+#         print values
+#         print v
+        
+        X = np.array([v])
+        probs = predictor(X)
+        pred = probs[0]
+#         print "------------->",pred, out
+        
+        if pred < 0.5:
+            if out == 1: 
+                nmiss += 1
+                print "Mismatch:",out,pred
+            else: nmatch += 1
+        else:          
+            if out == 1: nmatch += 1
+            else: 
+                nmiss += 1
+                print "Mismatch:",out,pred                
+        
+print "total:",count
+print "misses:",nmiss
+print "matches:",nmatch
 
 
 # parser = argparse.ArgumentParser()
