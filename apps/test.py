@@ -72,6 +72,8 @@ for pair in sorted_ranking:
     info = [d, v] 
     #print info
     models_info.append(info)
+    
+print "Loaded " + str(len(models_info)) +  " models"
 
 ####################################################################################
 # Read the data
@@ -79,6 +81,8 @@ for pair in sorted_ranking:
 data = pd.read_csv("../data/data.csv", delimiter=",", na_values="\\N")
 
 count = 0
+rec = 0
+died = 0
 nmiss = 0
 nmatch = 0
 for idx, row in data.iterrows():
@@ -162,6 +166,11 @@ for idx, row in data.iterrows():
         pred = probs[0]
 #         print "------------->",pred, out
         
+        if out == 1: 
+            died += 1
+        else: 
+            rec += 1
+                    
         if pred < 0.5:
             if out == 1: 
                 nmiss += 1
@@ -173,7 +182,9 @@ for idx, row in data.iterrows():
                 nmiss += 1
                 print "Mismatch:",out,pred                
         
-print "total:",count
+print "total patients:",count
+print "Recovered patients:",rec
+print "Diseased patients:",died
 print "misses:",nmiss
 print "matches:",nmatch
 
