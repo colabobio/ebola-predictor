@@ -60,6 +60,7 @@ for d in dirs:
 
 sorted_ranking = reversed(sorted(ranking.items(), key=operator.itemgetter(1)))
 models_info = []
+npcr = 0
 for pair in sorted_ranking:
     d = pair[0]
     v = []
@@ -69,11 +70,12 @@ for pair in sorted_ranking:
             line = line.strip()
             parts = line.split()
             v.append(parts[0])
+    if 'PCR' in v: npcr += 1        
     info = [d, v] 
     #print info
     models_info.append(info)
     
-print "Loaded " + str(len(models_info)) +  " models"
+print "Loaded " + str(len(models_info)) +  " models (" + str(npcr) + " include PCR)"
 
 ####################################################################################
 # Read the data
