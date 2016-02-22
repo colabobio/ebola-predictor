@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 """
 Runs the app on all the data instances
 
